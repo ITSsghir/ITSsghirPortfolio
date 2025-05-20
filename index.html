@@ -1,0 +1,1013 @@
+<script>
+    // Variables globales
+    let db;
+    const tableList = document.getElementById("table-list");
+    let isQLearningRunning = false;
+    let agent = { x: 0, y: 0 };
+    let goal = { x: 4, y: 4 };
+    let qTable = {};
+    let snakeDots = [];
+    const maxSnakeDots = 20;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    let mouseTail = [];
+    const maxTailLength = 12;
+    
+    // Rotation des compétences
+    function rotateSkills() {
+      const skills = document.querySelectorAll('.skill-item');
+      const activeSkill = document.querySelector('.skill-item.active');
+      const activeIndex = Array.from(skills).indexOf(activeSkill);
+      const nextIndex = (activeIndex + 1) % skills.length;
+      
+      activeSkill.classList.remove('active');
+      skills[nextIndex].classList.add('active');
+    }
+    
+    // Mettre en place la rotation automatique toutes les 4 secondes
+    setInterval(rotateSkills, 4000);
+
+    // Initialisation de SQL.js
+    initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` })
+      .then(SQL => {
+        db = new SQL.Database();
+        // Création des tables et insertion des données initiales
+        db.run(`CREATE TABLE Utilisateur (id INTEGER PRIMARY KEY, nom TEXT, titre TEXT);
+                CREATE TABLE Competences (id INTEGER PRIMARY KEY, utilisateur_id INTEGER, nom TEXT, niveau INTEGER);
+                CREATE TABLE SoftSkills (id INTEGER PRIMARY KEY, utilisateur_id INTEGER, nom TEXT);
+                CREATE TABLE Education (id INTEGER PRIMARY KEY, utilisateur_id INTEGER, diplome TEXT, ecole TEXT, annee TEXT);
+                CREATE TABLE Experience (id INTEGER PRIMARY KEY, utilisateur_id INTEGER, poste TEXT, entreprise TEXT, annee TEXT, description TEXT);
+                CREATE TABLE Projets (id INTEGER PRIMARY KEY, utilisateur_id INTEGER, nom TEXT, description TEXT, technologies TEXT);
+                
+                INSERT INTO Utilisateur VALUES (1, 'Itssghir', 'Data Scientist Senior');
+                
+                INSERT INTO Competences VALUES 
+                (1, 1, 'Python', 5),
+                (2, 1, 'Pandas', 5),
+                (3, 1, 'Numpy', 4),
+                (4, 1, 'Machine Learning', 4),
+                (5, 1, 'IA', 4),
+                (6, 1, 'Tableau', 3),
+                (7, 1, 'Dataiku', 4),
+                (8, 1, 'SQL', 4),
+                (9, 1, 'R', 3),
+                (10, 1, 'TensorFlow', 3);
+                
+                INSERT INTO SoftSkills VALUES 
+                (1, 1, 'Travail en équipe'),
+                (2, 1, 'Curiosité'),
+                (3, 1, 'Esprit critique'),
+                (4, 1, 'Communication'),
+                (5, 1, 'Résolution de problèmes');
+                
+                INSERT INTO Education VALUES 
+                (1, 1, 'Master en Data Science', 'Université AI Paris', '2023'),
+                (2, 1, 'Licence en Informatique', 'Université Paris Saclay', '2021');
+                
+                INSERT INTO Experience VALUES 
+                (1, 1, 'Data Scientist Senior', 'OpenAI France', '2024-Présent', 'Développement de modèles prédictifs et analyse de données massives'),
+                (2, 1, 'Data Analyst', 'DataTech Solutions', '2022-2024', 'Création de tableaux de bord et analyse de données clients');
+                
+                INSERT INTO Projets VALUES
+                (1, 1, 'Prédiction de fraude', 'Système de détection de fraudes bancaires par apprentissage automatique', 'Python, TensorFlow, SQL'),
+                (2, 1, 'Dashboard COVID', 'Visualisation en temps réel des données de la pandémie', 'Tableau, R, API REST');`);
+
+        // Affichage des tables disponibles
+        const res = db.exec("SELECT name FROM sqlite_master WHERE type='table';");
+        const tableNames = res[0].values.map(row => row[0]);
+        tableList.innerHTML = "<strong>📂 Tables disponibles dans la base de données :</strong><br>" + tableNames.join(", ");
+        
+        // Créer les hexagones pour chaque table
+        const hexContainer = document.getElementById("tables-hexagons");
+        tableNames.forEach(tableName => {
+          const hex = document.createElement('div');
+          hex.className = 'table-hex';
+          hex.textContent = tableName;
+          hex.onclick = () => {
+            document.getElementById('sql-input').value = `SELECT * FROM ${tableName};`;
+          };
+          hexContainer.appendChild(hex);
+        });
+        
+        // Pré-remplir la zone de requête SQL avec un exemple
+        document.getElementById("sql-input").value = "SELECT u.nom, u.titre, e.poste, e.entreprise\nFROM Utilisateur u\nJOIN Experience e ON u.id = e.utilisateur_id\nWHERE e.entreprise = 'OpenAI France';";
+      })
+      .catch(err => {
+        tableList.textContent = "❌ Erreur lors du chargement de SQL.js: " + err.message;
+      });
+
+    // Fonction pour exécuter des requêtes SQL
+    function runSQL() {
+      const output = document.getElementById("sql-output");
+      const input = document.getElementById("sql-input").value.trim();
+      
+      if (!input) {
+        output.textContent = "⚠️ Veuillez saisir une requête SQL.";
+        return;
+      }
+      
+      if (!db) {
+        output.textContent = "⚠️ Base de données non initialisée. Veuillez patienter...";
+        return;
+      }
+      
+      try {
+        output.innerHTML = "<div class='loading'><div></div><div></div><div></div></div>";
+        
+        // Simuler un délai pour donner l'impression de traitement
+        setTimeout(() => {
+          try {
+            const results = db.exec(input);
+            
+            if (results.length === 0) {
+              // Vérifier si la requête a modifié des lignes
+              if (input.toLowerCase().includes("insert") || 
+                  input.toLowerCase().includes("update") || 
+                  input.toLowerCase().includes("delete")) {
+                output.textContent = "✅ Requête exécutée avec succès.";
+              } else {
+                output.textContent = "ℹ️ Aucun résultat retourné.";
+              }
+              return;
+            }
+            
+            let html = "<table style='width:100%; border-collapse: collapse;'>";
+            
+            // En-têtes de colonnes
+            html += "<tr style='border-bottom: 1px solid #adf;'>";
+            results[0].columns.forEach(column => {
+              html += `<th style='padding: 8px; text-align: left;'>${column}</th>`;
+            });
+            html += "</tr>";
+            
+            // Lignes de données
+            results[0].values.forEach(row => {
+              html += "<tr style='border-bottom: 1px solid rgba(173, 216, 255, 0.3);'>";
+              row.forEach(cell => {
+                html += `<td style='padding: 8px<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Itssghir - Data Scientist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #4b0082, #8a2be2);
+      font-family: 'Orbitron', sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 60px 20px 30px;
+    }
+
+    header h1 {
+      font-size: 3em;
+      margin: 0;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    header p {
+      font-size: 1.2em;
+      opacity: 0.8;
+    }
+
+    section {
+      max-width: 900px;
+      margin: 0 auto 40px;
+      padding: 40px 20px;
+      text-align: center;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .q-learning-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      grid-template-rows: repeat(5, 60px);
+      gap: 4px;
+      margin: 30px auto;
+      justify-content: center;
+    }
+
+    .cell {
+      width: 60px;
+      height: 60px;
+      background: #6a0dad;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #fff;
+      transition: background-color 0.3s;
+    }
+
+    .agent {
+      background: #00ffcc;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      box-shadow: 0 0 15px #00ffcc;
+    }
+
+    .goal {
+      background: gold;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      box-shadow: 0 0 15px gold;
+    }
+
+    button {
+      background: #9b59b6;
+      border: none;
+      padding: 12px 24px;
+      color: white;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      background: #be75e6;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    #status {
+      margin-top: 20px;
+      font-size: 1.1em;
+      font-style: italic;
+      color: #ffd700;
+      min-height: 20px;
+    }
+
+    textarea {
+      width: 80%;
+      height: 100px;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      background-color: rgba(0, 0, 0, 0.3);
+      color: #fff;
+      font-family: monospace;
+      font-size: 14px;
+      resize: vertical;
+      transition: border-color 0.3s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #be75e6;
+    }
+
+    #sql-output {
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: left;
+      margin-top: 20px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      color: #adf;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid rgba(173, 216, 255, 0.2);
+    }
+
+    footer {
+      background-color: #2c003e;
+      color: #fff;
+      text-align: center;
+      padding: 20px 10px;
+      width: 100%;
+      bottom: 0;
+    }
+
+    #snake-follow {
+      position: fixed;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+    }
+
+    .snake-dot {
+      position: absolute;
+      pointer-events: none;
+      background: #00ffcc;
+      filter: blur(0px);
+      box-shadow: 0 0 12px #00ffcc;
+      opacity: 0.8;
+      z-index: 9999;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s;
+    }
+
+    .snake-trace {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #00ffcc;
+      border-radius: 50%;
+      filter: blur(2px);
+      opacity: 0.6;
+      pointer-events: none;
+      box-shadow: 0 0 8px rgba(0, 255, 204, 0.8);
+    }
+
+    .snake-tail {
+      position: absolute;
+      background: linear-gradient(90deg, transparent, #00ffcc);
+      height: 2px;
+      transform-origin: left center;
+      pointer-events: none;
+    }
+
+    #table-list {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      color: #adf;
+      text-align: left;
+    }
+
+    #storm-effect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 4px);
+      animation: storm 0.5s linear infinite;
+      z-index: 0;
+      opacity: 0.7;
+    }
+
+    /* Style pour la rotation des compétences */
+    .skill-rotator {
+      position: relative;
+      height: 160px;
+      margin: 20px auto;
+      perspective: 1000px;
+    }
+
+    .skill-item {
+      position: absolute;
+      width: 100%;
+      background: rgba(107, 13, 173, 0.5);
+      border-radius: 10px;
+      padding: 15px;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transform: translateY(30px) rotateX(-60deg);
+      transform-origin: bottom center;
+      transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(128, 0, 255, 0.2) inset;
+      z-index: 1;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .skill-item.active {
+      opacity: 1;
+      transform: translateY(0) rotateX(0);
+      z-index: 2;
+    }
+
+    .skill-item h3 {
+      color: #00ffcc;
+      margin-top: 0;
+      text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+    }
+
+    .skill-item p {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Animation pour l'effet de tempête */
+    @keyframes storm {
+      from { background-position: 0 0; }
+      to { background-position: 100% 100%; }
+    }
+
+    /* Animation pour les particules */
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+      100% { transform: translateY(0px) rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      section {
+        padding: 30px 15px;
+      }
+      
+      header h1 {
+        font-size: 2.5em;
+      }
+      
+      textarea {
+        width: 90%;
+      }
+      
+      .q-learning-grid {
+        grid-template-columns: repeat(5, 40px);
+        grid-template-rows: repeat(5, 40px);
+      }
+      
+      .cell {
+        width: 40px;
+        height: 40px;
+      }
+
+      .skill-rotator {
+        height: 200px;
+      }
+    }
+
+    .loading {
+      display: inline-block;
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto;
+    }
+    
+    .loading div {
+      display: inline-block;
+      position: absolute;
+      left: 8px;
+      width: 16px;
+      background: #ffd700;
+      animation: loading 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+    }
+    
+    .loading div:nth-child(1) {
+      left: 8px;
+      animation-delay: -0.24s;
+    }
+    
+    .loading div:nth-child(2) {
+      left: 32px;
+      animation-delay: -0.12s;
+    }
+    
+    .loading div:nth-child(3) {
+      left: 56px;
+      animation-delay: 0;
+    }
+    
+    @keyframes loading {
+      0% {
+        top: 8px;
+        height: 64px;
+      }
+      50%, 100% {
+        top: 24px;
+        height: 32px;
+      }
+    }
+
+    /* Hexagone pour les tables SQL */
+    .table-hex {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 5px;
+      width: 120px;
+      height: 80px;
+      background-color: rgba(0, 255, 204, 0.1);
+      clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 255, 204, 0.3);
+      cursor: pointer;
+      font-size: 12px;
+      text-align: center;
+      padding: 0 10px;
+    }
+
+    .table-hex:hover {
+      background-color: rgba(0, 255, 204, 0.3);
+      transform: scale(1.05);
+    }
+
+    .tables-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div id="storm-effect"></div>
+  <div id="snake-follow"></div>
+
+  <header>
+    <h1>Itssghir</h1>
+    <p>Data Scientist • Python Enthusiast • Q-Learning Explorer</p>
+  </header>
+
+  <section id="skills-showcase">
+    <h2>🚀 Ce que je sais faire</h2>
+    <div class="skill-rotator">
+      <div class="skill-item active">
+        <h3>Automatiser Dataiku</h3>
+        <p>Création de workflows automatisés et optimisation des pipelines de données</p>
+      </div>
+      <div class="skill-item">
+        <h3>Traiter & Nettoyer des données complexes</h3>
+        <p>Transformation de données brutes en informations exploitables</p>
+      </div>
+      <div class="skill-item">
+        <h3>Prédire à partir de certains paramètres</h3>
+        <p>Construction de modèles prédictifs fiables et performants</p>
+      </div>
+      <div class="skill-item">
+        <h3>Visualiser des insights</h3>
+        <p>Création de dashboards interactifs et représentations graphiques pertinentes</p>
+      </div>
+      <div class="skill-item">
+        <h3>Optimiser les algorithmes ML</h3>
+        <p>Réglage fin des hyperparamètres et amélioration des performances</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>📊 Console SQL Interactive</h2>
+    <div id="table-list">Chargement des tables...</div>
+    <div id="tables-hexagons" class="tables-container"></div>
+    <textarea id="sql-input" placeholder="Ex: SELECT * FROM Competences;"></textarea><br>
+    <button onclick="runSQL()">Exécuter</button>
+    <div id="sql-output"></div>
+  </section>
+
+  <section>
+    <h2>🤖 Jeu Q-Learning</h2>
+    <p>Un agent doit apprendre à atteindre l'objectif (case dorée) sur une grille 5x5.</p>
+    <div class="q-learning-grid" id="grid"></div>
+    <button onclick="startQLearning()">Démarrer l'apprentissage</button>
+    <div id="status"></div>
+  </section>
+
+  <footer>
+    <p>📧 Contact : itssghir@example.com | 💼 LinkedIn : <a href="https://www.linkedin.com/in/itssghir" style="color: #fff; text-decoration: underline;">linkedin.com/in/itssghir</a></p>
+    <p>&copy; 2025 Itssghir - Tous droits réservés</p>
+  </footer>
+
+  <script>
+    // Variables globales
+    let db;
+    const tableList = document.getElementById("table-list");
+    let isQLearningRunning = false;
+    let agent = { x: 0, y: 0 };
+    let goal = { x: 4, y: 4 };
+    let qTable = {};
+    let snakeDots = [];
+    const maxSnakeDots = 10;
+
+    // Initialisation de SQL.js
+    initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` })
+      .then(SQL => {
+        db = new SQL.Database();
+        // Création des tables et insertion des données initiales
+        db.run(`CREATE TABLE Utilisateur (id INTEGER PRIMARY KEY, nom TEXT, titre TEXT);
+                CREATE TABLE Competences (id INTEGER PRIMARY KEY, utilisateur_id INTEGER, nom TEXT, niveau INTEGER);
+                CREATE TABLE SoftSkills (id INTEGER PRIMARY KEY, utilisateur_id INTEGER, nom TEXT);
+                CREATE TABLE Education (id INTEGER PRIMARY KEY, utilisateur_id INTEGER, diplome TEXT, ecole TEXT, annee TEXT);
+                CREATE TABLE Experience (id INTEGER PRIMARY KEY, utilisateur_id INTEGER, poste TEXT, entreprise TEXT, annee TEXT, description TEXT);
+                CREATE TABLE Projets (id INTEGER PRIMARY KEY, utilisateur_id INTEGER, nom TEXT, description TEXT, technologies TEXT);
+                
+                INSERT INTO Utilisateur VALUES (1, 'Itssghir', 'Data Scientist Senior');
+                
+                INSERT INTO Competences VALUES 
+                (1, 1, 'Python', 5),
+                (2, 1, 'Pandas', 5),
+                (3, 1, 'Numpy', 4),
+                (4, 1, 'Machine Learning', 4),
+                (5, 1, 'IA', 4),
+                (6, 1, 'Tableau', 3),
+                (7, 1, 'Dataiku', 4),
+                (8, 1, 'SQL', 4),
+                (9, 1, 'R', 3),
+                (10, 1, 'TensorFlow', 3);
+                
+                INSERT INTO SoftSkills VALUES 
+                (1, 1, 'Travail en équipe'),
+                (2, 1, 'Curiosité'),
+                (3, 1, 'Esprit critique'),
+                (4, 1, 'Communication'),
+                (5, 1, 'Résolution de problèmes');
+                
+                INSERT INTO Education VALUES 
+                (1, 1, 'Master en Data Science', 'Université AI Paris', '2023'),
+                (2, 1, 'Licence en Informatique', 'Université Paris Saclay', '2021');
+                
+                INSERT INTO Experience VALUES 
+                (1, 1, 'Data Scientist Senior', 'OpenAI France', '2024-Présent', 'Développement de modèles prédictifs et analyse de données massives'),
+                (2, 1, 'Data Analyst', 'DataTech Solutions', '2022-2024', 'Création de tableaux de bord et analyse de données clients');
+                
+                INSERT INTO Projets VALUES
+                (1, 1, 'Prédiction de fraude', 'Système de détection de fraudes bancaires par apprentissage automatique', 'Python, TensorFlow, SQL'),
+                (2, 1, 'Dashboard COVID', 'Visualisation en temps réel des données de la pandémie', 'Tableau, R, API REST');`);
+
+        // Affichage des tables disponibles
+        const res = db.exec("SELECT name FROM sqlite_master WHERE type='table';");
+        const tableNames = res[0].values.map(row => row[0]);
+        tableList.innerHTML = "<strong>📂 Tables disponibles :</strong><br>" + tableNames.join(", ");
+        
+        // Pré-remplir la zone de requête SQL avec un exemple
+        document.getElementById("sql-input").value = "SELECT u.nom, u.titre, e.poste, e.entreprise\nFROM Utilisateur u\nJOIN Experience e ON u.id = e.utilisateur_id\nWHERE e.entreprise = 'OpenAI France';";
+      })
+      .catch(err => {
+        tableList.textContent = "❌ Erreur lors du chargement de SQL.js: " + err.message;
+      });
+
+    // Fonction pour exécuter des requêtes SQL
+    function runSQL() {
+      const output = document.getElementById("sql-output");
+      const input = document.getElementById("sql-input").value.trim();
+      
+      if (!input) {
+        output.textContent = "⚠️ Veuillez saisir une requête SQL.";
+        return;
+      }
+      
+      if (!db) {
+        output.textContent = "⚠️ Base de données non initialisée. Veuillez patienter...";
+        return;
+      }
+      
+      try {
+        output.innerHTML = "<div class='loading'><div></div><div></div><div></div></div>";
+        
+        // Simuler un délai pour donner l'impression de traitement
+        setTimeout(() => {
+          try {
+            const results = db.exec(input);
+            
+            if (results.length === 0) {
+              // Vérifier si la requête a modifié des lignes
+              if (input.toLowerCase().includes("insert") || 
+                  input.toLowerCase().includes("update") || 
+                  input.toLowerCase().includes("delete")) {
+                output.textContent = "✅ Requête exécutée avec succès.";
+              } else {
+                output.textContent = "ℹ️ Aucun résultat retourné.";
+              }
+              return;
+            }
+            
+            let html = "<table style='width:100%; border-collapse: collapse;'>";
+            
+            // En-têtes de colonnes
+            html += "<tr style='border-bottom: 1px solid #adf;'>";
+            results[0].columns.forEach(column => {
+              html += `<th style='padding: 8px; text-align: left;'>${column}</th>`;
+            });
+            html += "</tr>";
+            
+            // Lignes de données
+            results[0].values.forEach(row => {
+              html += "<tr style='border-bottom: 1px solid rgba(173, 216, 255, 0.3);'>";
+              row.forEach(cell => {
+                html += `<td style='padding: 8px;'>${cell !== null ? cell : 'NULL'}</td>`;
+              });
+              html += "</tr>";
+            });
+            
+            html += "</table>";
+            output.innerHTML = html;
+          } catch (e) {
+            output.textContent = "❌ Erreur SQL : " + e.message;
+          }
+        }, 500);
+      } catch (e) {
+        output.textContent = "❌ Erreur SQL : " + e.message;
+      }
+    }
+
+    // Fonction pour initialiser la grille Q-Learning
+    function initGrid() {
+      const grid = document.getElementById("grid");
+      grid.innerHTML = '';
+      
+      for (let y = 0; y < 5; y++) {
+        for (let x = 0; x < 5; x++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.id = `cell-${x}-${y}`;
+          
+          // Ajouter l'agent à sa position de départ
+          if (x === agent.x && y === agent.y) {
+            const agentDiv = document.createElement('div');
+            agentDiv.className = 'agent';
+            cell.appendChild(agentDiv);
+          }
+          
+          // Ajouter l'objectif
+          if (x === goal.x && y === goal.y) {
+            const goalDiv = document.createElement('div');
+            goalDiv.className = 'goal';
+            cell.appendChild(goalDiv);
+          }
+          
+          grid.appendChild(cell);
+        }
+      }
+    }
+
+    // Initialiser la table Q avec des valeurs aléatoires faibles
+    function initQTable() {
+      qTable = {};
+      for (let y = 0; y < 5; y++) {
+        for (let x = 0; x < 5; x++) {
+          qTable[`${x},${y}`] = {
+            up: Math.random() * 0.1,
+            right: Math.random() * 0.1,
+            down: Math.random() * 0.1,
+            left: Math.random() * 0.1
+          };
+        }
+      }
+    }
+
+    // Fonction pour mettre à jour la position de l'agent sur la grille
+    function updateAgentPosition() {
+      // Supprimer l'agent de toutes les cellules
+      document.querySelectorAll('.agent').forEach(el => el.remove());
+      
+      // Ajouter l'agent à sa nouvelle position
+      const cell = document.getElementById(`cell-${agent.x}-${agent.y}`);
+      if (cell) {
+        const agentDiv = document.createElement('div');
+        agentDiv.className = 'agent';
+        cell.appendChild(agentDiv);
+      }
+    }
+
+    // Fonction pour choisir la prochaine action en fonction de l'état actuel
+    function chooseAction(state, epsilon) {
+      // Exploration vs exploitation
+      if (Math.random() < epsilon) {
+        // Exploration: choisir une action aléatoire
+        const actions = ['up', 'right', 'down', 'left'];
+        return actions[Math.floor(Math.random() * actions.length)];
+      } else {
+        // Exploitation: choisir la meilleure action selon la table Q
+        const qValues = qTable[state];
+        let bestAction = 'up';
+        let bestValue = -Infinity;
+        
+        for (const [action, value] of Object.entries(qValues)) {
+          if (value > bestValue) {
+            bestValue = value;
+            bestAction = action;
+          }
+        }
+        
+        return bestAction;
+      }
+    }
+
+    // Fonction pour obtenir le nouvel état après avoir effectué une action
+    function getNewState(x, y, action) {
+      let newX = x;
+      let newY = y;
+      
+      switch (action) {
+        case 'up':
+          newY = Math.max(0, y - 1);
+          break;
+        case 'right':
+          newX = Math.min(4, x + 1);
+          break;
+        case 'down':
+          newY = Math.min(4, y + 1);
+          break;
+        case 'left':
+          newX = Math.max(0, x - 1);
+          break;
+      }
+      
+      return { x: newX, y: newY };
+    }
+
+    // Fonction pour obtenir la récompense d'une action
+    function getReward(newX, newY) {
+      // Récompense élevée si l'agent atteint l'objectif
+      if (newX === goal.x && newY === goal.y) {
+        return 100;
+      }
+      
+      // Petite pénalité pour chaque mouvement pour encourager des chemins courts
+      return -1;
+    }
+
+    // Fonction principale pour démarrer l'apprentissage par renforcement
+    function startQLearning() {
+      if (isQLearningRunning) {
+        return; // Éviter de lancer plusieurs instances en même temps
+      }
+      
+      isQLearningRunning = true;
+      
+      // Réinitialiser l'agent et la grille
+      agent = { x: 0, y: 0 };
+      initGrid();
+      initQTable();
+      
+      const statusElement = document.getElementById('status');
+      statusElement.textContent = "🧠 Apprentissage en cours...";
+      
+      // Paramètres d'apprentissage
+      const episodes = 100;
+      const alpha = 0.1;  // Taux d'apprentissage
+      const gamma = 0.9;  // Facteur d'actualisation
+      let epsilon = 0.9;  // Taux d'exploration (diminuera progressivement)
+      
+      let episode = 0;
+      
+      // Fonction pour exécuter un épisode
+      function runEpisode() {
+        // Diminuer progressivement le taux d'exploration
+        epsilon = Math.max(0.1, epsilon * 0.99);
+        
+        // Réinitialiser l'agent au début de chaque épisode
+        agent = { x: 0, y: 0 };
+        updateAgentPosition();
+        
+        let steps = 0;
+        const maxSteps = 50;
+        let isGoalReached = false;
+        
+        // Fonction pour exécuter une étape
+        function step() {
+          if (steps >= maxSteps || isGoalReached) {
+            // Fin de l'épisode
+            episode++;
+            statusElement.textContent = `⏳ Épisode ${episode}/${episodes} - ${isGoalReached ? "✅ Objectif atteint!" : "❌ Objectif non atteint"}`;
+            
+            if (episode < episodes) {
+              setTimeout(runEpisode, 50);
+            } else {
+              // Fin de l'apprentissage
+              showOptimalPath();
+            }
+            return;
+          }
+          
+          const state = `${agent.x},${agent.y}`;
+          const action = chooseAction(state, epsilon);
+          
+          // Nouvel état après l'action
+          const newPos = getNewState(agent.x, agent.y, action);
+          const reward = getReward(newPos.x, newPos.y);
+          const newState = `${newPos.x},${newPos.y}`;
+          
+          // Mettre à jour la table Q avec l'équation de Bellman
+          const maxFutureQ = Math.max(...Object.values(qTable[newState]));
+          qTable[state][action] = (1 - alpha) * qTable[state][action] + 
+                                  alpha * (reward + gamma * maxFutureQ);
+          
+          // Mettre à jour la position de l'agent
+          agent.x = newPos.x;
+          agent.y = newPos.y;
+          updateAgentPosition();
+          
+          steps++;
+          
+          // Vérifier si l'objectif est atteint
+          if (agent.x === goal.x && agent.y === goal.y) {
+            isGoalReached = true;
+          }
+          
+          // Continuer à la prochaine étape
+          setTimeout(step, 50);
+        }
+        
+        // Commencer les étapes de l'épisode
+        step();
+      }
+      
+      // Commencer le premier épisode
+      runEpisode();
+    }
+
+    // Fonction pour afficher le chemin optimal après l'apprentissage
+    function showOptimalPath() {
+      const statusElement = document.getElementById('status');
+      statusElement.textContent = "✅ Apprentissage terminé! Affichage du chemin optimal...";
+      
+      // Réinitialiser l'agent
+      agent = { x: 0, y: 0 };
+      updateAgentPosition();
+      
+      let steps = 0;
+      const maxSteps = 25;  // Éviter les boucles infinies
+      
+      function moveAlongOptimalPath() {
+        if (steps >= maxSteps || (agent.x === goal.x && agent.y === goal.y)) {
+          statusElement.textContent = agent.x === goal.x && agent.y === goal.y 
+            ? "🎉 L'agent a trouvé le chemin optimal!"
+            : "⚠️ L'agent n'a pas pu atteindre l'objectif en suivant le chemin optimal.";
+          
+          isQLearningRunning = false;
+          return;
+        }
+        
+        const state = `${agent.x},${agent.y}`;
+        const qValues = qTable[state];
+        
+        // Choisir la meilleure action
+        let bestAction = 'up';
+        let bestValue = -Infinity;
+        
+        for (const [action, value] of Object.entries(qValues)) {
+          if (value > bestValue) {
+            bestValue = value;
+            bestAction = action;
+          }
+        }
+        
+        // Appliquer l'action
+        const newPos = getNewState(agent.x, agent.y, bestAction);
+        agent.x = newPos.x;
+        agent.y = newPos.y;
+        updateAgentPosition();
+        
+        steps++;
+        
+        // Continuer le chemin optimal
+        setTimeout(moveAlongOptimalPath, 300);
+      }
+      
+      // Commencer à suivre le chemin optimal
+      setTimeout(moveAlongOptimalPath, 1000);
+    }
+
+    // Effet de suivi de la souris avec des points
+    document.addEventListener('mousemove', function(e) {
+      const snakeFollow = document.getElementById('snake-follow');
+      
+      // Ajouter un nouveau point
+      const dot = document.createElement('div');
+      dot.className = 'snake-dot';
+      dot.style.left = e.clientX + 'px';
+      dot.style.top = e.clientY + 'px';
+      snakeFollow.appendChild(dot);
+      
+      // Ajouter à notre tableau de points
+      snakeDots.push({
+        element: dot,
+        timestamp: Date.now()
+      });
+      
+      // Supprimer les points anciens
+      if (snakeDots.length > maxSnakeDots) {
+        const oldest = snakeDots.shift();
+        oldest.element.remove();
+      }
+      
+      // Faire disparaître progressivement les points
+      snakeDots.forEach((dot, index) => {
+        const age = Date.now() - dot.timestamp;
+        const opacity = 1 - (age / 1000);
+        if (opacity > 0) {
+          dot.element.style.opacity = opacity;
+        }
+      });
+    });
+
+    // Initialiser la grille au chargement de la page
+    window.onload = function() {
+      initGrid();
+    };
+  </script>
+</body>
+</html>
