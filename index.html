@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
   <style>
+     /* Style général de la page */
     body {
       margin: 0;
       padding: 0;
@@ -16,7 +17,7 @@
       overflow-x: hidden;
       position: relative;
     }
-
+     /* Section d'en-tête */
     header {
       text-align: center;
       padding: 60px 20px 30px;
@@ -32,7 +33,7 @@
       font-size: 1.2em;
       opacity: 0.8;
     }
-
+        /* Texte rotatif sous le titre */
     #rotating-text {
       font-size: 1.3em;
       font-style: italic;
@@ -44,14 +45,14 @@
       0% { opacity: 0; }
       100% { opacity: 1; }
     }
-
+    /* Section principale */
     section {
       max-width: 900px;
       margin: auto;
       padding: 40px 20px;
       text-align: center;
     }
-
+      /* Grille pour la démonstration Q-Learning */
     .q-learning-grid {
       display: grid;
       grid-template-columns: repeat(5, 60px);
@@ -60,7 +61,7 @@
       margin: 30px auto;
       justify-content: center;
     }
-
+        /* Style des cellules de la grille */
     .cell {
       width: 60px;
       height: 60px;
@@ -71,7 +72,7 @@
       border: 1px solid #ffffff66;
       transition: all 0.3s;
     }
-
+    /* Chemin optimal dans la grille */
     .optimal-path {
       background: rgba(0, 255, 204, 0.3) !important;
       animation: pathGlow 1.5s infinite alternate;
@@ -81,7 +82,7 @@
       0% { box-shadow: inset 0 0 5px #00ffcc; }
       100% { box-shadow: inset 0 0 15px #00ffcc; }
     }
-
+    /* Style de l'agent et de l'objectif */
     .agent {
       background: #00ffcc;
       border-radius: 50%;
@@ -97,7 +98,7 @@
       height: 30px;
       box-shadow: 0 0 15px gold;
     }
-
+        /* Boutons interactifs */
     button {
       background: #9b59b6;
       border: none;
@@ -122,30 +123,81 @@
       color: #ffd700;
       min-height: 60px;
     }
+/* Zone de texte pour les requêtes SQL - Style Netro Futuriste */
+textarea {
+  width: 80%;
+  height: 80px;
+  padding: 12px;
+  margin: 20px 0;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  font-family: monospace;
+  font-size: 14px;
+  background: linear-gradient(to bottom, rgba(138, 43, 226, 0.3), rgba(255, 20, 147, 0.3));
+  color: #fff;
+  box-shadow: 0 0 15px rgba(138, 43, 226, 0.4), 0 0 30px rgba(255, 20, 147, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
 
-    textarea {
-      width: 80%;
-      height: 80px;
-      padding: 10px;
-      margin: 20px 0;
-      border-radius: 5px;
-      border: none;
-      font-family: monospace;
-      font-size: 14px;
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-    }
+textarea:focus {
+  outline: none;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 20px rgba(138, 43, 226, 0.6), 0 0 40px rgba(255, 20, 147, 0.5);
+}
 
-    #sql-output {
-      background-color: rgba(255,255,255,0.1);
-      padding: 20px;
-      border-radius: 10px;
-      text-align: left;
-      margin-top: 10px;
-      font-family: monospace;
-      white-space: pre-wrap;
-    }
+/* Classe pour l'animation de pulse lors de la frappe */
+.text-pulse {
+  animation: text-glow 0.5s ease-out;
+}
 
+@keyframes text-glow {
+  0% {
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.6), 0 0 40px rgba(255, 20, 147, 0.5);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(138, 43, 226, 0.9), 0 0 60px rgba(255, 20, 147, 0.8);
+    border-color: rgba(255, 255, 255, 0.9);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.6), 0 0 40px rgba(255, 20, 147, 0.5);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* Conteneur pour les résultats SQL - Style Netro */
+#sql-output {
+  background: linear-gradient(to bottom, rgba(138, 43, 226, 0.2), rgba(255, 20, 147, 0.2));
+  padding: 20px;
+  border-radius: 15px;
+  text-align: left;
+  margin-top: 15px;
+  font-family: monospace;
+  white-space: pre-wrap;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 0 20px rgba(138, 43, 226, 0.5),
+    0 0 40px rgba(255, 20, 147, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+#sql-output::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(to bottom, rgba(191, 119, 255, 0.3), rgba(255, 141, 199, 0.3));
+  border-radius: 17px;
+  z-index: -1;
+  opacity: 0.5;
+}
+    /* Pied de page */
     footer {
       background-color: #2c003e;
       color: #fff;
@@ -187,6 +239,16 @@
       to { background-position: 100% 100%; }
     }
 
+    /* Ajout d'un conteneur pour les cartes interactives */
+    .card-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* espace entre les cartes */
+  flex-wrap: wrap; /* les cartes iront à la ligne sur petits écrans */
+  margin-bottom: 30px;
+}
+
+
     .interactive-card {
       background: rgba(255,255,255,0.1);
       border: 1px solid #ffffff44;
@@ -195,7 +257,7 @@
       cursor: pointer;
       transition: all 0.3s ease;
       width: 250px;
-      margin: auto;
+      margin: 0;
       text-align: center;
     }
 
@@ -217,17 +279,94 @@
       border-radius: 8px;
       font-family: monospace;
     }
+
+
+
+/* Ajouts pour la partie Classification */
+.classification-container {
+      display: none;
+      margin-top: 30px;
+    }
+
+    .data-tables {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap; /* Permet de s’adapter sur petits écrans */
+  gap: 20px; /* Espacement entre les tableaux */
+  margin: 20px 0;
+}
+
+.data-table {
+  background: rgba(255, 255, 255, 0.08); /* Opacité ajustée pour meilleure lecture */
+  border-radius: 8px;
+  padding: 15px;
+  width: 100%; /* Temporairement pour test : tu peux mettre 45% si ça passe bien */
+  max-width: 600px; /* Limite max pour éviter trop large */
+  overflow-x: auto; /* Permet le scroll horizontal si trop de colonnes */
+  transition: transform 0.3s;
+}
+
+.data-table:hover {
+  transform: translateY(-5px);
+}
+
+.prediction-table {
+  border: 2px solid #00ffcc;
+  box-shadow: 0 0 15px #00ffcc;
+}
+
+/* Table générale */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  table-layout: fixed; /* Force chaque colonne à respecter sa part */
+}
+
+/* Colonnes */
+th, td {
+  padding: 8px;
+  border: 1px solid #ffffff33;
+  text-align: center;
+  word-wrap: break-word; /* évite débordement de texte */
+  overflow-wrap: break-word;
+}
+
+th {
+  background-color: #6a0dad;
+  color: white;
+}
+
+.feature-column {
+  color: #00ffcc;
+}
+
+.prediction-column {
+  color: #ffd700;
+}
+
+/* Ajout pour mobile/responsive */
+@media (max-width: 768px) {
+  .data-table {
+    width: 100%;
+  }
+}
+
+
+
+
   </style>
 </head>
 <body>
+    <!-- Effet de tempête en arrière-plan -->
   <div id="storm-effect"></div>
-
+  <!-- En-tête -->
   <header>
     <h1>Itssghir</h1>
     <p>Data Scientist • Python Enthusiast • Q-Learning Explorer</p>
     <div id="rotating-text"></div>
   </header>
-
+  <!-- Section SQL Interactive -->
   <section>
     <h2>📊 Console SQL Interactive</h2>
     <div id="table-list">Chargement des tables...</div>
@@ -238,11 +377,45 @@
 
   <section>
     <h2>🧪 Test My Project :</h2>
+    <div class="card-container">
+      <!-- Carte Q-Learning -->
     <div class="interactive-card" onclick="toggleQlearning()" 
          onmouseover="this.innerHTML='🧠 Try Me !'" 
          onmouseout="this.innerHTML='Q-Learning Demo'">
       Q-Learning Demo
     </div>
+  </div>
+
+  <div class="card-container">
+<!-- Nouvelle carte Classification -->
+<div class="interactive-card" onclick="toggleClassification()" 
+onmouseover="this.innerHTML='🌼 Classification Demo'" 
+onmouseout="this.innerHTML='Classification Iris'">
+Classification Iris
+</div>
+</div>
+<!-- Conteneur Classification -->
+<div id="classification-container" class="classification-container">
+<p>Classifiez les fleurs d'iris en 3 espèces (setosa, versicolor, virginica)</p>
+<div class="data-tables">
+<div class="data-table">
+ <h3>Données de Test</h3>
+ <div id="test-data"></div>
+</div>
+<div class="data-table prediction-table" id="prediction-section" style="display:none;">
+ <h3>Résultats de Prédiction</h3>
+ <div id="prediction-results"></div>
+</div>
+</div>
+<button onclick="startClassification()" id="classify-btn">Démarrer la Classification</button>
+<button onclick="resetClassification()" id="reset-btn">🔁 Réinitialiser</button>
+<div id="classification-status"></div>
+</div>
+  <!-- Conteneur Q-Learning -->
+
+
+
+
     <div id="qlearning-container">
       <p>Un agent doit apprendre à atteindre l'objectif (case dorée) sur une grille 5x5.</p>
       <div class="q-learning-grid" id="grid"></div>
@@ -250,13 +423,153 @@
       <div id="status"></div>
     </div>
   </section>
-
+  <!-- Pied de page -->
   <footer>
     <p>📧 Contact : itssghir@example.com | 💼 LinkedIn : linkedin.com/in/itssghir</p>
     <p>&copy; 2025 Itssghir - Tous droits réservés</p>
   </footer>
 
   <script>
+
+ /* ======================
+       PARTIE CLASSIFICATION
+       ====================== */
+    
+    // Données Iris générées aléatoirement
+    const irisData = {
+      features: ['sepal_length', 'sepal_width', 'petal_length', 'petal_width'],
+      targetNames: ['setosa', 'versicolor', 'virginica'],
+      samples: Array.from({length: 30}, (_, i) => ({
+        id: i+1,
+        sepal_length: (4 + Math.random() * 3.5).toFixed(1),
+        sepal_width: (2 + Math.random() * 1.5).toFixed(1),
+        petal_length: (1 + Math.random() * 5).toFixed(1),
+        petal_width: (0.1 + Math.random() * 2.5).toFixed(1),
+        target: Math.floor(Math.random() * 3) // Valeur cible simulée
+      }))
+    };
+
+    // Simulateur de modèle IA
+    class IrisClassifier {
+  constructor(data) {
+    this.modelTrained = false;
+    this.samples = data.samples; // Stocker les données simulées
+    this.targetNames = data.targetNames;
+    this.features = data.features;
+  }
+
+  trainMock() {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        this.modelTrained = true;
+        resolve();
+      }, 2000);
+    });
+  }
+
+  predictMock() {
+    return this.samples.map(sample => ({
+      ...sample,
+      prediction: sample.target // Simulation d'une prédiction parfaite
+    }));
+  }
+}
+
+// Crée le classifieur avec les données
+let classifier = new IrisClassifier(irisData);
+
+    function generateDataTable(data, withPrediction = false) {
+      let html = `<table>
+        <tr>
+          ${data.features.map(f => `<th class="feature-column">${f}</th>`).join('')}
+          ${withPrediction ? '<th class="prediction-column">Prédiction</th>' : ''}
+        </tr>`;
+      
+      data.samples.forEach(sample => {
+        html += `<tr>
+          <td>${sample.sepal_length}</td>
+          <td>${sample.sepal_width}</td>
+          <td>${sample.petal_length}</td>
+          <td>${sample.petal_width}</td>
+          ${withPrediction ? 
+            `<td class="prediction-column">${irisData.targetNames[sample.prediction]}</td>` : ''}
+        </tr>`;
+      });
+      
+      return html + '</table>';
+    }
+  
+    async function startClassification() {
+  const status = document.getElementById('classification-status');
+  const btn = document.getElementById('classify-btn');
+  const resetBtn = document.getElementById('reset-btn');
+
+  btn.disabled = true;
+  status.innerHTML = '<div class="loading-message">⚙️ Entraînement du modèle en cours...</div>';
+
+  await classifier.trainMock();
+
+  status.innerHTML = '<div class="loading-message">🔮 Prédiction des résultats...</div>';
+  const results = classifier.predictMock();
+
+  setTimeout(() => {
+    document.getElementById('prediction-section').style.display = 'block';
+    document.getElementById('prediction-results').innerHTML =
+      generateDataTable({ features: irisData.features, samples: results }, true);
+
+    status.innerHTML = '<div style="color:#00ffcc">✅ Prédictions terminées avec succès!</div>';
+    btn.disabled = false;
+    resetBtn.style.display = 'inline-block'; // 👈 Affiche le bouton reset
+  }, 1500);
+}
+function resetClassification() {
+  // Masquer les résultats
+  document.getElementById('prediction-section').style.display = 'none';
+  document.getElementById('prediction-results').innerHTML = '';
+  document.getElementById('classification-status').innerHTML = '';
+  document.getElementById('reset-btn').style.display = 'none';
+
+  // Générer de nouvelles données
+  irisData.samples = Array.from({length: 30}, (_, i) => ({
+    id: i + 1,
+    sepal_length: (4 + Math.random() * 3.5).toFixed(1),
+    sepal_width: (2 + Math.random() * 1.5).toFixed(1),
+    petal_length: (1 + Math.random() * 5).toFixed(1),
+    petal_width: (0.1 + Math.random() * 2.5).toFixed(1),
+    target: Math.floor(Math.random() * 3)
+  }));
+
+  // Réinitialiser le classifieur
+  classifier = new IrisClassifier(irisData);
+
+  // Réafficher les nouvelles données
+  document.getElementById('test-data').innerHTML =
+    generateDataTable({ features: irisData.features, samples: irisData.samples });
+}
+
+
+
+    function toggleClassification() {
+  const classification = document.getElementById('classification-container');
+  const qlearning = document.getElementById('qlearning-container');
+
+  const isVisible = classification.style.display === 'block';
+
+  // Masquer les deux
+  classification.style.display = 'none';
+  qlearning.style.display = 'none';
+
+  // Afficher classification seulement si elle était cachée
+  if (!isVisible) {
+    classification.style.display = 'block';
+    document.getElementById('test-data').innerHTML = 
+      generateDataTable({ features: irisData.features, samples: irisData.samples });
+  }
+}
+
+
+
+        // Initialisation de la base de données SQL.js
     let db;
     const tableList = document.getElementById("table-list");
 
@@ -283,7 +596,7 @@
         const tableNames = res[0].values.map(row => row[0]);
         tableList.textContent = "📂 Tables disponibles : " + tableNames.join(", ");
       });
-
+    // Fonction pour exécuter une requête SQL
     function runSQL() {
       const output = document.getElementById("sql-output");
       const input = document.getElementById("sql-input").value;
@@ -471,10 +784,39 @@
     }, 4000);
 
     function toggleQlearning() {
-      const qSection = document.getElementById("qlearning-container");
-      qSection.style.display = qSection.style.display === "none" ? "block" : "none";
-      if (qSection.style.display === "block") drawGrid();
-    }
+  const qlearning = document.getElementById("qlearning-container");
+  const classification = document.getElementById("classification-container");
+
+  const isVisible = qlearning.style.display === 'block';
+
+  // Masquer les deux
+  qlearning.style.display = 'none';
+  classification.style.display = 'none';
+
+  // Afficher q-learning seulement si il était caché
+  if (!isVisible) {
+    qlearning.style.display = 'block';
+    drawGrid();
+  }
+}
+
+// Ajouter l'animation de "pulse" lors de la frappe dans la zone de texte
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.querySelector('textarea');
+    
+    textarea.addEventListener('keydown', function() {
+      // Supprimer la classe pour réinitialiser l'animation
+      this.classList.remove('text-pulse');
+      
+      // Force un reflow pour que l'animation puisse se déclencher à nouveau
+      void this.offsetWidth;
+      
+      // Ajouter la classe pour déclencher l'animation
+      this.classList.add('text-pulse');
+    });
+  });
+
+
   </script>
 </body>
 </html>
