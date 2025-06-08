@@ -1,0 +1,73 @@
+
+🔹 Profil
+Actuellement étudiant en Master 2 MIAGE, où j'ai acquis une solide expérience en informatique, en gestion et en organisation.
+Ma spécialisation en conception, développement et gestion de projets informatiques m'a permis de maîtriser plusieurs langages informatiques et de travailler efficacement sur différentes plateformes et logiciels.
+Mon intérêt pour les nouvelles technologies et les défis complexes m'a rendu curieux, créatif et passionné par la recherche de solutions innovantes.
+Rythme : À partir de septembre 2025.
+
+========================
+🔹 Compétences
+- Programmation : C, Java, Python, R
+- Développement Web : HTML, CSS, JavaScript, Python, Django
+- Gestion de Projet : SCRUM, GANTT, TOGAF, ARCHIMATE
+- Conception : MERISE, UML, SysML
+- Data Science : SQL, Python, NoSQL
+- Data Analysis : Tableau, Power BI
+- Bases de Données : MySQL, Dataiku, PostgreSQL
+- Cloud : IBM, AWS
+- Cybersécurité : OpenSSL, RSA, AES
+
+========================
+🔹 Technologies
+IntelliJ IDEA, Visual Studio, Docker, MongoDB, R Studio, DataGrip, VirtualBox, PostMan
+
+========================
+🔹 Langues
+Français, Anglais, Arabe
+
+========================
+🔹 Expérience Professionnelle
+
+📌 STAGE Product Owner / Data Engineer — La Banque Postale, Toulouse (2025 - En cours)
+- Documentation technique et métier des données
+- Modélisation logique des données et lineage complet
+- Tableaux de bord avec Tableau & Power BI
+- Recettes SQL et Python sur Dataiku
+- Optimisation des requêtes sur gros volumes
+- Transformation des besoins métiers en dashboards pertinents
+
+📌 Projet académique — Université Toulouse III (2023 - 2024)
+- Développement d’une application de calcul d’empreinte carbone (Python, React Native)
+- Reconnaissance caméra et vocale (APIs Google)
+- Gestion complète du projet (coordination, planification, supervision)
+
+📌 Alternance Chef de Projet IT — SHL, Marseille (2022 - 2023)
+- Développement full-stack d’une interface d’administration
+- Leadership dans la finalisation du site
+- Gestion d’équipe multidisciplinaire et alignement stratégique
+
+📌 Freelance Web — Moi, Aix-en-Provence (2021 - 2022)
+- Conception et développement de sites web multisecteurs
+- Travail en équipe interdisciplinaire
+- Compétences en gestion, communication, autonomie
+
+========================
+🔹 Éducation
+
+🎓 Master 2 MIAGE - Ingénierie des Données et Protection (IDP)  
+Université Toulouse III - Paul Sabatier, Toulouse (2023 - 2025)
+
+🎓 Licence Informatique - Parcours MIAGE  
+Université Aix-Marseille, Aix-en-Provence (2021 - 2023)
+
+========================
+🔹 Compétences
+
+- Informatique : Cybersécurité, Programmation, Développement
+- Data : Manipulation, analyse et traitement des données
+- Gestion : Application des solutions informatiques aux entreprises
+- Gestion de projet & Management d’équipe
+========================
+🔹 certification
+
+- Core Designer — Dataiku
