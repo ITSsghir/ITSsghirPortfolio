@@ -379,21 +379,260 @@ GITHUB_TOKEN=votre_token_github
 CORS_ORIGIN=http://localhost:5173
 ```
 
-## 🎨 Design
+## 🎨 Design & Système de Thèmes
 
-### Thème Principal
-- Palette Néon/Cyberpunk
-- Couleurs principales :
-  - `#4b0082` (Indigo) - Fond principal
-  - `#00ffcc` (Cyan néon) - Accents et surbrillances
-  - `#9b59b6` (Violet) - Éléments secondaires
-  - `#ffd700` (Or) - Points d'emphase
+### Palette de Couleurs
+
+#### 🌙 Mode Sombre (Dark Theme)
+**Palette Principale :**
+```css
+:root {
+  --dark-primary: #252422;      /* Arrière-plan principal très sombre */
+  --dark-secondary: #403D39;    /* Arrière-plan secondaire brun foncé */
+  --dark-accent: #CCC5B9;       /* Beige clair pour les accents */
+  --dark-text: #FFFCF2;         /* Blanc cassé pour le texte */
+  --neon-cyan: #00ffcc;         /* Cyan néon pour les highlights */
+  --neon-gold: #ffd700;         /* Or pour les éléments d'emphase */
+}
+```
+
+**Application :**
+- **Sections CV** : `linear-gradient(135deg, #403D39, #252422)`
+- **Bordures** : `2px solid rgba(0, 255, 204, 0.2)`
+- **Effets de glow** : `box-shadow: 0 0 20px rgba(0, 255, 204, 0.3)`
+- **Texte principal** : `#FFFCF2`
+- **Accents interactifs** : `#00ffcc`
+
+#### ☀️ Mode Clair (Light Theme)
+**Palette Principale :**
+```css
+:root {
+  --light-primary: #ffffff;     /* Blanc pur pour l'arrière-plan */
+  --light-secondary: #f8f9fa;   /* Gris très clair */
+  --light-accent: #6a1b9a;      /* Violet foncé pour les accents */
+  --light-text: #000000;        /* Noir pour le texte */
+  --cyber-purple: #9b59b6;      /* Violet cyberpunk */
+  --cyber-pink: #ff1493;        /* Rose vif pour les highlights */
+}
+```
+
+**Application :**
+- **Sections CV** : `linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 20, 147, 0.2))`
+- **Bordures** : `2px solid rgba(255, 255, 255, 0.2)`
+- **Effets de glow** : `box-shadow: 0 0 20px rgba(138, 43, 226, 0.4)`
+- **Texte principal** : `#000000`
+- **Accents interactifs** : `#00ffcc`
+
+### 🔄 Système de Thèmes Dynamiques
+
+#### Implémentation
+```javascript
+// Gestion du changement de thème
+function toggleTheme() {
+    const body = document.body;
+    const isDark = body.classList.contains('dark-theme');
+    
+    if (isDark) {
+        body.classList.remove('dark-theme');
+        body.classList.add('light-theme');
+    } else {
+        body.classList.remove('light-theme');
+        body.classList.add('dark-theme');
+    }
+    
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+}
+```
+
+#### Classes CSS Conditionnelles
+```css
+/* Mode sombre */
+.dark-theme .cv-section {
+    background: linear-gradient(135deg, #403D39, #252422);
+    border: 2px solid rgba(0, 255, 204, 0.2);
+    color: #FFFCF2;
+}
+
+/* Mode clair */
+.light-theme .cv-section,
+.cv-section {
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 20, 147, 0.2));
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+```
+
+## 🚀 Améliorations Récentes
+
+### ✨ Section Expérience Professionnelle - Refonte Complète
+
+#### Améliorations Visuelles
+1. **Timeline Modernisée**
+   ```css
+   .cv-experience-timeline::before {
+       width: 3px; /* Plus épaisse */
+       background: linear-gradient(to bottom, #00ffcc 0%, #66d9ff 50%, #ffd700 100%);
+       animation: pulse 3s infinite;
+       box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+   }
+   ```
+
+2. **Points de Timeline Animés**
+   ```css
+   .cv-experience-item::before {
+       width: 16px; height: 16px; /* Plus grands */
+       background: linear-gradient(135deg, #00ffcc, #66d9ff);
+       border: 3px solid #ffd700;
+       animation: pulseGlow 2s infinite alternate;
+   }
+   ```
+
+3. **Cartes d'Expérience Interactives**
+   - Effets hover avec translation et scale
+   - Backdrop-filter pour effet de flou
+   - Bordures dynamiques cyan
+   - Shadows avec glow effects
+
+#### Animations Ajoutées
+```css
+@keyframes pulseGlow {
+    0% { 
+        box-shadow: 0 0 15px rgba(0, 255, 204, 0.7); 
+        transform: scale(1); 
+    }
+    100% { 
+        box-shadow: 0 0 25px rgba(0, 255, 204, 1); 
+        transform: scale(1.1); 
+    }
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.2); }
+}
+```
+
+### 🎨 Harmonisation du Mode Sombre
+
+#### Avant les Modifications
+- **Sections CV** : Gradients violets/roses déconnectés
+- **Base de données** : Palette différente (`#4b0082`, `#2c003e`)
+- **Panneaux** : Couleurs incohérentes
+- **Expérience** : Style basique sans effets
+
+#### Après les Modifications
+- **Cohérence Totale** : Toutes les sections utilisent la même palette
+- **Gradients Unifiés** : `linear-gradient(135deg, #403D39, #252422)`
+- **Bordures Harmonisées** : `2px solid rgba(0, 255, 204, 0.2)`
+- **Effets de Glow** : Cyan uniforme sur tous les éléments
+
+#### Éléments Harmonisés
+1. **Sections CV** : Profil, Compétences, Expérience, etc.
+2. **Base de données du CV** : Panel SQL interactif
+3. **Panneaux Chat** : Toggle et conteneur
+4. **Formulaires** : Inputs et textarea
+5. **Navigation** : Headers et toggles
+
+### 🔧 Panneau SQL - Harmonisation Complète
+
+#### Modifications Appliquées
+```css
+/* Conteneur principal */
+.dark-theme .sql-container {
+    background: linear-gradient(135deg, #403D39, #252422);
+    border: 2px solid rgba(0, 255, 204, 0.2);
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+}
+
+/* Zone de texte SQL */
+.dark-theme textarea {
+    background: linear-gradient(to bottom, rgba(64, 61, 57, 0.8), rgba(37, 36, 34, 0.8));
+    border: 2px solid rgba(0, 255, 204, 0.2);
+    color: #FFFCF2;
+}
+
+/* Zone de sortie */
+.dark-theme #sql-output {
+    background: linear-gradient(to bottom, rgba(64, 61, 57, 0.6), rgba(37, 36, 34, 0.6));
+    border: 2px solid rgba(0, 255, 204, 0.2);
+    color: #FFFCF2;
+}
+```
+
+### 🎯 Améliorations de l'Interface Utilisateur
+
+#### Header & Navigation
+- **Logo Interactif** : Passage de SVG cyberpunk à PNG optimisé
+- **Boutons Thème/Son** : Espacement et styles unifiés
+- **H1 "ITSsghir"** : Gestion avancée du mode sombre/clair
+
+#### Footer
+- **Contacts Visibles** : Correction des problèmes de visibilité
+- **Bouton GitHub** : Ajout avec icône FontAwesome
+- **Palette Harmonisée** : Mode sombre avec couleurs cohérentes
+
+#### Interactions
+- **Effets Hover** : Transitions fluides sur tous les éléments
+- **Animations Responsives** : Adaptation mobile optimisée
+- **Feedback Visuel** : États actifs et focus améliorés
+
+### 📱 Responsive Design Amélioré
+
+#### Breakpoints Optimisés
+```css
+@media (max-width: 768px) {
+    .cv-experience-item {
+        animation: none; /* Performance mobile */
+        opacity: 1;
+    }
+    
+    .cv-experience-header {
+        grid-template-columns: 1fr; /* Layout vertical */
+        gap: 8px;
+    }
+}
+```
+
+#### Adaptations Mobiles
+- Timeline simplifiée sur petits écrans
+- Espacements réduits mais fonctionnels
+- Interactions tactiles optimisées
+- Performance préservée
+
+### 🔍 Détails Techniques
+
+#### CSS Custom Properties
+```css
+:root {
+    /* Palette Mode Sombre */
+    --dark-bg-primary: #252422;
+    --dark-bg-secondary: #403D39;
+    --dark-text: #FFFCF2;
+    --dark-accent: #CCC5B9;
+    
+    /* Effets Néon */
+    --neon-cyan: #00ffcc;
+    --neon-glow: rgba(0, 255, 204, 0.3);
+    
+    /* Transitions */
+    --transition-smooth: all 0.3s ease;
+    --transition-slow: all 0.5s ease;
+}
+```
+
+#### Architecture CSS
+- **BEM Methodology** : Classes structurées et maintenables
+- **CSS Grid & Flexbox** : Layouts modernes et flexibles
+- **CSS Custom Properties** : Thèmes dynamiques
+- **Progressive Enhancement** : Dégradation gracieuse
 
 ### Animations et Transitions
 - Effets de particules sur les interactions
 - Transitions fluides entre les sections
 - Animations de compteur pour les statistiques
 - Effets de survol sur les cartes de projets
+- Timeline pulsante avec effects de glow
+- Sparkle effects sur les puces de listes
 
 ## 🚀 Installation et Démarrage
 
@@ -669,3 +908,166 @@ setTimeout(() => {
 // Gestion de la compatibilité
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 ```
+
+## 📋 Changelog - Améliorations Récentes
+
+### 🎨 Version 2.1.0 - Harmonisation Complète du Design
+
+#### ✨ Nouvelles Fonctionnalités
+- **Système de Thèmes Unifié** : Palettes de couleurs cohérentes pour dark/light mode
+- **Section Expérience Modernisée** : Timeline interactive avec animations avancées
+- **Panneau SQL Harmonisé** : Intégration complète avec la palette du mode sombre
+
+#### 🔧 Améliorations Techniques
+
+##### Design & UI/UX
+1. **Palette de Couleurs Unifiée**
+   ```css
+   /* Mode Sombre */
+   --dark-primary: #252422      /* Arrière-plan principal */
+   --dark-secondary: #403D39    /* Arrière-plan secondaire */
+   --dark-text: #FFFCF2         /* Texte principal */
+   --neon-cyan: #00ffcc         /* Accents interactifs */
+   --neon-gold: #ffd700         /* Éléments d'emphase */
+   
+   /* Mode Clair */
+   --light-primary: #ffffff     /* Arrière-plan blanc */
+   --cyber-purple: #9b59b6      /* Violet cyberpunk */
+   --cyber-pink: #ff1493        /* Rose vif */
+   ```
+
+2. **Section Expérience Professionnelle**
+   - Timeline épaissie (3px) avec dégradé cyan-bleu-or
+   - Points de timeline animés (16px) avec effet `pulseGlow`
+   - Cartes interactives avec hover effects (translation + scale)
+   - Puces ⚡ animées avec effet `sparkle`
+   - Compétences avec gradients et hover 3D
+
+3. **Harmonisation Mode Sombre**
+   - **Avant** : Couleurs incohérentes (`#4b0082`, gradients violets/roses)
+   - **Après** : Palette unifiée sur tous les éléments
+   - **Éléments harmonisés** :
+     * Sections CV (Profil, Compétences, Expérience)
+     * Base de données du CV
+     * Panneaux Chat et Toggle
+     * Formulaires SQL
+     * Navigation et Headers
+
+##### Panneau SQL - Refonte Complète
+```css
+/* Conteneur Principal */
+.dark-theme .sql-container {
+    background: linear-gradient(135deg, #403D39, #252422);
+    border: 2px solid rgba(0, 255, 204, 0.2);
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+}
+
+/* Textarea SQL */
+.dark-theme textarea {
+    background: linear-gradient(to bottom, rgba(64, 61, 57, 0.8), rgba(37, 36, 34, 0.8));
+    color: #FFFCF2;
+    border: 2px solid rgba(0, 255, 204, 0.2);
+}
+
+/* Zone de Sortie */
+.dark-theme #sql-output {
+    background: linear-gradient(to bottom, rgba(64, 61, 57, 0.6), rgba(37, 36, 34, 0.6));
+    color: #FFFCF2;
+}
+```
+
+#### 🎯 Interface Utilisateur
+
+##### Header & Navigation
+- **Logo** : Migration SVG cyberpunk → PNG optimisé
+- **Boutons** : Espacement uniforme (gap: 10px)
+- **H1 "ITSsghir"** : Visibilité assurée en mode sombre/clair
+- **Thème Toggle** : Styles harmonisés
+
+##### Footer
+- **Visibilité** : Résolution des problèmes de contraste
+- **GitHub Button** : Ajout avec icône FontAwesome
+- **Contacts** : Palette cohérente en mode sombre
+
+#### 🔄 Animations & Interactions
+
+##### Nouvelles Animations
+```css
+/* Pulsation Timeline */
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 15px rgba(0, 255, 204, 0.7); transform: scale(1); }
+    100% { box-shadow: 0 0 25px rgba(0, 255, 204, 1); transform: scale(1.1); }
+}
+
+/* Effet Sparkle */
+@keyframes sparkle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.2); }
+}
+```
+
+##### Effets Hover Améliorés
+- **Cartes d'expérience** : `translateX(10px) scale(1.02)`
+- **Compétences** : `translateY(-3px) scale(1.05)`
+- **Timeline points** : Animation continue `pulseGlow`
+- **Puces de liste** : Effet `sparkle` sur les ⚡
+
+#### 📱 Responsive Design
+
+##### Optimisations Mobile
+```css
+@media (max-width: 768px) {
+    .cv-experience-item {
+        animation: none;    /* Performance préservée */
+        opacity: 1;
+    }
+    .cv-experience-header {
+        grid-template-columns: 1fr;  /* Layout vertical */
+    }
+}
+```
+
+#### 🔍 Détails d'Implémentation
+
+##### Architecture CSS
+- **Méthodologie BEM** : Classes structurées
+- **CSS Custom Properties** : Variables pour thèmes dynamiques
+- **CSS Grid/Flexbox** : Layouts modernes
+- **Progressive Enhancement** : Dégradation gracieuse
+
+##### Performance
+- Animations optimisées pour mobile
+- Propriétés `will-change` ciblées
+- `backface-visibility: hidden` pour de meilleures performances
+- Transitions fluides (`all 0.3s ease`)
+
+#### 🎨 Cohérence Visuelle
+
+##### Avant/Après
+| Élément | Avant | Après |
+|---------|-------|-------|
+| **Sections CV** | Gradients violets incohérents | `linear-gradient(135deg, #403D39, #252422)` |
+| **Bordures** | `1px solid #CCC5B9` | `2px solid rgba(0, 255, 204, 0.2)` |
+| **Effets** | Couleurs multiples | Glow cyan uniforme |
+| **Timeline** | 2px basique | 3px avec dégradé animé |
+| **Texte** | Contrastes variables | `#FFFCF2` cohérent |
+
+##### Résultat Final
+✅ **Cohérence totale** entre tous les panneaux en mode sombre  
+✅ **Expérience utilisateur** fluide et moderne  
+✅ **Performance optimisée** sur mobile et desktop  
+✅ **Accessibilité** améliorée avec de meilleurs contrastes  
+
+### 🔄 Migration Guide
+
+Pour adopter ces améliorations dans d'autres projets :
+
+1. **Copier les Custom Properties** depuis `:root`
+2. **Utiliser les classes conditionnelles** `.dark-theme` / `.light-theme`
+3. **Appliquer les animations** `pulseGlow` et `sparkle`
+4. **Adopter la structure CSS** avec gradients harmonisés
+
+---
+
+*Dernière mise à jour : Décembre 2024*  
+*Version actuelle : 2.1.0*

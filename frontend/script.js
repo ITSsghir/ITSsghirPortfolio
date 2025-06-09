@@ -5,6 +5,14 @@ const config = {
     apiBaseUrl: 'http://localhost:3000'
 };
 
+// Fonction pour retourner en haut de la page (logo cliquable)
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
 // Cache DOM pour les performances
 const domCache = {
     githubRepos: document.getElementById('github-projects'),
@@ -605,61 +613,120 @@ function resetClassification() {
        messages.scrollTop = messages.scrollHeight;
    }
 
-   // Theme Manager
+   // Gestionnaire de thème
    const themeManager = {
-       isDark: true,
+       isDark: false,
        
        lightTheme: {
-           '--bg-primary': '#ffffff',
-           '--bg-secondary': '#f0f0f0',
-           '--text-primary': '#333333',
-           '--text-secondary': '#666666',
-           '--accent-primary': '#9b59b6',
-           '--accent-secondary': '#8e44ad',
-           '--neon-glow': 'rgba(155, 89, 182, 0.5)'
-       },
-       
-       darkTheme: {
            '--bg-primary': '#4b0082',
            '--bg-secondary': '#2c003e',
            '--text-primary': '#ffffff',
            '--text-secondary': '#cccccc',
            '--accent-primary': '#00ffcc',
            '--accent-secondary': '#00ccaa',
-           '--neon-glow': 'rgba(0, 255, 204, 0.5)'
+           '--neon-glow': 'rgba(0, 255, 204, 0.5)',
+           '--border-color': 'rgba(255, 255, 255, 0.1)',
+           '--gradient-start': '#00ffcc',
+           '--gradient-end': '#00ccaa',
+           '--navbar-bg': '#CCC5B9',
+           '--navbar-text': '#403D39'
        },
        
+       darkTheme: {
+           '--bg-primary': '#252422',
+           '--bg-secondary': '#403D39',
+           '--text-primary': '#FFFCF2',
+           '--text-secondary': '#CCC5B9',
+           '--accent-primary': '#CCC5B9',
+           '--accent-secondary': '#403D39',
+           '--neon-glow': 'rgba(204, 197, 185, 0.3)',
+           '--border-color': '#CCC5B9',
+           '--gradient-start': '#403D39',
+           '--gradient-end': '#252422',
+           '--shadow-color': 'rgba(37, 36, 34, 0.8)',
+           '--navbar-bg': '#252422',
+           '--navbar-text': '#FFFCF2'
+       },
+
        toggle() {
            this.isDark = !this.isDark;
            this.applyTheme();
+           
+           // Mettre à jour l'icône avec une animation
+           const themeButton = document.getElementById('theme-toggle');
+           if (themeButton) {
+               const icon = themeButton.querySelector('i');
+               icon.className = 'fas ' + (this.isDark ? 'fa-sun' : 'fa-moon');
+               icon.classList.add('rotating');
+               setTimeout(() => icon.classList.remove('rotating'), 500);
+               themeButton.classList.toggle('active', this.isDark);
+           }
+           
+           // Sauvegarder la préférence
+           localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
        },
        
        applyTheme() {
            const theme = this.isDark ? this.darkTheme : this.lightTheme;
-           document.documentElement.style.transition = 'all 0.5s ease';
            
+           // Appliquer les variables CSS
            Object.entries(theme).forEach(([property, value]) => {
                document.documentElement.style.setProperty(property, value);
            });
            
-           localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+           // Mettre à jour les classes du body
+           document.body.classList.remove('light-theme', 'dark-theme');
+           document.body.classList.add(this.isDark ? 'dark-theme' : 'light-theme');
            
-           const themeIcon = document.getElementById('theme-toggle-icon');
-           if (themeIcon) {
-               themeIcon.className = this.isDark ? 'fas fa-sun' : 'fas fa-moon';
+           // Forcer la mise à jour de la navbar
+           const navbar = document.querySelector('.navbar');
+           if (navbar) {
+               // Temporairement forcer le style pour éviter les transitions indésirables
+               if (this.isDark) {
+                   navbar.style.background = 'rgba(37, 36, 34, 0.95)';
+               } else {
+                   navbar.style.background = 'rgba(204, 197, 185, 0.95)';
+               }
            }
        },
        
        init() {
+           // Vérifier la préférence sauvegardée
            const savedTheme = localStorage.getItem('theme');
            if (savedTheme) {
                this.isDark = savedTheme === 'dark';
            } else {
+               // Vérifier la préférence système
                this.isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
            }
+           
+           // Appliquer le thème initial
            this.applyTheme();
+           
+           // Initialiser le bouton
+           const themeButton = document.getElementById('theme-toggle');
+           if (themeButton) {
+               const icon = themeButton.querySelector('i');
+               icon.className = 'fas ' + (this.isDark ? 'fa-sun' : 'fa-moon');
+               themeButton.classList.toggle('active', this.isDark);
+               themeButton.addEventListener('click', () => this.toggle());
+           }
+           
+           // Écouter les changements de préférence système
+           window.matchMedia('(prefers-color-scheme: dark)').addListener((e) => {
+               if (!localStorage.getItem('theme')) {
+                   this.isDark = e.matches;
+                   this.applyTheme();
+               }
+           });
        }
    };
+
+   // Initialiser le gestionnaire de thème au chargement
+   document.addEventListener('DOMContentLoaded', () => {
+       themeManager.init();
+       // ... autres initialisations ...
+   });
 
    // Initialize everything when DOM is loaded
    document.addEventListener('DOMContentLoaded', function() {
@@ -1138,51 +1205,6 @@ function addTooltips() {
     });
 }
 
-// Fonction pour créer un mode sombre/clair
-function createThemeToggle() {
-    const toggleButton = document.createElement('button');
-    toggleButton.innerHTML = '<i class="fas fa-moon"></i>';
-    toggleButton.className = 'theme-toggle';
-    toggleButton.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: linear-gradient(135deg, #9b59b6, #be75e6);
-        border: none;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        color: white;
-        font-size: 1.2rem;
-        cursor: pointer;
-        z-index: 1000;
-        box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);
-        transition: all 0.3s ease;
-    `;
-    
-    document.body.appendChild(toggleButton);
-    
-    let isDarkMode = true;
-    
-    toggleButton.addEventListener('click', function() {
-        isDarkMode = !isDarkMode;
-        
-        if (isDarkMode) {
-            document.body.style.filter = 'none';
-            this.innerHTML = '<i class="fas fa-moon"></i>';
-        } else {
-            document.body.style.filter = 'invert(1) hue-rotate(180deg)';
-            this.innerHTML = '<i class="fas fa-sun"></i>';
-        }
-        
-        // Animation du bouton
-        this.style.transform = 'scale(0.9)';
-        setTimeout(() => {
-            this.style.transform = 'scale(1)';
-        }, 150);
-    });
-}
-
 // Fonction pour créer un effet de typing sur le texte de profil
 function createTypingEffect() {
     const profileText = document.querySelector('.cv-profile-text');
@@ -1491,7 +1513,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initScrollAnimations();
     createExperienceTimeline();
     addTooltips();
-    createThemeToggle();
     createTypingEffect();
     addSoundEffects();
 });
@@ -1759,6 +1780,9 @@ const soundManager = {
                 }
             });
 
+            // Initialiser les sons SQL
+            this.initializeSqlSounds();
+
             console.log('Sound manager initialized successfully');
         } catch (error) {
             console.error('Error initializing sound manager:', error);
@@ -1908,6 +1932,12 @@ const soundManager = {
             element.dataset.soundDisabled = 'true';
         });
 
+        // Désactiver les sons SQL
+        const sqlInput = document.getElementById('sql-input');
+        const executeButton = document.querySelector('.sql-button.primary');
+        if (sqlInput) sqlInput.dataset.soundDisabled = 'true';
+        if (executeButton) executeButton.dataset.soundDisabled = 'true';
+
         // Désactiver le contexte audio si existant
         if (this.audioContext) {
             this.audioContext.suspend();
@@ -1943,6 +1973,12 @@ const soundManager = {
         document.querySelectorAll('.cv-section-header, .cv-skill-tag, .cv-download-btn').forEach(element => {
             element.dataset.soundDisabled = 'false';
         });
+
+        // Réactiver les sons SQL
+        const sqlInput = document.getElementById('sql-input');
+        const executeButton = document.querySelector('.sql-button.primary');
+        if (sqlInput) sqlInput.dataset.soundDisabled = 'false';
+        if (executeButton) executeButton.dataset.soundDisabled = 'false';
 
         // Réactiver le contexte audio si existant
         if (this.audioContext) {
@@ -1984,10 +2020,7 @@ const soundManager = {
         const soundToggle = document.getElementById('sound-toggle');
         if (soundToggle) {
             const icon = soundToggle.querySelector('i');
-            if (icon) {
-                icon.className = this.isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
-            }
-            soundToggle.classList.toggle('muted', this.isMuted);
+            icon.className = 'fas ' + (soundManager.isMuted ? 'fa-volume-mute' : 'fa-volume-up');
         }
     },
 
@@ -2173,7 +2206,72 @@ const soundManager = {
             }
             return false;
         }) && this.isMuted;
-    }
+    },
+
+    playSqlKeySound() {
+        if (!this.isMuted) {
+            this.playSound({
+                frequency: 1200,
+                volume: 0.01,
+                duration: 0.05,
+                type: 'sine'
+            });
+        }
+    },
+
+    playSqlDeleteSound() {
+        if (!this.isMuted) {
+            this.playSound({
+                frequency: 800,
+                volume: 0.01,
+                duration: 0.05,
+                type: 'sine'
+            });
+        }
+    },
+
+    playSqlExecuteSound() {
+        if (!this.isMuted) {
+            // Son plus élaboré pour l'exécution
+            const notes = [
+                { freq: 600, time: 0 },
+                { freq: 800, time: 0.1 },
+                { freq: 1000, time: 0.2 }
+            ];
+            
+            notes.forEach(note => {
+                setTimeout(() => {
+                    this.playSound({
+                        frequency: note.freq,
+                        volume: 0.03,
+                        duration: 0.15,
+                        type: 'sine'
+                    });
+                }, note.time * 1000);
+            });
+        }
+    },
+
+    initializeSqlSounds() {
+        const sqlInput = document.getElementById('sql-input');
+        const executeButton = document.querySelector('.sql-button.primary');
+
+        if (sqlInput) {
+            sqlInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Backspace' || event.key === 'Delete') {
+                    this.playSqlDeleteSound();
+                } else if (event.key.length === 1 || event.key === 'Enter') {
+                    this.playSqlKeySound();
+                }
+            });
+        }
+
+        if (executeButton) {
+            executeButton.addEventListener('click', () => {
+                this.playSqlExecuteSound();
+            });
+        }
+    },
 };
 
 // Initialiser le gestionnaire de son au chargement de la page
