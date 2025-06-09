@@ -79,6 +79,42 @@ Le site sera accessible à :
 - API : OpenAI GPT
 - Autres : Font Awesome, Google Fonts
 
+## Effets Sonores
+
+Le portfolio utilise l'API Web Audio pour créer des effets sonores interactifs. Ces sons sont générés de manière programmatique, sans nécessiter de fichiers audio externes.
+
+### Implémentation des Sons
+
+Les sons sont créés en utilisant l'API Web Audio, qui génère des oscillations sonores en temps réel :
+
+```javascript
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+function playTone(frequency, duration) {
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value = frequency;
+    oscillator.type = 'sine';
+    
+    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + duration);
+}
+```
+
+### Interactions Sonores
+
+- **Sections CV** : Un son de fréquence 800Hz est joué lors du clic sur les en-têtes de section (durée : 0.1s)
+- **Tags de Compétences** : Un son aigu de 1000Hz est joué au survol des tags (durée : 0.05s)
+
+Ces sons sont délibérément subtils et non-intrusifs, ajoutant une dimension interactive au portfolio sans perturber l'expérience utilisateur.
+
 # Portfolio Interactif - Data Science & IA
 
 Un portfolio moderne et interactif mettant en avant mes compétences en Data Science, Machine Learning et développement web, avec une base de données SQL interactive et des démonstrations d'algorithmes d'IA en temps réel.
@@ -396,3 +432,240 @@ cd ITSsghirPortfolio
 ## 📄 Licence
 
 Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+## Documentation des Sons
+
+### Système de Gestion du Son
+
+Le portfolio intègre un système de sons interactifs sophistiqué pour améliorer l'expérience utilisateur. Tous les sons sont gérés par le `soundManager`, un gestionnaire centralisé qui contrôle la création, la lecture et le volume des effets sonores.
+
+#### Contrôle Global du Son
+- Un bouton de contrôle du son est disponible dans la barre de navigation
+- État du son persistant grâce au localStorage
+- Icônes dynamiques : 
+  - 🔊 Son activé : `fa-volume-up`
+  - 🔇 Son désactivé : `fa-volume-mute`
+
+### Guide d'Utilisation des Sons
+
+#### 1. Initialisation du Système
+```javascript
+// Dans votre fichier principal (ex: script.js)
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser le gestionnaire de son
+    soundManager.initialize();
+    
+    // Configurer le bouton de contrôle du son
+    const soundToggle = document.querySelector('.sound-toggle');
+    soundToggle.addEventListener('click', () => soundManager.toggleMute());
+});
+```
+
+#### 2. Ajout des Sons aux Éléments
+
+##### Sons de Survol
+```javascript
+// Pour les cartes GitHub
+const githubCards = document.querySelectorAll('.repo-card');
+githubCards.forEach(card => {
+    card.addEventListener('mouseenter', () => {
+        soundManager.playHoverSound();
+    });
+});
+
+// Pour les boutons de contact
+const contactButtons = document.querySelectorAll('footer a[href*="mailto"], footer a[href*="tel"], footer a[href*="linkedin"]');
+contactButtons.forEach(button => {
+    button.addEventListener('mouseenter', () => {
+        soundManager.playSoftHoverSound();
+    });
+});
+
+// Pour les tables de la base de données
+const dbTables = document.querySelectorAll('.table-item');
+dbTables.forEach(table => {
+    table.addEventListener('mouseenter', () => {
+        soundManager.playHoverSound();
+    });
+});
+```
+
+##### Sons de Clic
+```javascript
+// Pour les boutons du footer
+const footerButtons = document.querySelectorAll('footer a');
+footerButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        soundManager.playFooterClickSound();
+    });
+});
+
+// Pour les tables de la base de données
+dbTables.forEach(table => {
+    table.addEventListener('click', () => {
+        soundManager.playTableClickSound();
+    });
+});
+```
+
+##### Son de Téléchargement
+```javascript
+// Pour le bouton de téléchargement du CV
+const cvButton = document.querySelector('.cv-download-btn');
+cvButton.addEventListener('click', () => {
+    soundManager.playDownloadSound();
+});
+```
+
+### Détails des Sons et Cas d'Utilisation
+
+#### 1. Sons de Survol (Hover)
+
+##### Cartes GitHub (`playHoverSound`)
+- **Quand l'utiliser** : Sur les éléments interactifs principaux
+- **Cas d'usage** : 
+  ```javascript
+  element.addEventListener('mouseenter', () => soundManager.playHoverSound());
+  ```
+- **Caractéristiques** :
+  - Son doux et professionnel
+  - Durée courte (0.3s)
+  - Idéal pour les éléments fréquemment survolés
+
+##### Boutons de Contact (`playSoftHoverSound`)
+- **Quand l'utiliser** : Sur les éléments de navigation secondaires
+- **Cas d'usage** :
+  ```javascript
+  element.addEventListener('mouseenter', () => soundManager.playSoftHoverSound());
+  ```
+- **Caractéristiques** :
+  - Son très léger
+  - Durée très courte (0.15s)
+  - Parfait pour les menus et liens
+
+#### 2. Sons de Clic
+
+##### Footer Buttons (`playFooterClickSound`)
+- **Quand l'utiliser** : Pour les actions de contact/réseaux sociaux
+- **Cas d'usage** :
+  ```javascript
+  element.addEventListener('click', () => soundManager.playFooterClickSound());
+  ```
+- **Caractéristiques** :
+  - Son court et satisfaisant
+  - Feedback immédiat
+  - Volume modéré
+
+##### Tables de Base de Données (`playTableClickSound`)
+- **Quand l'utiliser** : Pour les interactions avec les données
+- **Cas d'usage** :
+  ```javascript
+  element.addEventListener('click', () => soundManager.playTableClickSound());
+  ```
+- **Caractéristiques** :
+  - Son riche et informatif
+  - Accord harmonieux
+  - Durée moyenne (0.4s)
+
+#### 3. Son de Téléchargement (`playDownloadSound`)
+- **Quand l'utiliser** : Pour les actions de téléchargement/succès
+- **Cas d'usage** :
+  ```javascript
+  element.addEventListener('click', () => soundManager.playDownloadSound());
+  ```
+- **Caractéristiques** :
+  - Mélodie ascendante joyeuse
+  - Durée satisfaisante (0.5s)
+  - Volume équilibré
+
+### Personnalisation des Sons
+
+#### Modification des Paramètres
+```javascript
+// Exemple de personnalisation d'un son
+playCustomSound() {
+    const ctx = this.audioContext;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    // Connecter les nœuds
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    // Personnaliser les paramètres
+    osc.type = 'sine';                // Type d'onde : 'sine', 'triangle', 'square', 'sawtooth'
+    osc.frequency.value = 440;        // Fréquence en Hz
+    gain.gain.value = 0.05;           // Volume (0-1)
+
+    // Durée et timing
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.2);  // Durée en secondes
+}
+```
+
+### Bonnes Pratiques d'Implémentation
+
+1. **Vérification de l'État**
+```javascript
+if (soundManager.canPlaySound()) {
+    soundManager.playHoverSound();
+}
+```
+
+2. **Gestion des Erreurs**
+```javascript
+try {
+    soundManager.playDownloadSound();
+} catch (error) {
+    console.warn('Erreur de lecture du son:', error);
+}
+```
+
+3. **Performance**
+```javascript
+// Mauvaise pratique : Créer un nouveau contexte à chaque fois
+const context = new AudioContext(); // ❌
+
+// Bonne pratique : Réutiliser le contexte existant
+if (!this.audioContext) {
+    this.audioContext = new AudioContext(); // ✅
+}
+```
+
+4. **Nettoyage des Ressources**
+```javascript
+// Arrêter proprement les oscillateurs
+osc.stop(ctx.currentTime + duration);
+setTimeout(() => {
+    osc.disconnect();
+    gain.disconnect();
+}, duration * 1000);
+```
+
+### Dépannage Courant
+
+1. **Son Non Fonctionnel**
+   - Vérifier que le son n'est pas en sourdine (`soundManager.isMuted`)
+   - Confirmer que l'AudioContext est initialisé
+   - Vérifier les permissions du navigateur
+
+2. **Sons Trop Forts/Faibles**
+   - Ajuster les valeurs de gain (entre 0 et 1)
+   - Utiliser des rampes de gain pour des transitions douces
+
+3. **Latence**
+   - Minimiser la durée des sons
+   - Précharger l'AudioContext au chargement de la page
+   - Éviter les opérations lourdes pendant la lecture
+
+### Compatibilité
+
+- Chrome/Edge : Totalement supporté
+- Firefox : Totalement supporté
+- Safari : Nécessite le préfixe webkit
+- IE : Non supporté
+
+```javascript
+// Gestion de la compatibilité
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+```

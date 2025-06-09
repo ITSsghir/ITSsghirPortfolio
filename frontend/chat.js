@@ -4,6 +4,9 @@ class ChatBot {
         this.messages = [];
         this.isOpen = false;
         this.isTyping = false;
+        
+        // Initialiser le contexte audio
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 
     createChatInterface() {
@@ -65,8 +68,55 @@ class ChatBot {
         }, 500);
     }
 
+    playToggleSound(isOpening) {
+        // Vérifier si le son est désactivé via le soundManager
+        if (soundManager && soundManager.isMuted) return;
+
+        const oscillator1 = this.audioContext.createOscillator();
+        const oscillator2 = this.audioContext.createOscillator();
+        const gainNode1 = this.audioContext.createGain();
+        const gainNode2 = this.audioContext.createGain();
+
+        oscillator1.connect(gainNode1);
+        oscillator2.connect(gainNode2);
+        gainNode1.connect(this.audioContext.destination);
+        gainNode2.connect(this.audioContext.destination);
+
+        if (isOpening) {
+            // Son d'ouverture : montée
+            oscillator1.frequency.setValueAtTime(300, this.audioContext.currentTime);
+            oscillator1.frequency.exponentialRampToValueAtTime(600, this.audioContext.currentTime + 0.2);
+            oscillator2.frequency.setValueAtTime(900, this.audioContext.currentTime);
+            oscillator2.frequency.exponentialRampToValueAtTime(1200, this.audioContext.currentTime + 0.2);
+        } else {
+            // Son de fermeture : descente
+            oscillator1.frequency.setValueAtTime(600, this.audioContext.currentTime);
+            oscillator1.frequency.exponentialRampToValueAtTime(300, this.audioContext.currentTime + 0.2);
+            oscillator2.frequency.setValueAtTime(1200, this.audioContext.currentTime);
+            oscillator2.frequency.exponentialRampToValueAtTime(900, this.audioContext.currentTime + 0.2);
+        }
+
+        oscillator1.type = 'sine';
+        oscillator2.type = 'triangle';
+
+        gainNode1.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+        gainNode2.gain.setValueAtTime(0.05, this.audioContext.currentTime);
+
+        gainNode1.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+        gainNode2.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+
+        oscillator1.start(this.audioContext.currentTime);
+        oscillator2.start(this.audioContext.currentTime);
+        oscillator1.stop(this.audioContext.currentTime + 0.3);
+        oscillator2.stop(this.audioContext.currentTime + 0.3);
+    }
+
     toggleChat() {
         this.isOpen = !this.isOpen;
+        
+        // Jouer le son correspondant
+        this.playToggleSound(this.isOpen);
+        
         if (this.isOpen) {
             this.chatWindow.style.display = 'flex';
             requestAnimationFrame(() => {

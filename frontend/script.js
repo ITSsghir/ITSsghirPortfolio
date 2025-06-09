@@ -363,7 +363,7 @@ function resetClassification() {
 
        if (res[0]) {
                const tables = res[0].values.map(([name, cols, rows]) => `
-                   <li class="table-item">
+                       <li class="table-item" data-table-name="${name}">
              <div class="table-name">${name}</div>
              <div class="table-stats">
                <span class="table-cols">${cols} colonnes</span>
@@ -381,6 +381,13 @@ function resetClassification() {
                        ${tables}
            </ul>
          `;
+
+               // Ajouter les événements aux nouvelles tables
+               document.querySelectorAll('.table-item').forEach(table => {
+                   if (!table.dataset.soundInitialized) {
+                       soundManager.addTableEvents(table);
+                   }
+               });
        }
        } catch (error) {
            console.error('Erreur lors de la mise à jour de la liste des tables:', error);
@@ -1206,37 +1213,7 @@ function createTypingEffect() {
     observer.observe(profileText.parentElement);
 }
 
-// Fonction pour ajouter des sons aux interactions (optionnel)
-function addSoundEffects() {
-    // Créer des sons avec l'API Web Audio (plus moderne que des fichiers audio)
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    function playTone(frequency, duration) {
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.value = frequency;
-        oscillator.type = 'sine';
-        
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + duration);
-    }
-    
-    // Ajouter des sons aux interactions
-    document.querySelectorAll('.cv-section-header').forEach(header => {
-        header.addEventListener('click', () => playTone(800, 0.1));
-    });
-    
-    document.querySelectorAll('.cv-skill-tag').forEach(tag => {
-        tag.addEventListener('mouseenter', () => playTone(1000, 0.05));
-    });
-}
+// Les sons sont maintenant gérés par le soundManager
 
 // Optimisation des performances
 const ANIMATION_FRAME = window.requestAnimationFrame ||
@@ -1247,34 +1224,24 @@ const ANIMATION_FRAME = window.requestAnimationFrame ||
 
 // Fonction d'initialisation optimisée
 function initCvInteractions() {
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initCvInteractions);
-        return;
-    }
-    
-    // Initialisation du cache DOM
-    domCache.cvSections = document.querySelectorAll('.cv-section');
-    domCache.githubRepos = document.getElementById('github-repos');
-    domCache.profileText = document.querySelector('.cv-profile-text');
-
-    // Initialisation des fonctionnalités avec délai optimisé
-    const initSequence = [
-        { fn: initExperienceAnimations, delay: 0 },
-        { fn: loadGitHubRepos, delay: 100 },
-        { fn: initScrollAnimations, delay: 300 }
-    ];
-
-    initSequence.forEach(({ fn, delay }) => {
-        setTimeout(() => requestAnimationFrame(fn), delay);
-    });
-
-    // Appel unique à createAnimatedStats
-    setTimeout(() => {
-        const existingStats = document.querySelector('.cv-stats');
-        if (!existingStats) {
-            createAnimatedStats();
+    const cvSection = document.querySelector('.cv-section');
+    if (cvSection) {
+        // Vérifier l'état du son au démarrage
+        if (soundManager && soundManager.isMuted) {
+            cvSection.classList.add('sounds-disabled');
         }
-    }, 200);
+
+        // Ajouter les gestionnaires d'événements avec vérification du son
+        document.querySelectorAll('.cv-section-header').forEach(header => {
+            header.addEventListener('click', () => {
+                if (soundManager && !soundManager.isMuted) {
+                    soundManager.playHoverSound();
+                }
+            });
+        });
+
+        // Autres gestionnaires d'événements du CV...
+    }
 }
 
 // Optimisation des animations d'expérience
@@ -1298,9 +1265,52 @@ function initExperienceAnimations() {
 
 // Optimisation du toggle des sections
 function toggleCvSection(header) {
+    // Vérifier si le soundManager existe et est initialisé
+    if (typeof soundManager === 'undefined') {
+        console.warn('soundManager not initialized');
+        return;
+    }
+
     const section = header.parentElement;
     const content = section.querySelector('.cv-section-content');
     const isActive = section.classList.contains('active');
+
+    // Jouer le son uniquement si le son n'est pas désactivé globalement
+    if (!soundManager.isMuted) {
+        try {
+            const oscillator = soundManager.audioContext.createOscillator();
+            const gainNode = soundManager.audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(soundManager.audioContext.destination);
+            
+            // Son différent pour l'ouverture et la fermeture
+            if (isActive) {
+                // Son de fermeture
+                oscillator.frequency.setValueAtTime(600, soundManager.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(400, soundManager.audioContext.currentTime + 0.2);
+            } else {
+                // Son d'ouverture
+                oscillator.frequency.setValueAtTime(400, soundManager.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(600, soundManager.audioContext.currentTime + 0.2);
+            }
+            
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.03, soundManager.audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, soundManager.audioContext.currentTime + 0.2);
+            
+            oscillator.start(soundManager.audioContext.currentTime);
+            oscillator.stop(soundManager.audioContext.currentTime + 0.2);
+
+            // Nettoyer les nœuds audio après utilisation
+            setTimeout(() => {
+                oscillator.disconnect();
+                gainNode.disconnect();
+            }, 300);
+        } catch (error) {
+            console.error('Error playing section toggle sound:', error);
+        }
+    }
 
     requestAnimationFrame(() => {
         if (isActive) {
@@ -1697,15 +1707,476 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Gestionnaire d'événements pour la touche Entrée dans le chat
-document.addEventListener('DOMContentLoaded', function() {
-    const chatInput = document.getElementById('chat-input');
-    if (chatInput) {
-        chatInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
+// Gestionnaire de son global
+const soundManager = {
+    audioContext: null,
+    isMuted: false,
+
+    initialize() {
+        try {
+            // Initialiser le contexte audio
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Récupérer l'état du son depuis le localStorage
+            this.isMuted = localStorage.getItem('soundMuted') === 'true';
+            
+            // Mettre à jour l'icône du son
+            this.updateSoundIcon();
+            
+            // Ajouter le gestionnaire d'événements pour le bouton de son
+            const soundToggle = document.getElementById('sound-toggle');
+            if (soundToggle) {
+                soundToggle.addEventListener('click', () => {
+                    const willBeMuted = !this.isMuted;
+                    // Suspendre/reprendre le contexte audio en fonction de l'état
+                    if (willBeMuted) {
+                        this.audioContext.suspend();
+                    } else {
+                        this.audioContext.resume();
+                    }
+                    this.playToggleSound(willBeMuted);
+                    this.toggleMute();
+                });
+            }
+
+            // Initialiser les événements pour les éléments statiques
+            this.initializeStaticElements();
+
+            // Observer les changements dans le DOM pour les éléments dynamiques
+            this.observeDynamicElements();
+
+            // Désactiver tous les sons si nécessaire
+            if (this.isMuted) {
+                this.disableAllSounds();
+                this.audioContext.suspend();
+            }
+
+            // Ajouter un gestionnaire global pour les sections CV
+            document.addEventListener('click', (event) => {
+                if (event.target.closest('.cv-section-header')) {
+                    // Le son sera géré par toggleCvSection
+                    return;
+                }
+            });
+
+            console.log('Sound manager initialized successfully');
+        } catch (error) {
+            console.error('Error initializing sound manager:', error);
+            this.audioContext = null;
+            this.isMuted = true;
+        }
+    },
+
+    initializeStaticElements() {
+        // Ajouter les événements pour le bouton de CV
+        const cvButton = document.querySelector('.cv-download-btn');
+        if (cvButton) {
+            cvButton.addEventListener('mouseenter', () => {
+                if (!this.isMuted) this.playSoftHoverSound();
+            });
+            cvButton.addEventListener('click', () => {
+                if (!this.isMuted) this.playDownloadSound();
+            });
+        }
+
+        // Ajouter les événements pour les boutons du footer
+        document.querySelectorAll('footer a').forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                if (!this.isMuted) this.playSoftHoverSound();
+            });
+            button.addEventListener('click', () => {
+                if (!this.isMuted) this.playFooterClickSound();
+            });
+        });
+
+        // Ajouter les événements pour les éléments du CV
+        document.querySelectorAll('.cv-section-header').forEach(header => {
+            header.addEventListener('click', () => {
+                if (!this.isMuted) {
+                    this.playSound({
+                        frequency: 800,
+                        volume: 0.03,
+                        duration: 0.1,
+                        type: 'sine'
+                    });
+                }
+            });
+        });
+
+        // Ajouter les événements pour les tags de compétences
+        document.querySelectorAll('.cv-skill-tag').forEach(tag => {
+            tag.addEventListener('mouseenter', () => {
+                if (!this.isMuted) {
+                    this.playSound({
+                        frequency: 1000,
+                        volume: 0.02,
+                        duration: 0.05,
+                        type: 'sine'
+                    });
+                }
+            });
+        });
+    },
+
+    observeDynamicElements() {
+        // Créer un observateur pour les changements dans le DOM
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                // Pour chaque nouveau nœud ajouté
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) { // 1 = ELEMENT_NODE
+                        // Vérifier et ajouter les événements aux cartes GitHub
+                        node.querySelectorAll('.repo-card').forEach(card => {
+                            this.addGitHubCardEvents(card);
+                        });
+
+                        // Vérifier et ajouter les événements aux tables
+                        node.querySelectorAll('.table-item').forEach(table => {
+                            this.addTableEvents(table);
+                        });
+                    }
+                });
+            });
+        });
+
+        // Observer les changements dans tout le document
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        // Ajouter les événements aux éléments existants
+        this.addEventsToExistingElements();
+    },
+
+    addEventsToExistingElements() {
+        // Ajouter les événements aux cartes GitHub existantes
+        document.querySelectorAll('.repo-card').forEach(card => {
+            this.addGitHubCardEvents(card);
+        });
+
+        // Ajouter les événements aux tables existantes
+        document.querySelectorAll('.table-item').forEach(table => {
+            this.addTableEvents(table);
+        });
+    },
+
+    addGitHubCardEvents(card) {
+        // Éviter les doublons d'événements
+        if (!card.dataset.soundInitialized) {
+            card.addEventListener('mouseenter', () => this.playHoverSound());
+            card.dataset.soundInitialized = 'true';
+        }
+    },
+
+    addTableEvents(table) {
+        // Éviter les doublons d'événements
+        if (!table.dataset.soundInitialized) {
+            table.addEventListener('mouseenter', () => this.playHoverSound());
+            table.addEventListener('click', () => {
+                const tableName = table.getAttribute('data-table-name');
+                const sqlInput = document.getElementById('sql-input');
+                if (sqlInput) {
+                    sqlInput.value = `SELECT * FROM ${tableName};`;
+                    this.playTableClickSound();
+                }
+            });
+            table.dataset.soundInitialized = 'true';
+        }
+    },
+
+    disableAllSounds() {
+        // Désactiver tous les éléments audio
+        document.querySelectorAll('audio').forEach(audio => {
+            audio.muted = true;
+            audio.pause();
+        });
+
+        // Désactiver les sons dans la section CV
+        const cvSections = document.querySelectorAll('.cv-section, .cv-section-header, .cv-section-content');
+        cvSections.forEach(section => {
+            section.classList.add('sounds-disabled');
+            // Désactiver les sons pour les sections accordéon
+            const header = section.querySelector('.cv-section-header');
+            if (header) {
+                header.dataset.soundDisabled = 'true';
             }
         });
+
+        // Désactiver les événements sonores des éléments du CV
+        document.querySelectorAll('.cv-section-header, .cv-skill-tag, .cv-download-btn').forEach(element => {
+            element.dataset.soundDisabled = 'true';
+        });
+
+        // Désactiver le contexte audio si existant
+        if (this.audioContext) {
+            this.audioContext.suspend();
+        }
+
+        // Désactiver les sons du chat si le chatbot existe
+        if (window.chatBot && chatBot.audioContext) {
+            chatBot.audioContext.suspend();
+        }
+
+        // Mettre à jour l'état dans le localStorage
+        localStorage.setItem('soundMuted', 'true');
+    },
+
+    enableAllSounds() {
+        // Activer tous les éléments audio
+        document.querySelectorAll('audio').forEach(audio => {
+            audio.muted = false;
+        });
+
+        // Activer les sons dans la section CV
+        const cvSections = document.querySelectorAll('.cv-section, .cv-section-header, .cv-section-content');
+        cvSections.forEach(section => {
+            section.classList.remove('sounds-disabled');
+            // Réactiver les sons pour les sections accordéon
+            const header = section.querySelector('.cv-section-header');
+            if (header) {
+                header.dataset.soundDisabled = 'false';
+            }
+        });
+
+        // Réactiver les événements sonores des éléments du CV
+        document.querySelectorAll('.cv-section-header, .cv-skill-tag, .cv-download-btn').forEach(element => {
+            element.dataset.soundDisabled = 'false';
+        });
+
+        // Réactiver le contexte audio si existant
+        if (this.audioContext) {
+            this.audioContext.resume();
+        }
+
+        // Réactiver les sons du chat si le chatbot existe
+        if (window.chatBot && chatBot.audioContext) {
+            chatBot.audioContext.resume();
+        }
+
+        // Mettre à jour l'état dans le localStorage
+        localStorage.setItem('soundMuted', 'false');
+    },
+
+    toggleMute() {
+        this.isMuted = !this.isMuted;
+        localStorage.setItem('soundMuted', this.isMuted);
+        this.updateSoundIcon();
+        
+        // Suspendre/reprendre immédiatement le contexte audio
+        if (this.audioContext) {
+            if (this.isMuted) {
+                this.audioContext.suspend();
+                this.disableAllSounds();
+            } else {
+                this.audioContext.resume();
+                this.enableAllSounds();
+            }
+        }
+        
+        // Mettre à jour l'état des sections CV
+        document.querySelectorAll('.cv-section-header').forEach(header => {
+            header.dataset.soundDisabled = this.isMuted.toString();
+        });
+    },
+
+    updateSoundIcon() {
+        const soundToggle = document.getElementById('sound-toggle');
+        if (soundToggle) {
+            const icon = soundToggle.querySelector('i');
+            if (icon) {
+                icon.className = this.isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+            }
+            soundToggle.classList.toggle('muted', this.isMuted);
+        }
+    },
+
+    canPlaySound() {
+        if (this.isMuted) {
+            // Vérifier si l'événement actuel provient d'un élément du CV
+            if (event && event.target) {
+                const cvElement = event.target.closest('.cv-section, .cv-download-btn, [data-section="cv"]');
+                if (cvElement) {
+                    return false;
+                }
+            }
+        }
+        return this.audioContext !== null && !this.isMuted;
+    },
+
+    playSound(options) {
+        // Bloquer tous les sons si le son est désactivé
+        if (this.isMuted) return;
+
+        // Vérifier si l'audioContext est disponible
+        if (!this.audioContext) return;
+
+        try {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+            
+            osc.connect(gain);
+            gain.connect(this.audioContext.destination);
+            
+            osc.type = options.type || 'sine';
+            osc.frequency.setValueAtTime(options.frequency, this.audioContext.currentTime);
+            
+            if (options.frequencyEnd) {
+                osc.frequency.exponentialRampToValueAtTime(
+                    options.frequencyEnd,
+                    this.audioContext.currentTime + options.duration
+                );
+            }
+            
+            gain.gain.setValueAtTime(options.volume, this.audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(
+                0.001,
+                this.audioContext.currentTime + options.duration
+            );
+            
+            osc.start(this.audioContext.currentTime);
+            osc.stop(this.audioContext.currentTime + options.duration);
+
+            setTimeout(() => {
+                osc.disconnect();
+                gain.disconnect();
+            }, options.duration * 1000);
+        } catch (error) {
+            console.error('Erreur lors de la lecture du son:', error);
+        }
+    },
+
+    playToggleSound(willBeMuted) {
+        const tempMuted = this.isMuted;
+        this.isMuted = false;
+        
+        if (willBeMuted) {
+            // Son de désactivation : fréquence descendante
+            this.playSound({
+                frequency: 880,
+                frequencyEnd: 440,
+                volume: 0.03,
+                duration: 0.2,
+                type: 'sine'
+            });
+            
+            // Ajouter un son secondaire plus grave
+            setTimeout(() => {
+                this.playSound({
+                    frequency: 440,
+                    frequencyEnd: 220,
+                    volume: 0.02,
+                    duration: 0.15,
+                    type: 'sine'
+                });
+            }, 50);
+        } else {
+            // Son d'activation : fréquence ascendante
+            this.playSound({
+                frequency: 440,
+                frequencyEnd: 880,
+                volume: 0.03,
+                duration: 0.2,
+                type: 'sine'
+            });
+            
+            // Ajouter un son secondaire plus aigu
+            setTimeout(() => {
+                this.playSound({
+                    frequency: 880,
+                    frequencyEnd: 1760,
+                    volume: 0.02,
+                    duration: 0.15,
+                    type: 'sine'
+                });
+            }, 50);
+        }
+        
+        this.isMuted = tempMuted;
+    },
+
+    playHoverSound() {
+        if (event && this.isCvSectionEvent(event)) return;
+        this.playSound({
+            frequency: 440,
+            frequencyEnd: 550,
+            volume: 0.03,
+            duration: 0.3,
+            type: 'sine'
+        });
+    },
+
+    playSoftHoverSound() {
+        if (event && this.isCvSectionEvent(event)) return;
+        this.playSound({
+            frequency: 440,
+            frequencyEnd: 466.16,
+            volume: 0.02,
+            duration: 0.15,
+            type: 'sine'
+        });
+    },
+
+    playTableClickSound() {
+        if (event && this.isCvSectionEvent(event)) return;
+        this.playSound({
+            frequency: 523.25,
+            frequencyEnd: 587.33,
+            volume: 0.03,
+            duration: 0.1,
+            type: 'sine'
+        });
+    },
+
+    playFooterClickSound() {
+        if (event && this.isCvSectionEvent(event)) return;
+        this.playSound({
+            frequency: 783.99,
+            frequencyEnd: 880.00,
+            volume: 0.015,
+            duration: 0.1,
+            type: 'sine'
+        });
+    },
+
+    playDownloadSound() {
+        if (event && this.isCvSectionEvent(event)) return;
+        const notes = [
+            { freq: 392.00, time: 0 },
+            { freq: 493.88, time: 0.1 },
+            { freq: 587.33, time: 0.2 },
+            { freq: 783.99, time: 0.3 }
+        ];
+        
+        notes.forEach(note => {
+            setTimeout(() => {
+                this.playSound({
+                    frequency: note.freq,
+                    volume: 0.04,
+                    duration: 0.2,
+                    type: 'sine'
+                });
+            }, note.time * 1000);
+        });
+    },
+
+    isCvSectionEvent(event) {
+        // Vérifier si l'événement provient d'une section CV
+        const path = event.composedPath();
+        return path.some(element => {
+            if (element && element.classList) {
+                return element.classList.contains('cv-section') ||
+                       element.classList.contains('cv-section-header') ||
+                       element.classList.contains('cv-download-btn') ||
+                       element.classList.contains('cv-skill-tag') ||
+                       element.closest('.cv-section');
+            }
+            return false;
+        }) && this.isMuted;
     }
+};
+
+// Initialiser le gestionnaire de son au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    soundManager.initialize();
 });
