@@ -143,12 +143,14 @@ function resetClassification() {
    function toggleClassification() {
  const classification = document.getElementById('classification-container');
  const qlearning = document.getElementById('qlearning-container');
+ const dataAnalytics = document.getElementById('data-analytics-container');
 
  const isVisible = classification.style.display === 'block';
 
- // Masquer les deux
+ // Masquer tous
  classification.style.display = 'none';
  qlearning.style.display = 'none';
+ dataAnalytics.style.display = 'none';
 
  // Afficher classification seulement si elle était cachée
  if (!isVisible) {
@@ -688,9 +690,123 @@ function resetClassification() {
                    navbar.style.background = 'rgba(204, 197, 185, 0.95)';
                }
            }
+           
+           // CORRECTION STRICTE - Éliminer tout violet en mode sombre UNIQUEMENT
+           if (this.isDark) {
+               this.eliminatePurpleElements();
+           } else {
+               this.restorePurpleElements(); // Restaurer violet en light mode
+           }
        },
        
-       init() {
+               eliminatePurpleElements() {
+            // UNIQUEMENT EN DARK MODE - Forcer le background du body
+            if (this.isDark) {
+                document.body.style.background = '#252422';
+                document.body.style.backgroundColor = '#252422';
+                document.body.style.backgroundImage = 'none';
+            }
+           
+           // Identifier et corriger tous les éléments avec du violet
+           const purpleColors = [
+               '#4b0082', '#8a2be2', '#8A2BE2', '#9b59b6', 
+               '#6a1b9a', '#9c27b0', 'purple', 'violet'
+           ];
+           
+                       // UNIQUEMENT EN DARK MODE - Parcourir tous les éléments
+            if (this.isDark) {
+                const allElements = document.querySelectorAll('*');
+                allElements.forEach(element => {
+                    const computedStyle = window.getComputedStyle(element);
+                    const bgColor = computedStyle.backgroundColor;
+                    const bgImage = computedStyle.backgroundImage;
+                    
+                    // Vérifier si l'élément a du violet EN DARK MODE SEULEMENT
+                    purpleColors.forEach(color => {
+                        if (bgColor.includes(color) || bgImage.includes(color)) {
+                            element.style.background = '#252422';
+                            element.style.backgroundColor = '#252422';
+                            element.style.backgroundImage = 'none';
+                        }
+                    });
+                    
+                    // Traiter les styles inline EN DARK MODE SEULEMENT
+                    const inlineStyle = element.getAttribute('style') || '';
+                    if (purpleColors.some(color => inlineStyle.includes(color))) {
+                        element.style.background = '#252422';
+                        element.style.backgroundColor = '#252422';
+                        element.style.backgroundImage = 'none';
+                    }
+                });
+            }
+           
+                       // UNIQUEMENT EN DARK MODE - Forcer les éléments spécifiques problématiques
+            if (this.isDark) {
+                const chatButton = document.querySelector('.chat-button');
+                if (chatButton) {
+                    chatButton.style.background = 'linear-gradient(135deg, #403D39, #252422)';
+                    chatButton.style.border = '2px solid #CCC5B9';
+                }
+                
+                const chatWindow = document.querySelector('.chat-window');
+                if (chatWindow) {
+                    chatWindow.style.background = 'linear-gradient(135deg, #403D39, #252422)';
+                }
+                
+                // Forcer les cellules Q-Learning EN DARK MODE SEULEMENT
+                const cells = document.querySelectorAll('.cell');
+                cells.forEach(cell => {
+                    if (!cell.classList.contains('optimal-path')) {
+                        cell.style.background = 'linear-gradient(to top, #403D39 50%, #CCC5B9 100%)';
+                    }
+                });
+            }
+               },
+        
+        restorePurpleElements() {
+            // RESTAURER LES COULEURS VIOLET ORIGINALES EN LIGHT MODE
+            document.body.style.background = 'linear-gradient(135deg, #4b0082, #8a2be2)';
+            document.body.style.backgroundColor = '';
+            document.body.style.backgroundImage = '';
+            
+            // Restaurer les boutons violet
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.style.background = '';
+                button.style.backgroundColor = '';
+                button.style.border = '';
+                button.style.color = '';
+            });
+            
+            // Restaurer chat button violet
+            const chatButton = document.querySelector('.chat-button');
+            if (chatButton) {
+                chatButton.style.background = '';
+                chatButton.style.border = '';
+            }
+            
+            // Restaurer chat window violet
+            const chatWindow = document.querySelector('.chat-window');
+            if (chatWindow) {
+                chatWindow.style.background = '';
+            }
+            
+            // Restaurer textarea violet
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                textarea.style.background = '';
+                textarea.style.color = '';
+            });
+            
+            // Restaurer SQL output violet
+            const sqlOutput = document.getElementById('sql-output');
+            if (sqlOutput) {
+                sqlOutput.style.background = '';
+                sqlOutput.style.color = '';
+            }
+        },
+        
+        init() {
            // Vérifier la préférence sauvegardée
            const savedTheme = localStorage.getItem('theme');
            if (savedTheme) {
@@ -754,6 +870,319 @@ function resetClassification() {
            themeToggle.addEventListener('click', () => themeManager.toggle());
        }
    });
+
+   // NAVBAR RESPONSIVE DYNAMIQUE - GESTION COMPLETE
+   
+   class ResponsiveNavbar {
+       constructor() {
+           this.navbar = document.querySelector('.navbar');
+           this.hamburgerBtn = document.querySelector('.hamburger-btn');
+           this.mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
+           this.mobileMenu = document.querySelector('.mobile-menu');
+           this.mobileMenuClose = document.querySelector('.mobile-menu-close');
+           this.mobileMenuItems = document.querySelectorAll('.mobile-menu-item');
+           this.mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+           this.mobileSoundToggle = document.getElementById('mobile-sound-toggle');
+           
+           this.isMenuOpen = false;
+           this.currentBreakpoint = this.getCurrentBreakpoint();
+           this.lastScrollY = window.scrollY;
+           
+           this.init();
+       }
+       
+       init() {
+           this.bindEvents();
+           this.handleResize();
+           this.setupKeyboardNavigation();
+           this.syncMobileControls();
+       }
+       
+       bindEvents() {
+           // Hamburger button click
+           if (this.hamburgerBtn) {
+               this.hamburgerBtn.addEventListener('click', (e) => {
+                   e.stopPropagation();
+                   this.toggleMobileMenu();
+               });
+           }
+           
+           // Mobile menu close button
+           if (this.mobileMenuClose) {
+               this.mobileMenuClose.addEventListener('click', () => {
+                   this.closeMobileMenu();
+               });
+           }
+           
+           // Overlay click to close
+           if (this.mobileMenuOverlay) {
+               this.mobileMenuOverlay.addEventListener('click', (e) => {
+                   if (e.target === this.mobileMenuOverlay) {
+                       this.closeMobileMenu();
+                   }
+               });
+           }
+           
+           // Mobile menu items click
+           this.mobileMenuItems.forEach(item => {
+               item.addEventListener('click', () => {
+                   this.closeMobileMenu();
+                   // Smooth scroll to section
+                   const href = item.getAttribute('href');
+                   if (href && href.startsWith('#')) {
+                       const target = document.querySelector(href);
+                       if (target) {
+                           target.scrollIntoView({ 
+                               behavior: 'smooth',
+                               block: 'start'
+                           });
+                       }
+                   }
+               });
+           });
+           
+           // Window resize
+           window.addEventListener('resize', () => {
+               this.handleResize();
+           });
+           
+           // Orientation change
+           window.addEventListener('orientationchange', () => {
+               setTimeout(() => {
+                   this.handleResize();
+               }, 100);
+           });
+           
+           // Scroll behavior
+           window.addEventListener('scroll', () => {
+               this.handleScroll();
+           });
+           
+           // Mobile theme controls
+           if (this.mobileThemeToggle) {
+               this.mobileThemeToggle.addEventListener('click', () => {
+                   themeManager.toggle();
+                   this.syncMobileControls();
+               });
+           }
+           
+           if (this.mobileSoundToggle) {
+               this.mobileSoundToggle.addEventListener('click', () => {
+                   soundManager.toggleMute();
+                   this.syncMobileControls();
+               });
+           }
+       }
+       
+       getCurrentBreakpoint() {
+           const width = window.innerWidth;
+           if (width <= 768) return 'mobile';
+           if (width <= 1024) return 'tablet';
+           return 'desktop';
+       }
+       
+       handleResize() {
+           const newBreakpoint = this.getCurrentBreakpoint();
+           
+           // Close mobile menu if switching to larger screen
+           if (this.currentBreakpoint === 'mobile' && newBreakpoint !== 'mobile') {
+               this.closeMobileMenu();
+           }
+           
+           this.currentBreakpoint = newBreakpoint;
+           this.updateNavbarLayout();
+       }
+       
+       updateNavbarLayout() {
+           // Priority display for tablet mode
+           if (this.currentBreakpoint === 'tablet') {
+               this.applyTabletLayout();
+           }
+       }
+       
+       applyTabletLayout() {
+           // Show only priority items in tablet mode
+           const navItems = document.querySelectorAll('.navbar-item');
+           const priority = ['#profil', '#competences', '#experience', '#projects', '#contact']; // Priority order
+           
+           navItems.forEach(item => {
+               const href = item.getAttribute('href');
+               if (priority.includes(href)) {
+                   item.style.display = 'flex';
+               } else {
+                   item.style.display = 'none';
+               }
+           });
+       }
+       
+       toggleMobileMenu() {
+           if (this.isMenuOpen) {
+               this.closeMobileMenu();
+           } else {
+               this.openMobileMenu();
+           }
+       }
+       
+       openMobileMenu() {
+           this.isMenuOpen = true;
+           this.hamburgerBtn.classList.add('active');
+           this.hamburgerBtn.setAttribute('aria-expanded', 'true');
+           this.mobileMenuOverlay.classList.add('active');
+           
+           // Prevent body scroll
+           document.body.style.overflow = 'hidden';
+           
+           // Focus trap
+           this.trapFocus();
+           
+           // Sound effect
+           if (typeof soundManager !== 'undefined') {
+               soundManager.playToggleSound(false);
+           }
+       }
+       
+       closeMobileMenu() {
+           this.isMenuOpen = false;
+           this.hamburgerBtn.classList.remove('active');
+           this.hamburgerBtn.setAttribute('aria-expanded', 'false');
+           this.mobileMenuOverlay.classList.remove('active');
+           
+           // Restore body scroll
+           document.body.style.overflow = '';
+           
+           // Sound effect
+           if (typeof soundManager !== 'undefined') {
+               soundManager.playToggleSound(true);
+           }
+       }
+       
+       handleScroll() {
+           const currentScrollY = window.scrollY;
+           
+           // Auto-close mobile menu on scroll
+           if (this.isMenuOpen && this.currentBreakpoint === 'mobile') {
+               if (Math.abs(currentScrollY - this.lastScrollY) > 50) {
+                   this.closeMobileMenu();
+               }
+           }
+           
+           // Hide/show navbar on scroll (optional)
+           if (currentScrollY > this.lastScrollY && currentScrollY > 100) {
+               this.navbar.classList.add('navbar-hidden');
+           } else {
+               this.navbar.classList.remove('navbar-hidden');
+           }
+           
+           this.lastScrollY = currentScrollY;
+       }
+       
+       setupKeyboardNavigation() {
+           // Escape key to close menu
+           document.addEventListener('keydown', (e) => {
+               if (e.key === 'Escape' && this.isMenuOpen) {
+                   this.closeMobileMenu();
+               }
+           });
+           
+           // Tab navigation within mobile menu
+           if (this.mobileMenu) {
+               this.mobileMenu.addEventListener('keydown', (e) => {
+                   if (e.key === 'Tab') {
+                       this.handleTabNavigation(e);
+                   }
+               });
+           }
+       }
+       
+       handleTabNavigation(e) {
+           const focusableElements = this.mobileMenu.querySelectorAll(
+               'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+           );
+           const firstFocusable = focusableElements[0];
+           const lastFocusable = focusableElements[focusableElements.length - 1];
+           
+           if (e.shiftKey) {
+               if (document.activeElement === firstFocusable) {
+                   lastFocusable.focus();
+                   e.preventDefault();
+               }
+           } else {
+               if (document.activeElement === lastFocusable) {
+                   firstFocusable.focus();
+                   e.preventDefault();
+               }
+           }
+       }
+       
+       trapFocus() {
+           // Focus on first menu item when opened
+           setTimeout(() => {
+               const firstMenuItem = this.mobileMenu.querySelector('.mobile-menu-item');
+               if (firstMenuItem) {
+                   firstMenuItem.focus();
+               }
+           }, 300);
+       }
+       
+       syncMobileControls() {
+           // Sync theme button state
+           if (this.mobileThemeToggle) {
+               const icon = this.mobileThemeToggle.querySelector('i');
+               if (themeManager.isDark) {
+                   icon.className = 'fas fa-sun';
+               } else {
+                   icon.className = 'fas fa-moon';
+               }
+           }
+           
+           // Sync sound button state
+           if (this.mobileSoundToggle && typeof soundManager !== 'undefined') {
+               const icon = this.mobileSoundToggle.querySelector('i');
+               if (soundManager.isMuted) {
+                   icon.className = 'fas fa-volume-mute';
+               } else {
+                   icon.className = 'fas fa-volume-up';
+               }
+           }
+       }
+       
+       // Touch gestures for advanced interaction
+       setupTouchGestures() {
+           let startX = 0;
+           let startY = 0;
+           
+           this.mobileMenu.addEventListener('touchstart', (e) => {
+               startX = e.touches[0].clientX;
+               startY = e.touches[0].clientY;
+           });
+           
+           this.mobileMenu.addEventListener('touchmove', (e) => {
+               if (!startX || !startY) return;
+               
+               const currentX = e.touches[0].clientX;
+               const currentY = e.touches[0].clientY;
+               
+               const diffX = startX - currentX;
+               const diffY = startY - currentY;
+               
+               // Swipe right to close
+               if (Math.abs(diffX) > Math.abs(diffY) && diffX < -50) {
+                   this.closeMobileMenu();
+               }
+           });
+           
+           this.mobileMenu.addEventListener('touchend', () => {
+               startX = 0;
+               startY = 0;
+           });
+       }
+   }
+
+   // Initialize responsive navbar
+   let responsiveNavbar;
+   
+   // Export for external access
+   window.ResponsiveNavbar = ResponsiveNavbar;
 
    // SYSTÈME Q-LEARNING COMPLET
    const gridElement = document.getElementById("grid");
@@ -931,12 +1360,14 @@ function resetClassification() {
    function toggleQlearning() {
  const qlearning = document.getElementById("qlearning-container");
  const classification = document.getElementById("classification-container");
+ const dataAnalytics = document.getElementById('data-analytics-container');
 
  const isVisible = qlearning.style.display === 'block';
 
- // Masquer les deux
+ // Masquer tous
  qlearning.style.display = 'none';
  classification.style.display = 'none';
+ dataAnalytics.style.display = 'none';
 
  // Afficher q-learning seulement si il était caché
  if (!isVisible) {
@@ -968,11 +1399,457 @@ document.addEventListener('DOMContentLoaded', function() {
  const gbt = document.getElementById('gbt-container');
  const classification = document.getElementById('classification-container');
  const qlearning = document.getElementById('qlearning-container');
+ const dataAnalytics = document.getElementById('data-analytics-container');
 
  // Masquer les autres
  classification.style.display = 'none';
  qlearning.style.display = 'none';
+ dataAnalytics.style.display = 'none';
  gbt.style.display = gbt.style.display === 'block' ? 'none' : 'block';
+}
+
+function toggleDataAnalytics() {
+ const dataAnalytics = document.getElementById('data-analytics-container');
+ const classification = document.getElementById('classification-container');
+ const qlearning = document.getElementById('qlearning-container');
+ const gbt = document.getElementById('gbt-container');
+
+ const isVisible = dataAnalytics.style.display === 'block';
+
+ // Masquer tous les autres
+ classification.style.display = 'none';
+ qlearning.style.display = 'none';
+ gbt.style.display = 'none';
+
+ // Afficher data analytics seulement si il était caché
+ if (!isVisible) {
+   dataAnalytics.style.display = 'block';
+   initializeDataAnalytics();
+ }
+}
+
+function closeDataAnalytics() {
+ const dataAnalytics = document.getElementById('data-analytics-container');
+ dataAnalytics.style.display = 'none';
+ 
+ // Réinitialiser à la source par défaut
+ document.getElementById('data-source').value = 'sales';
+ document.getElementById('time-range').value = '7d';
+}
+
+// Données simulées dynamiques pour le dashboard
+function generateDynamicData() {
+  const currentTime = Date.now();
+  const randomFactor = Math.sin(currentTime / 100000) * 0.3 + 1; // Oscillation basée sur le temps
+  
+  return {
+    sales: {
+      name: "Données de Ventes",
+      kpis: {
+        revenue: "€" + Math.floor(45230 * randomFactor).toLocaleString(),
+        users: Math.floor(12847 * (randomFactor + 0.1)).toLocaleString(),
+        conversion: (3.2 * randomFactor).toFixed(1) + "%",
+        performance: (98.5 * (randomFactor * 0.02 + 0.98)).toFixed(1) + "%"
+      },
+      trends: {
+        revenue: (Math.random() > 0.5 ? "+" : "") + (15.3 * randomFactor - 7.5).toFixed(1) + "%",
+        users: (Math.random() > 0.5 ? "+" : "") + (8.7 * randomFactor - 4).toFixed(1) + "%",
+        conversion: (Math.random() > 0.5 ? "+" : "") + (2.1 * randomFactor - 3).toFixed(1) + "%",
+        performance: (Math.random() > 0.5 ? "+" : "") + (1.2 * randomFactor - 0.5).toFixed(1) + "%"
+      },
+      chartData: Array.from({length: 7}, (_, i) => Math.floor((120 + i * 40) * (randomFactor + Math.sin(i) * 0.2))),
+      categories: ["Produit A", "Produit B", "Produit C", "Produit D"],
+      categoryValues: [
+        Math.floor(35 * randomFactor),
+        Math.floor(25 * (randomFactor + 0.2)),
+        Math.floor(20 * (randomFactor + 0.1)),
+        Math.floor(20 * randomFactor)
+      ]
+    },
+    users: {
+      name: "Utilisateurs Actifs",
+      kpis: {
+        revenue: "€" + Math.floor(38920 * (randomFactor + 0.3)).toLocaleString(),
+        users: Math.floor(18234 * randomFactor).toLocaleString(),
+        conversion: (4.1 * (randomFactor + 0.1)).toFixed(1) + "%",
+        performance: (96.8 * (randomFactor * 0.03 + 0.97)).toFixed(1) + "%"
+      },
+      trends: {
+        revenue: (Math.random() > 0.5 ? "+" : "") + (8.9 * randomFactor - 4).toFixed(1) + "%",
+        users: (Math.random() > 0.5 ? "+" : "") + (12.3 * randomFactor - 6).toFixed(1) + "%",
+        conversion: (Math.random() > 0.5 ? "+" : "") + (3.2 * randomFactor - 1.5).toFixed(1) + "%",
+        performance: (Math.random() > 0.5 ? "+" : "") + (0.5 * randomFactor - 1).toFixed(1) + "%"
+      },
+      chartData: Array.from({length: 7}, (_, i) => Math.floor((800 + i * 150) * (randomFactor + Math.cos(i) * 0.3))),
+      categories: ["Nouveaux", "Récurrents", "Premium", "Inactifs"],
+      categoryValues: [
+        Math.floor(40 * (randomFactor + 0.1)),
+        Math.floor(35 * randomFactor),
+        Math.floor(15 * (randomFactor + 0.3)),
+        Math.floor(10 * randomFactor)
+      ]
+    },
+    performance: {
+      name: "Performance Système",
+      kpis: {
+        revenue: "€" + Math.floor(52840 * (randomFactor + 0.2)).toLocaleString(),
+        users: Math.floor(9567 * (randomFactor + 0.1)).toLocaleString(),
+        conversion: (2.8 * randomFactor).toFixed(1) + "%",
+        performance: (99.2 * (randomFactor * 0.01 + 0.995)).toFixed(1) + "%"
+      },
+      trends: {
+        revenue: (Math.random() > 0.5 ? "+" : "") + (22.1 * randomFactor - 10).toFixed(1) + "%",
+        users: (Math.random() > 0.5 ? "+" : "") + (5.4 * randomFactor - 2.5).toFixed(1) + "%",
+        conversion: (Math.random() > 0.5 ? "+" : "") + (1.8 * randomFactor - 2.5).toFixed(1) + "%",
+        performance: (Math.random() > 0.5 ? "+" : "") + (2.1 * randomFactor - 1).toFixed(1) + "%"
+      },
+      chartData: Array.from({length: 7}, (_, i) => Math.floor((95 + Math.sin(i) * 3) * (randomFactor * 0.02 + 0.98))),
+      categories: ["CPU", "Mémoire", "Réseau", "Stockage"],
+      categoryValues: [
+        Math.floor(30 * (randomFactor + 0.1)),
+        Math.floor(25 * randomFactor),
+        Math.floor(25 * (randomFactor + 0.2)),
+        Math.floor(20 * randomFactor)
+      ]
+    },
+    market: {
+      name: "Analyse de Marché",
+      kpis: {
+        revenue: "€" + Math.floor(67190 * (randomFactor + 0.4)).toLocaleString(),
+        users: Math.floor(24891 * randomFactor).toLocaleString(),
+        conversion: (5.7 * (randomFactor + 0.2)).toFixed(1) + "%",
+        performance: (94.3 * (randomFactor * 0.04 + 0.96)).toFixed(1) + "%"
+      },
+      trends: {
+        revenue: (Math.random() > 0.5 ? "+" : "") + (18.7 * randomFactor - 9).toFixed(1) + "%",
+        users: (Math.random() > 0.5 ? "+" : "") + (15.9 * randomFactor - 7.5).toFixed(1) + "%",
+        conversion: (Math.random() > 0.5 ? "+" : "") + (4.3 * randomFactor - 2).toFixed(1) + "%",
+        performance: (Math.random() > 0.5 ? "+" : "") + (1.8 * randomFactor - 2.5).toFixed(1) + "%"
+      },
+      chartData: Array.from({length: 7}, (_, i) => Math.floor((200 + i * 110) * (randomFactor + Math.sin(i * 0.8) * 0.25))),
+      categories: ["Segment 1", "Segment 2", "Segment 3", "Segment 4"],
+      categoryValues: [
+        Math.floor(45 * (randomFactor + 0.1)),
+        Math.floor(30 * randomFactor),
+        Math.floor(15 * (randomFactor + 0.4)),
+        Math.floor(10 * randomFactor)
+      ]
+    }
+  };
+}
+
+function initializeDataAnalytics() {
+  // Initialiser avec les données de ventes par défaut
+  updateAnalyticsDashboard('sales');
+  
+  // Mettre à jour le status
+  document.getElementById('analytics-status').innerHTML = 
+    '<span style="color: #00ffcc;">✓ Dashboard initialisé</span><br>' +
+    '<span style="color: #ffd700;">📊 Données simulées chargées avec succès</span><br>' +
+    '<span style="color: #ffffff;">🔄 Prêt pour l\'analyse en temps réel</span>';
+}
+
+function changeDataSource() {
+  const dataSource = document.getElementById('data-source').value;
+  updateAnalyticsDashboard(dataSource);
+  
+  // Animation de changement
+  const dashboard = document.querySelector('.analytics-dashboard');
+  dashboard.style.opacity = '0.7';
+  dashboard.style.transform = 'scale(0.98)';
+  
+  setTimeout(() => {
+    dashboard.style.opacity = '1';
+    dashboard.style.transform = 'scale(1)';
+  }, 300);
+  
+  // Mettre à jour le status
+  const analyticsData = generateDynamicData();
+  document.getElementById('analytics-status').innerHTML = 
+    `<span style="color: #00ffcc;">✓ Source de données mise à jour : ${analyticsData[dataSource].name}</span>`;
+}
+
+function changeTimeRange() {
+  const timeRange = document.getElementById('time-range').value;
+  const timeRangeNames = {
+    '24h': 'Dernières 24 heures',
+    '7d': '7 derniers jours', 
+    '30d': '30 derniers jours',
+    '1y': 'Cette année'
+  };
+  
+  // Simulation de rechargement des données
+  setTimeout(() => {
+    document.getElementById('analytics-status').innerHTML = 
+      `<span style="color: #ffd700;">📅 Période mise à jour : ${timeRangeNames[timeRange]}</span><br>` +
+      `<span style="color: #00ffcc;">🔄 Données recalculées automatiquement</span>`;
+  }, 500);
+}
+
+function updateAnalyticsDashboard(dataSource) {
+  const analyticsData = generateDynamicData();
+  const data = analyticsData[dataSource];
+  
+  // Mettre à jour les KPIs
+  document.getElementById('revenue-kpi').textContent = data.kpis.revenue;
+  document.getElementById('users-kpi').textContent = data.kpis.users;
+  document.getElementById('conversion-kpi').textContent = data.kpis.conversion;
+  document.getElementById('performance-kpi').textContent = data.kpis.performance;
+  
+  // Mettre à jour les tendances
+  const kpiCards = document.querySelectorAll('.kpi-card');
+  const trends = ['revenue', 'users', 'conversion', 'performance'];
+  
+  kpiCards.forEach((card, index) => {
+    const trendElement = card.querySelector('.kpi-trend');
+    const trendValue = data.trends[trends[index]];
+    trendElement.textContent = trendValue;
+    
+    // Déterminer si c'est positif ou négatif
+    if (trendValue.includes('+')) {
+      trendElement.className = 'kpi-trend positive';
+    } else {
+      trendElement.className = 'kpi-trend negative';
+    }
+  });
+  
+  // Simuler la mise à jour des graphiques
+  updateChartPlaceholders(data, dataSource);
+}
+
+function updateChartPlaceholders(data, dataSource) {
+  // Couleurs spécifiques selon la source de données
+  const sourceColors = {
+    sales: { primary: '#00ffcc', secondary: '#ffd700', accent: '#ff6B35' },
+    users: { primary: '#4CAF50', secondary: '#8BC34A', accent: '#CDDC39' },
+    performance: { primary: '#2196F3', secondary: '#03DAC6', accent: '#BB86FC' },
+    market: { primary: '#FF9800', secondary: '#FF5722', accent: '#E91E63' }
+  };
+  
+  const colors = sourceColors[dataSource] || sourceColors.sales;
+  
+  // Graphique des tendances - style différent selon la source
+  const salesChart = document.getElementById('sales-chart');
+  const maxValue = Math.max(...data.chartData);
+  
+  salesChart.innerHTML = `
+    <div style="
+      display: flex; 
+      align-items: end; 
+      justify-content: space-around; 
+      height: 150px; 
+      padding: 20px;
+      background: linear-gradient(45deg, rgba(0,0,0,0.1), rgba(255,255,255,0.05));
+      border-radius: 8px;
+    ">
+      ${data.chartData.map((value, index) => {
+        const height = (value / maxValue) * 100;
+        const barStyle = dataSource === 'performance' ? 
+          `background: linear-gradient(to top, ${colors.primary}, ${colors.secondary}); border-radius: 8px;` :
+          dataSource === 'users' ?
+          `background: linear-gradient(135deg, ${colors.primary}, ${colors.secondary}); border-radius: 50% 50% 0 0;` :
+          `background: linear-gradient(to top, ${colors.primary}, ${colors.secondary}); border-radius: 4px 4px 0 0;`;
+        
+        return `
+          <div style="
+            width: ${dataSource === 'market' ? '25px' : '20px'}; 
+            height: ${height}%; 
+            ${barStyle}
+            margin: 0 2px;
+            position: relative;
+            animation: barGrow 1s ease ${index * 0.15}s both;
+            box-shadow: 0 0 10px rgba(0,255,204,0.3);
+          ">
+            <div style="
+              position: absolute;
+              top: -25px;
+              left: 50%;
+              transform: translateX(-50%);
+              font-size: 10px;
+              color: ${colors.primary};
+              font-weight: bold;
+            ">${value}</div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+    <div style="
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+      font-size: 11px;
+      color: #888;
+    ">
+      ${['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(day => `<span>${day}</span>`).join('')}
+    </div>
+    <style>
+      @keyframes barGrow {
+        from { height: 0; opacity: 0; }
+        to { height: ${100}%; opacity: 1; }
+      }
+    </style>
+  `;
+  
+  // Graphique en secteurs - design différent selon la source
+  const categoryChart = document.getElementById('category-chart');
+  const total = data.categoryValues.reduce((a, b) => a + b, 0);
+  
+  categoryChart.innerHTML = `
+    <div style="display: flex; flex-direction: column; height: 150px; gap: 8px; padding: 10px;">
+      ${data.categories.map((category, index) => {
+        const percentage = Math.round((data.categoryValues[index] / total) * 100);
+        const barWidth = percentage;
+        
+        return `
+          <div style="
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            animation: slideInLeft 0.8s ease ${index * 0.2}s both;
+          ">
+            <div style="
+              width: 80px;
+              font-size: 0.8rem;
+              color: #ffffff;
+              text-align: right;
+            ">${category}</div>
+            <div style="
+              flex: 1;
+              height: 18px;
+              background: rgba(255,255,255,0.1);
+              border-radius: 10px;
+              overflow: hidden;
+              position: relative;
+            ">
+              <div style="
+                width: ${barWidth}%;
+                height: 100%;
+                background: linear-gradient(90deg, ${colors.primary}, ${colors.secondary});
+                border-radius: 10px;
+                animation: fillBar 1.2s ease ${index * 0.3}s both;
+                position: relative;
+              ">
+                <div style="
+                  position: absolute;
+                  right: 5px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  font-size: 10px;
+                  color: white;
+                  font-weight: bold;
+                  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+                ">${percentage}%</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+    <style>
+      @keyframes slideInLeft {
+        from { 
+          opacity: 0; 
+          transform: translateX(-30px); 
+        }
+        to { 
+          opacity: 1; 
+          transform: translateX(0); 
+        }
+      }
+      @keyframes fillBar {
+        from { width: 0%; }
+        to { width: ${100}%; }
+      }
+    </style>
+  `;
+  
+  // Mettre à jour les insights IA selon la source de données
+  updateAIInsights(dataSource, data);
+}
+
+function updateAIInsights(dataSource, data) {
+  const insights = {
+    sales: [
+      `Les ventes ont augmenté de ${data.trends.revenue} ce mois-ci`,
+      `Peak de ventes détecté le vendredi (+23% vs moyenne)`,
+      `Recommandation: Optimiser le stock des produits A et B`
+    ],
+    users: [
+      `Croissance utilisateurs: ${data.trends.users} vs mois dernier`,
+      `Les utilisateurs premium génèrent 3x plus de revenus`,
+      `Taux de rétention en hausse dans la tranche 25-35 ans`
+    ],
+    performance: [
+      `Performance système: ${data.kpis.performance} (excellent)`,
+      `CPU optimisé: -15% de consommation vs semaine dernière`,
+      `Recommandation: Augmenter la capacité réseau de 20%`
+    ],
+    market: [
+      `Part de marché: ${data.trends.revenue} de croissance`,
+      `Segment 1 domine avec ${data.categoryValues[0]}% du marché`,
+      `Opportunité détectée: expansion sur le Segment 3`
+    ]
+  };
+  
+  const insightsContainer = document.getElementById('ai-insights-content');
+  if (insightsContainer) {
+    insightsContainer.innerHTML = insights[dataSource].map((insight, index) => `
+      <div class="insight-item" style="animation: fadeInUp 0.6s ease ${index * 0.2}s both;">
+        <i class="fas fa-${index === 0 ? 'lightbulb' : index === 1 ? 'trending-up' : 'exclamation-triangle'}"></i>
+        <span>${insight}</span>
+      </div>
+    `).join('');
+  }
+}
+
+function generateAnalytics() {
+  // Animation de rechargement
+  const status = document.getElementById('analytics-status');
+  const kpiCards = document.querySelectorAll('.kpi-card');
+  
+  status.innerHTML = '<span style="color: #ffd700;">🔄 Actualisation des données en cours...</span>';
+  
+  // Animer les cartes KPI
+  kpiCards.forEach((card, index) => {
+    setTimeout(() => {
+      card.style.transform = 'scale(0.95)';
+      card.style.opacity = '0.7';
+      
+      setTimeout(() => {
+        card.style.transform = 'scale(1)';
+        card.style.opacity = '1';
+      }, 200);
+    }, index * 100);
+  });
+  
+  // Simulation du rechargement
+  setTimeout(() => {
+    const dataSource = document.getElementById('data-source').value;
+    updateAnalyticsDashboard(dataSource);
+    
+    const processedData = Math.floor(Math.random() * 1000 + 500);
+    const accuracy = (95 + Math.random() * 4).toFixed(1);
+    
+    status.innerHTML = 
+      '<span style="color: #00ffcc;">✅ Données actualisées avec succès !</span><br>' +
+      '<span style="color: #ffd700;">⏰ Dernière mise à jour : ' + new Date().toLocaleTimeString() + '</span><br>' +
+      '<span style="color: #ffffff;">📊 ' + processedData + ' points de données traités</span><br>' +
+      '<span style="color: #00ffcc;">🎯 Précision des prédictions : ' + accuracy + '%</span>';
+  }, 2000);
+}
+
+function exportDashboard() {
+  const status = document.getElementById('analytics-status');
+  
+  status.innerHTML = '<span style="color: #ffd700;">📄 Génération du rapport en cours...</span>';
+  
+  // Simulation de l'export
+  setTimeout(() => {
+    status.innerHTML = 
+      '<span style="color: #00ffcc;">✅ Rapport exporté avec succès !</span><br>' +
+      '<span style="color: #ffffff;">📋 Format : PDF • Taille : 2.3 MB</span><br>' +
+      '<span style="color: #ffd700;">💾 Sauvegardé dans : /downloads/analytics_report.pdf</span>';
+  }, 1500);
 }
 
 // Fonction pour toggle les sections CV
@@ -1121,64 +1998,7 @@ function animateSkillCounters() {
     });
 }
 
-// Fonction pour créer un système de progression pour l'expérience
-function createExperienceTimeline() {
-    const experienceSection = document.querySelector('.cv-section:has(.cv-experience-item)');
-    if (!experienceSection) return;
-    
-    const timeline = document.createElement('div');
-    timeline.className = 'cv-timeline';
-    timeline.style.cssText = `
-        position: absolute;
-        left: 20px;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: linear-gradient(to bottom, #00ffcc, #ffd700, #ff6b35);
-        border-radius: 2px;
-        box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
-    `;
-    
-    const experienceContent = experienceSection.querySelector('.cv-section-content');
-    experienceContent.style.position = 'relative';
-    experienceContent.appendChild(timeline);
-    
-    // Ajouter des points sur la timeline
-    const experienceItems = experienceSection.querySelectorAll('.cv-experience-item');
-    experienceItems.forEach((item, index) => {
-        const timelinePoint = document.createElement('div');
-        timelinePoint.className = 'timeline-point';
-        timelinePoint.style.cssText = `
-            position: absolute;
-            left: 18px;
-            top: ${(index + 1) * 120}px;
-            width: 12px;
-            height: 12px;
-            background: #00ffcc;
-            border-radius: 50%;
-            border: 3px solid rgba(0, 255, 204, 0.3);
-            box-shadow: 0 0 15px #00ffcc;
-            animation: pulse 2s infinite;
-            z-index: 1;
-        `;
-        
-        experienceContent.appendChild(timelinePoint);
-        
-        // Ajouter une ligne de connexion
-        const connectionLine = document.createElement('div');
-        connectionLine.style.cssText = `
-            position: absolute;
-            left: 24px;
-            top: ${(index + 1) * 120 + 6}px;
-            width: 50px;
-            height: 2px;
-            background: linear-gradient(to right, #00ffcc, transparent);
-            box-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
-        `;
-        
-        experienceContent.appendChild(connectionLine);
-    });
-}
+// Timeline supprimée - Section expériences professionnelles sans éléments timeline
 
 // Fonction pour ajouter des tooltips informatifs
 function addTooltips() {
@@ -1193,7 +2013,17 @@ function addTooltips() {
         'Docker': 'Conteneurisation et déploiement d\'applications',
         'SCRUM': 'Méthodologie agile de gestion de projet',
         'MongoDB': 'Base de données NoSQL orientée documents',
-        'R': 'Analyse statistique et data science'
+        'R': 'Analyse statistique et data science',
+        'MERISE': 'Méthode de conception de systèmes d\'information',
+        'UML': 'Langage de modélisation unifié',
+        'SysML': 'Langage de modélisation systèmes',
+        'Tableau': 'Outil de visualisation de données',
+        'Power BI': 'Solution Microsoft de business intelligence',
+        'MySQL': 'Système de gestion de base de données relationnelle',
+        'Dataiku': 'Plateforme de data science collaborative',
+        'PostgreSQL': 'Système de gestion de base de données avancé',
+        'IBM': 'Solutions cloud et services IBM',
+        'AWS': 'Services cloud Amazon Web Services'
     };
     
     skillTags.forEach(tag => {
@@ -1386,8 +2216,19 @@ async function loadGitHubRepos() {
                 ${projectsHTML}
             </div>`;
 
-        // Add hover effects after rendering
-        document.querySelectorAll('.repo-card').forEach(card => {
+        // Add hover effects and animations after rendering
+        document.querySelectorAll('.repo-card').forEach((card, index) => {
+            // Animation d'apparition progressive
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s cubic-bezier(0.23, 1, 0.320, 1)';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+            
+            // Effets de survol
             card.addEventListener('mouseenter', () => createParticleEffect(card));
         });
 
@@ -1405,52 +2246,63 @@ async function loadGitHubRepos() {
 }
 
 function createRepoCard(repo) {
+    // Nettoyer et formater le nom du repository
+    const formattedName = formatRepoName(repo.name);
+    
     const topics = repo.topics && repo.topics.length > 0 
-        ? `<div class="repo-topics">${repo.topics.map(topic => `<span class="topic">${topic}</span>`).join('')}</div>`
+        ? `<div class="repo-topics">${repo.topics.map(topic => `<span class="topic">${escapeHtml(topic)}</span>`).join('')}</div>`
         : '';
     
     const homepage = repo.homepage 
-        ? `<a href="${repo.homepage}" target="_blank" rel="noopener" class="repo-link homepage-link">
-            <i class="fas fa-globe"></i> Demo
+        ? `<a href="${repo.homepage}" target="_blank" rel="noopener" class="repo-link homepage-link" aria-label="Voir la démo du projet ${formattedName}">
+            <i class="fas fa-globe" aria-hidden="true"></i> <span>Demo</span>
            </a>`
         : '';
 
+    // Formater la description pour éviter les problèmes d'affichage
+    const description = repo.description 
+        ? escapeHtml(repo.description)
+        : 'Aucune description disponible';
+
     return `
-        <div class="repo-card" data-repo-id="${repo.id}">
+        <div class="repo-card" data-repo-id="${repo.id}" role="article" aria-labelledby="repo-title-${repo.id}">
             <div class="repo-header">
-                <h3 class="repo-title">
-                    <a href="${repo.html_url}" target="_blank" rel="noopener">
-                        <i class="fab fa-github"></i> ${repo.name}
+                <h3 class="repo-title" id="repo-title-${repo.id}">
+                    <a href="${repo.html_url}" target="_blank" rel="noopener" aria-label="Voir le code source de ${formattedName} sur GitHub">
+                        <i class="fab fa-github" aria-hidden="true"></i> 
+                        <span class="repo-name">${formattedName}</span>
                     </a>
                 </h3>
-                <div class="repo-links">
+                <div class="repo-links" role="navigation" aria-label="Liens du projet">
                     ${homepage}
-                    <a href="${repo.html_url}" target="_blank" rel="noopener" class="repo-link">
-                        <i class="fas fa-code"></i> Code
+                    <a href="${repo.html_url}" target="_blank" rel="noopener" class="repo-link" aria-label="Voir le code source de ${formattedName}">
+                        <i class="fas fa-code" aria-hidden="true"></i> <span>Code</span>
                     </a>
-            </div>
+                </div>
             </div>
             
-            <p class="repo-description">${repo.description || 'Aucune description disponible'}</p>
+            <p class="repo-description">${description}</p>
             
             ${topics}
             
-            <div class="repo-stats">
-                <span class="repo-stat">
-                    <i class="fas fa-star"></i> ${repo.stargazers_count}
+            <div class="repo-stats" role="group" aria-label="Statistiques du projet">
+                <span class="repo-stat" title="Nombre d'étoiles">
+                    <i class="fas fa-star" aria-hidden="true"></i> 
+                    <span>${formatNumber(repo.stargazers_count)}</span>
                 </span>
-                <span class="repo-stat">
-                    <i class="fas fa-code-branch"></i> ${repo.forks_count}
+                <span class="repo-stat" title="Nombre de forks">
+                    <i class="fas fa-code-branch" aria-hidden="true"></i> 
+                    <span>${formatNumber(repo.forks_count)}</span>
                 </span>
-                <span class="repo-stat ${repo.language ? 'with-language' : ''}">
-                    <i class="fas fa-circle" style="color: ${getLanguageColor(repo.language)}"></i>
-                    ${repo.language || 'N/A'}
+                <span class="repo-stat ${repo.language ? 'with-language' : ''}" title="Langage principal">
+                    <i class="fas fa-circle" style="color: ${getLanguageColor(repo.language)}" aria-hidden="true"></i>
+                    <span>${repo.language || 'N/A'}</span>
                 </span>
-                <span class="repo-stat">
-                    <i class="fas fa-clock"></i>
-                    ${formatDate(repo.updated_at)}
+                <span class="repo-stat" title="Dernière mise à jour">
+                    <i class="fas fa-clock" aria-hidden="true"></i>
+                    <span>${formatDate(repo.updated_at)}</span>
                 </span>
-        </div>
+            </div>
         </div>
     `;
 }
@@ -1486,6 +2338,33 @@ function formatDate(dateString) {
     return `Il y a ${Math.floor(diffDays/365)} ans`;
 }
 
+// Fonction pour formater les noms de repository
+function formatRepoName(name) {
+    // Remplacer les tirets et underscores par des espaces
+    return name
+        .replace(/[-_]/g, ' ')
+        .replace(/([a-z])([A-Z])/g, '$1 $2') // Séparer les mots en camelCase
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ')
+        .trim();
+}
+
+// Fonction pour échapper les caractères HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Fonction pour formater les nombres
+function formatNumber(num) {
+    if (num === 0) return '0';
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+    return num.toString();
+}
+
 // Optimisation des animations au scroll
 function initScrollAnimations() {
     const observer = new IntersectionObserver((entries) => {
@@ -1511,10 +2390,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initCvInteractions();
     loadGitHubRepos(); // Charger les projets GitHub
     initScrollAnimations();
-    createExperienceTimeline();
+    // createExperienceTimeline(); // Timeline supprimée - plus d'éléments timeline
     addTooltips();
     createTypingEffect();
-    addSoundEffects();
+    // addSoundEffects(); // Fonction inexistante - supprimée
 });
 
 // Désactivation des animations si la préférence de réduction de mouvement est activée
@@ -2276,5 +3155,14 @@ const soundManager = {
 
 // Initialiser le gestionnaire de son au chargement de la page
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser le gestionnaire de son
     soundManager.initialize();
+    
+    // Initialiser la navbar responsive
+    if (typeof ResponsiveNavbar !== 'undefined') {
+        responsiveNavbar = new ResponsiveNavbar();
+        console.log('✅ ResponsiveNavbar initialisée');
+    } else {
+        console.error('❌ ResponsiveNavbar non trouvée');
+    }
 });

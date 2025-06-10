@@ -13,57 +13,172 @@
     <!-- Effet de tempête en arrière-plan -->
     <div id="storm-effect"></div>
 
-    <!-- Navbar -->
+    <!-- Navbar Responsive -->
     <nav class="navbar">
       <div class="navbar-brand">
         <a href="#" onclick="scrollToTop()" class="navbar-logo-link" aria-label="Retour en haut">
           <img src="images/logo.png" alt="ITSsghir Logo" width="50" height="50" class="navbar-logo-img">
         </a>
       </div>
+      
+      <!-- Desktop Menu - Sections principales seulement -->
       <div class="navbar-menu">
-        <a href="#about" class="navbar-item" data-text="À propos">
+        <a href="#profil" class="navbar-item" data-text="Profil">
           <i class="fas fa-user"></i>
-          <span>À propos</span>
+          <span>Profil</span>
+        </a>
+        <a href="#competences" class="navbar-item" data-text="Compétences">
+          <i class="fas fa-code"></i>
+          <span>Compétences</span>
         </a>
         <a href="#experience" class="navbar-item" data-text="Expérience">
           <i class="fas fa-briefcase"></i>
           <span>Expérience</span>
         </a>
         <a href="#projects" class="navbar-item" data-text="Projets">
-          <i class="fas fa-code"></i>
+          <i class="fab fa-github"></i>
           <span>Projets</span>
-        </a>
-        <a href="#skills" class="navbar-item" data-text="Compétences">
-          <i class="fas fa-tools"></i>
-          <span>Compétences</span>
         </a>
         <a href="#contact" class="navbar-item" data-text="Contact">
           <i class="fas fa-envelope"></i>
           <span>Contact</span>
         </a>
       </div>
-      <div class="theme-controls">
-        <button id="theme-toggle" class="theme-button" aria-label="Changer de thème">
-          <i class="fas fa-moon"></i>
-        </button>
-        <button id="sound-toggle" class="theme-button" aria-label="Activer/Désactiver le son">
-          <i class="fas fa-volume-up"></i>
+      
+      <!-- Menu Secondaire - Icônes seulement -->
+      <div class="navbar-secondary">
+        <a href="#technologies" class="navbar-icon-item" data-text="Technologies" title="Technologies">
+          <i class="fas fa-tools"></i>
+        </a>
+        <a href="#langues" class="navbar-icon-item" data-text="Langues" title="Langues">
+          <i class="fas fa-language"></i>
+        </a>
+        <a href="#education" class="navbar-icon-item" data-text="Éducation" title="Éducation">
+          <i class="fas fa-graduation-cap"></i>
+        </a>
+        <a href="#certifications" class="navbar-icon-item" data-text="Certifications" title="Certifications">
+          <i class="fas fa-medal"></i>
+        </a>
+      </div>
+      
+      <!-- Controls & Hamburger -->
+      <div class="navbar-controls">
+        <div class="theme-controls">
+          <button id="theme-toggle" class="theme-button" aria-label="Changer de thème">
+            <i class="fas fa-moon"></i>
+          </button>
+          <button id="sound-toggle" class="theme-button" aria-label="Activer/Désactiver le son">
+            <i class="fas fa-volume-up"></i>
+          </button>
+        </div>
+        
+        <!-- Hamburger Button -->
+        <button class="hamburger-btn" aria-label="Menu de navigation" aria-expanded="false">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
         </button>
       </div>
     </nav>
 
-    <!-- En-tête -->
-    <header>
-      <h1>Itssghir</h1>
-      <p>Data Scientist • Python Enthusiast • Q-Learning Explorer</p>
-      <div id="rotating-text"></div>
-    </header>
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay">
+      <div class="mobile-menu">
+        <div class="mobile-menu-header">
+          <h3>Navigation</h3>
+          <button class="mobile-menu-close" aria-label="Fermer le menu">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="mobile-menu-content">
+          <a href="#profil" class="mobile-menu-item">
+            <i class="fas fa-user"></i>
+            <span>👤 Profil</span>
+          </a>
+          <a href="#education" class="mobile-menu-item">
+            <i class="fas fa-graduation-cap"></i>
+            <span>🎓 Éducation</span>
+          </a>
+          <a href="#experience" class="mobile-menu-item">
+            <i class="fas fa-briefcase"></i>
+            <span>💼 Expérience</span>
+          </a>
+          <a href="#competences" class="mobile-menu-item">
+            <i class="fas fa-code"></i>
+            <span>💻 Compétences</span>
+          </a>
+          <a href="#technologies" class="mobile-menu-item">
+            <i class="fas fa-tools"></i>
+            <span>🔧 Technologies</span>
+          </a>
+          <a href="#projects" class="mobile-menu-item">
+            <i class="fab fa-github"></i>
+            <span>🚀 Projets</span>
+          </a>
+          <a href="#langues" class="mobile-menu-item">
+            <i class="fas fa-language"></i>
+            <span>🌍 Langues</span>
+          </a>
+          <a href="#certifications" class="mobile-menu-item">
+            <i class="fas fa-medal"></i>
+            <span>🏆 Certifications</span>
+          </a>
+          <a href="#contact" class="mobile-menu-item">
+            <i class="fas fa-envelope"></i>
+            <span>📧 Contact</span>
+          </a>
+        </div>
+        <div class="mobile-menu-footer">
+          <div class="mobile-theme-controls">
+            <button class="mobile-theme-btn" id="mobile-theme-toggle" aria-label="Changer de thème">
+              <i class="fas fa-moon"></i>
+              <span>Thème</span>
+            </button>
+            <button class="mobile-theme-btn" id="mobile-sound-toggle" aria-label="Activer/Désactiver le son">
+              <i class="fas fa-volume-up"></i>
+              <span>Son</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <!-- Section CV -->
-    <section id="about">
+    <!-- Section d'accueil -->
+    <section id="hero">
+      <div class="hero-content">
+        <div class="profile-avatar-container">
+          <div class="crown-container">
+            <div class="crown">
+              <div class="crown-point"></div>
+              <div class="crown-point"></div>
+              <div class="crown-point crown-center"></div>
+              <div class="crown-point"></div>
+              <div class="crown-point"></div>
+              <div class="crown-base"></div>
+            </div>
+          </div>
+          <div class="profile-avatar">
+            <div class="avatar-ring"></div>
+            <div class="avatar-ring-rgb"></div>
+            <div class="avatar-inner">
+              <img src="images/Photo.jpg" alt="ITSsghir Photo" class="avatar-img">
+            </div>
+            <div class="avatar-glow"></div>
+          </div>
+        </div>
+        <div class="hero-text">
+          <h1>Itssghir</h1>
+          <p>Data Scientist • Python Enthusiast • Q-Learning Explorer</p>
+          <div id="rotating-text"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Profil -->
+    <section id="profil">
       <div class="cv-header">
         <div class="title-container">
-          <h2>📋 Mon CV Interactif</h2>
+          <h2><i class="fas fa-user"></i> Profil</h2>
           <a href="cv.pdf" download class="cv-download-btn">
             <span class="download-icon">
               <i class="fas fa-file-download"></i>
@@ -73,303 +188,379 @@
         </div>
       </div>
       <div class="cv-container">
-          
-          <!-- Section Profil -->
-          <div class="cv-section active">
-              <div class="cv-section-header" onclick="toggleCvSection(this)">
-                  <div class="cv-section-title">
-                      <i class="fas fa-user cv-section-icon"></i>
-                      Profil
-                  </div>
-                  <i class="fas fa-chevron-down cv-toggle-icon"></i>
-              </div>
-              <div class="cv-section-content">
-                  <p class="cv-profile-text">
-                      Actuellement étudiant en Master 2 MIAGE, où j'ai acquis une solide expérience en informatique, en gestion et en organisation.
-                      Ma spécialisation en conception, développement et gestion de projets informatiques m'a permis de maîtriser plusieurs langages informatiques et de travailler efficacement sur différentes plateformes et logiciels.
-                      Mon intérêt pour les nouvelles technologies et les défis complexes m'a rendu curieux, créatif et passionné par la recherche de solutions innovantes.
-                  </p>
-                  <div class="cv-availability">
-                      <h4><i class="fas fa-calendar-alt"></i> Disponibilité</h4>
-                      <p>À partir de septembre 2025</p>
-                  </div>
-              </div>
+        <div class="cv-section active">
+          <div class="cv-section-content">
+            <p class="cv-profile-text">
+              Actuellement étudiant en Master 2 MIAGE, où j'ai acquis une solide expérience en informatique, en gestion et en organisation.
+              Ma spécialisation en conception, développement et gestion de projets informatiques m'a permis de maîtriser plusieurs langages informatiques et de travailler efficacement sur différentes plateformes et logiciels.
+              Mon intérêt pour les nouvelles technologies et les défis complexes m'a rendu curieux, créatif et passionné par la recherche de solutions innovantes.
+            </p>
+            <div class="cv-availability">
+              <h4><i class="fas fa-calendar-alt"></i> Disponibilité</h4>
+              <p>À partir de septembre 2025</p>
+            </div>
           </div>
+        </div>
+      </div>
+    </section>
 
-          <!-- Section Compétences -->
-          <div class="cv-section">
-              <div class="cv-section-header" onclick="toggleCvSection(this)">
-                  <div class="cv-section-title" id="skills">
-                      <i class="fas fa-code cv-section-icon"></i>
-                      Compétences
-                  </div>
-                  <i class="fas fa-chevron-down cv-toggle-icon"></i>
+    <!-- Section Éducation -->
+    <section id="education">
+      <div class="cv-header">
+        <div class="title-container">
+          <h2><i class="fas fa-graduation-cap"></i> Éducation</h2>
+        </div>
+      </div>
+      <div class="cv-container">
+        <div class="cv-section active">
+          <div class="cv-section-content">
+            <div class="cv-education-item">
+              <i class="fas fa-award cv-education-icon"></i>
+              <div class="cv-education-details">
+                <h4>Master 2 MIAGE - Ingénierie des Données et Protection (IDP)</h4>
+                <p>Université Toulouse III - Paul Sabatier, Toulouse (2023 - 2025)</p>
               </div>
-              <div class="cv-section-content">
-                  <div class="cv-skills-grid">
-                      <div class="cv-skill-category">
-                          <h4><i class="fas fa-laptop-code"></i> Programmation</h4>
-                          <div class="cv-skill-tags">
-                              <span class="cv-skill-tag">C</span>
-                              <span class="cv-skill-tag">Java</span>
-                              <span class="cv-skill-tag">Python</span>
-                              <span class="cv-skill-tag">R</span>
-                          </div>
-                      </div>
-                      <div class="cv-skill-category">
-                          <h4><i class="fas fa-globe"></i> Développement Web</h4>
-                          <div class="cv-skill-tags">
-                              <span class="cv-skill-tag">HTML</span>
-                              <span class="cv-skill-tag">CSS</span>
-                              <span class="cv-skill-tag">JavaScript</span>
-                              <span class="cv-skill-tag">Django</span>
-                          </div>
-                      </div>
-                      <div class="cv-skill-category">
-                          <h4><i class="fas fa-tasks"></i> Gestion de Projet</h4>
-                          <div class="cv-skill-tags">
-                              <span class="cv-skill-tag">SCRUM</span>
-                              <span class="cv-skill-tag">GANTT</span>
-                              <span class="cv-skill-tag">TOGAF</span>
-                              <span class="cv-skill-tag">ARCHIMATE</span>
-                          </div>
-                      </div>
-                      <div class="cv-skill-category">
-                          <h4><i class="fas fa-database"></i> Data Science</h4>
-                          <div class="cv-skill-tags">
-                              <span class="cv-skill-tag">SQL</span>
-                              <span class="cv-skill-tag">Python</span>
-                              <span class="cv-skill-tag">NoSQL</span>
-                          </div>
-                      </div>
-                      <div class="cv-skill-category">
-                          <h4><i class="fas fa-shield-alt"></i> Cybersécurité</h4>
-                          <div class="cv-skill-tags">
-                              <span class="cv-skill-tag">OpenSSL</span>
-                              <span class="cv-skill-tag">RSA</span>
-                              <span class="cv-skill-tag">AES</span>
-                          </div>
-                      </div>
-                  </div>
+            </div>
+            <div class="cv-education-item">
+              <i class="fas fa-certificate cv-education-icon"></i>
+              <div class="cv-education-details">
+                <h4>Licence Informatique - Parcours MIAGE</h4>
+                <p>Université Aix-Marseille, Aix-en-Provence (2021 - 2023)</p>
               </div>
+            </div>
           </div>
+        </div>
+      </div>
+    </section>
 
-          <!-- Section Technologies -->
-          <div class="cv-section">
-              <div class="cv-section-header" onclick="toggleCvSection(this)">
-                  <div class="cv-section-title">
-                      <i class="fas fa-tools cv-section-icon"></i>
-                      Technologies
+    <!-- Section Expérience -->
+    <section id="experience">
+      <div class="cv-header">
+        <div class="title-container">
+          <h2><i class="fas fa-briefcase"></i> Expérience Professionnelle</h2>
+        </div>
+      </div>
+      <div class="cv-container">
+        <div class="cv-section active">
+          <div class="cv-section-content">
+            <div class="cv-experience-timeline">
+              <div class="cv-experience-item" data-aos="fade-left">
+                <div class="cv-experience-header">
+                  <div class="cv-experience-title">Product Owner / Data Engineer</div>
+                  <div class="cv-experience-company">La Banque Postale</div>
+                  <div class="cv-experience-date">
+                    <span class="cv-experience-year">📅 2025</span>
+                    <span class="cv-experience-location"><i class="fas fa-map-marker-alt"></i> Toulouse</span>
                   </div>
-                  <i class="fas fa-chevron-down cv-toggle-icon"></i>
+                </div>
+                <div class="cv-experience-description">
+                  <ul>
+                    <li>Documentation technique et métier des données</li>
+                    <li>Modélisation logique des données et lineage complet</li>
+                    <li>Tableaux de bord avec Tableau & Power BI</li>
+                    <li>Optimisation des requêtes sur gros volumes</li>
+                  </ul>
+                </div>
+                <div class="cv-experience-skills">
+                  <span class="cv-experience-skill">SQL</span>
+                  <span class="cv-experience-skill">Power BI</span>
+                  <span class="cv-experience-skill">Data Engineering</span>
+                  <span class="cv-experience-skill">Agile</span>
+                </div>
               </div>
-              <div class="cv-section-content">
-                  <div class="cv-tech-grid">
-                      <div class="cv-tech-item">
-                          <i class="fab fa-java"></i>
-                          <p>IntelliJ IDEA</p>
-                      </div>
-                      <div class="cv-tech-item">
-                          <i class="fas fa-code"></i>
-                          <p>Visual Studio</p>
-                      </div>
-                      <div class="cv-tech-item">
-                          <i class="fab fa-docker"></i>
-                          <p>Docker</p>
-                      </div>
-                      <div class="cv-tech-item">
-                          <i class="fas fa-leaf"></i>
-                          <p>MongoDB</p>
-                      </div>
-                      <div class="cv-tech-item">
-                          <i class="fab fa-r-project"></i>
-                          <p>R Studio</p>
-                      </div>
-                      <div class="cv-tech-item">
-                          <i class="fas fa-database"></i>
-                          <p>DataGrip</p>
-                      </div>
+              <div class="cv-experience-item" data-aos="fade-left" data-aos-delay="100">
+                <div class="cv-experience-header">
+                  <div class="cv-experience-title">Chef de Projet IT</div>
+                  <div class="cv-experience-company">SHL</div>
+                  <div class="cv-experience-date">
+                    <span class="cv-experience-year">📅 2022-2023</span>
+                    <span class="cv-experience-location"><i class="fas fa-map-marker-alt"></i> Marseille</span>
                   </div>
+                </div>
+                <div class="cv-experience-description">
+                  <ul>
+                    <li>Développement full-stack d'une interface d'administration</li>
+                    <li>Leadership dans la finalisation du site</li>
+                    <li>Gestion d'équipe multidisciplinaire</li>
+                  </ul>
+                </div>
+                <div class="cv-experience-skills">
+                  <span class="cv-experience-skill">React</span>
+                  <span class="cv-experience-skill">Node.js</span>
+                  <span class="cv-experience-skill">Scrum</span>
+                  <span class="cv-experience-skill">Management</span>
+                </div>
               </div>
+              <div class="cv-experience-item" data-aos="fade-left" data-aos-delay="200">
+                <div class="cv-experience-header">
+                  <div class="cv-experience-title">Freelance Web</div>
+                  <div class="cv-experience-company">Indépendant</div>
+                  <div class="cv-experience-date">
+                    <span class="cv-experience-year">📅 2021-2022</span>
+                    <span class="cv-experience-location"><i class="fas fa-map-marker-alt"></i> Aix-en-Provence</span>
+                  </div>
+                </div>
+                <div class="cv-experience-description">
+                  <ul>
+                    <li>Conception et développement de sites web multisecteurs</li>
+                    <li>Travail en équipe interdisciplinaire</li>
+                    <li>Compétences en gestion, communication, autonomie</li>
+                  </ul>
+                </div>
+                <div class="cv-experience-skills">
+                  <span class="cv-experience-skill">HTML/CSS</span>
+                  <span class="cv-experience-skill">JavaScript</span>
+                  <span class="cv-experience-skill">WordPress</span>
+                  <span class="cv-experience-skill">UI/UX</span>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
+    </section>
 
-          <!-- Section Langues -->
-          <div class="cv-section">
-              <div class="cv-section-header" onclick="toggleCvSection(this)">
-                  <div class="cv-section-title">
-                      <i class="fas fa-language cv-section-icon"></i>
-                      Langues
-                  </div>
-                  <i class="fas fa-chevron-down cv-toggle-icon"></i>
+    <!-- Section Compétences -->
+    <section id="competences">
+      <div class="cv-header">
+        <div class="title-container">
+          <h2><i class="fas fa-code"></i> Compétences</h2>
+        </div>
+      </div>
+      <div class="cv-container">
+        <div class="cv-section active">
+          <div class="cv-section-content">
+            <div class="cv-skills-grid">
+              <div class="cv-skill-category">
+                <h4><i class="fas fa-laptop-code"></i> Programmation</h4>
+                <div class="cv-skill-tags">
+                  <span class="cv-skill-tag">C</span>
+                  <span class="cv-skill-tag">Java</span>
+                  <span class="cv-skill-tag">Python</span>
+                  <span class="cv-skill-tag">R</span>
+                </div>
               </div>
-              <div class="cv-section-content">
-                  <div class="cv-languages">
-                      <div class="cv-language-item">
-                          <span class="cv-language-flag">🇫🇷</span>
-                          <span>Français</span>
-                      </div>
-                      <div class="cv-language-item">
-                          <span class="cv-language-flag">🇬🇧</span>
-                          <span>Anglais</span>
-                      </div>
-                      <div class="cv-language-item">
-                          <span class="cv-language-flag">🇸🇦</span>
-                          <span>Arabe</span>
-                      </div>
-                  </div>
+              <div class="cv-skill-category">
+                <h4><i class="fas fa-globe"></i> Développement Web</h4>
+                <div class="cv-skill-tags">
+                  <span class="cv-skill-tag">HTML</span>
+                  <span class="cv-skill-tag">CSS</span>
+                  <span class="cv-skill-tag">JavaScript</span>
+                  <span class="cv-skill-tag">Django</span>
+                </div>
               </div>
+              <div class="cv-skill-category">
+                <h4><i class="fas fa-tasks"></i> Gestion de Projet</h4>
+                <div class="cv-skill-tags">
+                  <span class="cv-skill-tag">SCRUM</span>
+                  <span class="cv-skill-tag">GANTT</span>
+                  <span class="cv-skill-tag">TOGAF</span>
+                  <span class="cv-skill-tag">ARCHIMATE</span>
+                </div>
+              </div>
+              <div class="cv-skill-category">
+                <h4><i class="fas fa-database"></i> Data Science</h4>
+                <div class="cv-skill-tags">
+                  <span class="cv-skill-tag">SQL</span>
+                  <span class="cv-skill-tag">Python</span>
+                  <span class="cv-skill-tag">NoSQL</span>
+                </div>
+              </div>
+              <div class="cv-skill-category">
+                <h4><i class="fas fa-shield-alt"></i> Cybersécurité</h4>
+                <div class="cv-skill-tags">
+                  <span class="cv-skill-tag">OpenSSL</span>
+                  <span class="cv-skill-tag">RSA</span>
+                  <span class="cv-skill-tag">AES</span>
+                </div>
+              </div>
+              <div class="cv-skill-category">
+                <h4><i class="fas fa-drafting-compass"></i> Conception</h4>
+                <div class="cv-skill-tags">
+                  <span class="cv-skill-tag">MERISE</span>
+                  <span class="cv-skill-tag">UML</span>
+                  <span class="cv-skill-tag">SysML</span>
+                </div>
+              </div>
+              <div class="cv-skill-category">
+                <h4><i class="fas fa-chart-bar"></i> Data Analysis</h4>
+                <div class="cv-skill-tags">
+                  <span class="cv-skill-tag">Tableau</span>
+                  <span class="cv-skill-tag">Power BI</span>
+                </div>
+              </div>
+              <div class="cv-skill-category">
+                <h4><i class="fas fa-database"></i> Data Base</h4>
+                <div class="cv-skill-tags">
+                  <span class="cv-skill-tag">MySQL</span>
+                  <span class="cv-skill-tag">Dataiku</span>
+                  <span class="cv-skill-tag">PostgreSQL</span>
+                </div>
+              </div>
+              <div class="cv-skill-category">
+                <h4><i class="fas fa-cloud"></i> Cloud</h4>
+                <div class="cv-skill-tags">
+                  <span class="cv-skill-tag">IBM</span>
+                  <span class="cv-skill-tag">AWS</span>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
+    </section>
 
-          <!-- Section Expérience -->
-          <div class="cv-section">
-              <div class="cv-section-header" onclick="toggleCvSection(this)">
-                  <div class="cv-section-title" id="experience">
-                      <i class="fas fa-briefcase cv-section-icon"></i>
-                      Expérience Professionnelle
-                  </div>
-                  <i class="fas fa-chevron-down cv-toggle-icon"></i>
+    <!-- Section Technologies -->
+    <section id="technologies">
+      <div class="cv-header">
+        <div class="title-container">
+          <h2><i class="fas fa-tools"></i> Technologies</h2>
+        </div>
+      </div>
+      <div class="cv-container">
+        <div class="cv-section active">
+          <div class="cv-section-content">
+            <div class="cv-tech-grid">
+              <div class="cv-tech-item">
+                <i class="fab fa-java"></i>
+                <p>IntelliJ IDEA</p>
               </div>
-              <div class="cv-section-content">
-                  <div class="cv-experience-timeline">
-                      <div class="cv-experience-item" data-aos="fade-left">
-                          <div class="cv-experience-header">
-                              <div class="cv-experience-title">Product Owner / Data Engineer</div>
-                              <div class="cv-experience-company">La Banque Postale</div>
-                              <div class="cv-experience-date">2025 • Toulouse</div>
-                          </div>
-                          <div class="cv-experience-description">
-                              <ul>
-                                  <li>Documentation technique et métier des données</li>
-                                  <li>Modélisation logique des données et lineage complet</li>
-                                  <li>Tableaux de bord avec Tableau & Power BI</li>
-                                  <li>Optimisation des requêtes sur gros volumes</li>
-                              </ul>
-                          </div>
-                          <div class="cv-experience-skills">
-                              <span class="cv-experience-skill">SQL</span>
-                              <span class="cv-experience-skill">Power BI</span>
-                              <span class="cv-experience-skill">Data Engineering</span>
-                              <span class="cv-experience-skill">Agile</span>
-                          </div>
-                      </div>
-
-                      <div class="cv-experience-item" data-aos="fade-left" data-aos-delay="100">
-                          <div class="cv-experience-header">
-                              <div class="cv-experience-title">Chef de Projet IT</div>
-                              <div class="cv-experience-company">SHL</div>
-                              <div class="cv-experience-date">2022-2023 • Marseille</div>
-                          </div>
-                          <div class="cv-experience-description">
-                              <ul>
-                                  <li>Développement full-stack d'une interface d'administration</li>
-                                  <li>Leadership dans la finalisation du site</li>
-                                  <li>Gestion d'équipe multidisciplinaire</li>
-                              </ul>
-                          </div>
-                          <div class="cv-experience-skills">
-                              <span class="cv-experience-skill">React</span>
-                              <span class="cv-experience-skill">Node.js</span>
-                              <span class="cv-experience-skill">Scrum</span>
-                              <span class="cv-experience-skill">Management</span>
-                          </div>
-                      </div>
-
-                      <div class="cv-experience-item" data-aos="fade-left" data-aos-delay="200">
-                          <div class="cv-experience-header">
-                              <div class="cv-experience-title">Freelance Web</div>
-                              <div class="cv-experience-company">Indépendant</div>
-                              <div class="cv-experience-date">2021-2022 • Aix-en-Provence</div>
-                          </div>
-                          <div class="cv-experience-description">
-                              <ul>
-                                  <li>Conception et développement de sites web multisecteurs</li>
-                                  <li>Travail en équipe interdisciplinaire</li>
-                                  <li>Compétences en gestion, communication, autonomie</li>
-                              </ul>
-                          </div>
-                          <div class="cv-experience-skills">
-                              <span class="cv-experience-skill">HTML/CSS</span>
-                              <span class="cv-experience-skill">JavaScript</span>
-                              <span class="cv-experience-skill">WordPress</span>
-                              <span class="cv-experience-skill">UI/UX</span>
-                          </div>
-                      </div>
-                  </div>
+              <div class="cv-tech-item">
+                <i class="fas fa-code"></i>
+                <p>Visual Studio</p>
               </div>
+              <div class="cv-tech-item">
+                <i class="fab fa-docker"></i>
+                <p>Docker</p>
+              </div>
+              <div class="cv-tech-item">
+                <i class="fas fa-leaf"></i>
+                <p>MongoDB</p>
+              </div>
+              <div class="cv-tech-item">
+                <i class="fab fa-r-project"></i>
+                <p>R Studio</p>
+              </div>
+              <div class="cv-tech-item">
+                <i class="fas fa-database"></i>
+                <p>DataGrip</p>
+              </div>
+              <div class="cv-tech-item">
+                <i class="fas fa-cube"></i>
+                <p>Virtual Box</p>
+              </div>
+              <div class="cv-tech-item">
+                <i class="fas fa-satellite-dish"></i>
+                <p>PostMan</p>
+              </div>
+              <div class="cv-tech-item">
+                <i class="fas fa-terminal"></i>
+                <p>Powershell</p>
+              </div>
+              <div class="cv-tech-item">
+                <i class="fab fa-linux"></i>
+                <p>Linux</p>
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
+    </section>
 
-          <!-- Section Éducation -->
-          <div class="cv-section">
-              <div class="cv-section-header" onclick="toggleCvSection(this)">
-                  <div class="cv-section-title">
-                      <i class="fas fa-graduation-cap cv-section-icon"></i>
-                      Éducation
-                  </div>
-                  <i class="fas fa-chevron-down cv-toggle-icon"></i>
-              </div>
-              <div class="cv-section-content">
-                  <div class="cv-education-item">
-                      <i class="fas fa-award cv-education-icon"></i>
-                      <div class="cv-education-details">
-                          <h4>Master 2 MIAGE - Ingénierie des Données et Protection (IDP)</h4>
-                          <p>Université Toulouse III - Paul Sabatier, Toulouse (2023 - 2025)</p>
-                      </div>
-                  </div>
-                  <div class="cv-education-item">
-                      <i class="fas fa-certificate cv-education-icon"></i>
-                      <div class="cv-education-details">
-                          <h4>Licence Informatique - Parcours MIAGE</h4>
-                          <p>Université Aix-Marseille, Aix-en-Provence (2021 - 2023)</p>
-                      </div>
-                  </div>
-              </div>
+    <!-- Section Projets GitHub -->
+    <section id="projects">
+      <div class="cv-header">
+        <div class="title-container">
+          <h2><i class="fab fa-github"></i> Mes Projets GitHub</h2>
+        </div>
+      </div>
+      <div class="cv-container">
+        <div class="cv-section active">
+          <div class="cv-section-content">
+            <div id="github-projects" class="github-projects-container">
+              <!-- Les projets seront chargés dynamiquement ici -->
+            </div>
           </div>
+        </div>
+      </div>
+    </section>
 
-          <!-- Section Certification -->
-          <div class="cv-section">
-              <div class="cv-section-header" onclick="toggleCvSection(this)">
-                  <div class="cv-section-title">
-                      <i class="fas fa-medal cv-section-icon"></i>
-                      Certification
-                  </div>
-                  <i class="fas fa-chevron-down cv-toggle-icon"></i>
+    <!-- Section Langues -->
+    <section id="langues">
+      <div class="cv-header">
+        <div class="title-container">
+          <h2><i class="fas fa-language"></i> Langues</h2>
+        </div>
+      </div>
+      <div class="cv-container">
+        <div class="cv-section active">
+          <div class="cv-section-content">
+            <div class="cv-languages">
+              <div class="cv-language-item">
+                <div class="cv-language-header">
+                  <span class="cv-language-flag">🇫🇷</span>
+                  <span class="cv-language-name">Français</span>
+                  <span class="cv-language-level">Maîtrise 100/100</span>
+                </div>
+                <div class="cv-language-progress">
+                  <div class="cv-language-bar" style="width: 100%"></div>
+                </div>
               </div>
-              <div class="cv-section-content">
-                  <div class="cv-certification-item">
-                      <i class="fas fa-trophy cv-certification-icon"></i>
-                      <div>
-                          <h4 style="color: #ffd700;">
-                              <a href="https://verify.skilljar.com/c/mado54c83jie" target="_blank" class="certification-link">
-                                  Core Designer — Dataiku
-                                  <i class="fas fa-external-link-alt"></i>
-                              </a>
-                          </h4>
-                          <p style="color: #fff;">Certification en conception et développement sur la plateforme Dataiku</p>
-                      </div>
-                  </div>
+              <div class="cv-language-item">
+                <div class="cv-language-header">
+                  <span class="cv-language-flag">🇬🇧</span>
+                  <span class="cv-language-name">Anglais</span>
+                  <span class="cv-language-level">Maîtrise 75/100</span>
+                </div>
+                <div class="cv-language-progress">
+                  <div class="cv-language-bar" style="width: 75%"></div>
+                </div>
               </div>
+              <div class="cv-language-item">
+                <div class="cv-language-header">
+                  <span class="cv-language-flag">🇸🇦</span>
+                  <span class="cv-language-name">Arabe</span>
+                  <span class="cv-language-level">Maîtrise 100/100</span>
+                </div>
+                <div class="cv-language-progress">
+                  <div class="cv-language-bar" style="width: 100%"></div>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
+    </section>
 
-          <!-- Section Projets GitHub -->
-          <div class="cv-section" id="projects">
-              <div class="cv-section-header" onclick="toggleCvSection(this)">
-                  <div class="cv-section-title">
-                      <i class="fab fa-github cv-section-icon"></i>
-                      🚀 Mes Projets GitHub
-                  </div>
-                  <i class="fas fa-chevron-down cv-toggle-icon"></i>
+    <!-- Section Certification -->
+    <section id="certifications">
+      <div class="cv-header">
+        <div class="title-container">
+          <h2><i class="fas fa-medal"></i> Certifications</h2>
+        </div>
+      </div>
+      <div class="cv-container">
+        <div class="cv-section active">
+          <div class="cv-section-content">
+            <div class="cv-certification-item">
+              <i class="fas fa-trophy cv-certification-icon"></i>
+              <div>
+                <h4 style="color: #ffd700;">
+                  <a href="https://verify.skilljar.com/c/mado54c83jie" target="_blank" class="certification-link">
+                    Core Designer — Dataiku
+                    <i class="fas fa-external-link-alt"></i>
+                  </a>
+                </h4>
+                <p style="color: #fff;">Certification en conception et développement sur la plateforme Dataiku</p>
               </div>
-              <div class="cv-section-content">
-                  <div id="github-projects" class="github-projects-container">
-                      <!-- Les projets seront chargés dynamiquement ici -->
-                  </div>
-              </div>
+            </div>
           </div>
+        </div>
       </div>
     </section>
 
     <!-- Section SQL Interactive -->
-    <section id="skills" class="interactive-section">
+    <section id="sql-console" class="interactive-section">
         <h2>📊 Console SQL Interactive</h2>
         <div class="section-description">
             Explorez la base de données avec des requêtes SQL personnalisées
@@ -415,52 +606,198 @@
         </div>
     </section>
 
-    <section id="experience">
-      <h2>🧪 Test My Project :</h2>
-      <div class="card-container">
+    <section id="demos">
+      <div class="section-header">
+        <h2>🧪 Test My Project :</h2>
+        <p class="section-subtitle">Découvrez mes projets interactifs en action</p>
+      </div>
+      
+      <div class="demo-cards-grid">
         <!-- Carte Q-Learning -->
-      <div class="interactive-card" onclick="toggleQlearning()" 
-           onmouseover="this.innerHTML='🧠 Try Me !'" 
-           onmouseout="this.innerHTML='Q-Learning Demo'">
-        Q-Learning Demo
+        <div class="demo-card" onclick="toggleQlearning()">
+          <div class="demo-card-header">
+            <div class="demo-card-icon">🧠</div>
+            <div class="demo-card-title">Q-Learning Demo</div>
+          </div>
+          <div class="demo-card-description">
+            Algorithme d'apprentissage par renforcement. L'agent apprend à naviguer pour atteindre l'objectif.
+          </div>
+          <div class="demo-card-tags">
+            <span class="demo-tag">IA</span>
+            <span class="demo-tag">Machine Learning</span>
+            <span class="demo-tag">Python</span>
+          </div>
+          <div class="demo-card-footer">
+            <span class="demo-card-action">🎮 Essayer</span>
+          </div>
+        </div>
+
+        <!-- Carte Classification Iris -->
+        <div class="demo-card" onclick="toggleClassification()">
+          <div class="demo-card-header">
+            <div class="demo-card-icon">🌸</div>
+            <div class="demo-card-title">Classification Iris</div>
+          </div>
+          <div class="demo-card-description">
+            Classification de fleurs d'iris en 3 espèces avec un modèle de machine learning.
+          </div>
+          <div class="demo-card-tags">
+            <span class="demo-tag">Classification</span>
+            <span class="demo-tag">Data Science</span>
+            <span class="demo-tag">R</span>
+          </div>
+          <div class="demo-card-footer">
+            <span class="demo-card-action">🔬 Tester</span>
+          </div>
+        </div>
+
+        <!-- Carte GBT API -->
+        <div class="demo-card" onclick="toggleGBT()">
+          <div class="demo-card-header">
+            <div class="demo-card-icon">🎨</div>
+            <div class="demo-card-title">Test GBT API</div>
+          </div>
+          <div class="demo-card-description">
+            Génération d'images avec l'API GPT. Créez des images à partir de descriptions textuelles.
+          </div>
+          <div class="demo-card-tags">
+            <span class="demo-tag">API</span>
+            <span class="demo-tag">GPT</span>
+            <span class="demo-tag">IA Générative</span>
+          </div>
+          <div class="demo-card-footer">
+            <span class="demo-card-action">✨ Créer</span>
+          </div>
+        </div>
+
+        <!-- Carte Data Analytics Dashboard -->
+        <div class="demo-card" onclick="toggleDataAnalytics()">
+          <div class="demo-card-header">
+            <div class="demo-card-icon">📊</div>
+            <div class="demo-card-title">Data Analytics Pro</div>
+          </div>
+          <div class="demo-card-description">
+            Tableau de bord d'analyse de données en temps réel avec visualisations interactives et insights automatiques.
+          </div>
+          <div class="demo-card-tags">
+            <span class="demo-tag">Analytics</span>
+            <span class="demo-tag">Visualization</span>
+            <span class="demo-tag">Dashboard</span>
+          </div>
+          <div class="demo-card-footer">
+            <span class="demo-card-action">📈 Analyser</span>
+          </div>
+        </div>
+      </div>
+    <!-- Conteneur Classification Moderne -->
+    <div id="classification-container" class="demo-panel classification-panel">
+      <div class="panel-header">
+        <div class="panel-icon">🌸</div>
+        <div class="panel-title">
+          <h3>Classification des Iris</h3>
+          <p class="panel-subtitle">Intelligence Artificielle • Classification Multi-Classes</p>
+        </div>
+        <div class="panel-close" onclick="toggleClassification()">
+          <i class="fas fa-times"></i>
+        </div>
+      </div>
+      
+      <div class="panel-content">
+        <div class="demo-intro">
+          <div class="intro-text">
+            <p>🔬 <strong>Objectif :</strong> Classifier automatiquement les fleurs d'iris en 3 espèces distinctes</p>
+            <p>🌺 <strong>Espèces :</strong> <span class="species setosa">Setosa</span>, <span class="species versicolor">Versicolor</span>, <span class="species virginica">Virginica</span></p>
+            <p>📊 <strong>Algorithme :</strong> Machine Learning avec validation croisée</p>
+          </div>
+        </div>
+
+        <div class="data-visualization">
+          <div class="data-panel">
+            <div class="panel-section-header">
+              <i class="fas fa-table"></i>
+              <h4>Données d'Entraînement</h4>
+            </div>
+            <div id="test-data" class="data-display"></div>
+          </div>
+          
+          <div class="prediction-panel" id="prediction-section" style="display:none;">
+            <div class="panel-section-header">
+              <i class="fas fa-brain"></i>
+              <h4>Résultats de Classification</h4>
+            </div>
+            <div id="prediction-results" class="prediction-display"></div>
+          </div>
+        </div>
+
+        <div class="demo-controls">
+          <button onclick="startClassification()" id="classify-btn" class="demo-btn primary">
+            <i class="fas fa-play"></i>
+            Lancer la Classification
+          </button>
+          <button onclick="resetClassification()" id="reset-btn" class="demo-btn secondary">
+            <i class="fas fa-redo"></i>
+            Réinitialiser
+          </button>
+        </div>
+        
+        <div id="classification-status" class="demo-status"></div>
       </div>
     </div>
+      <!-- Conteneur Q-Learning Moderne -->
+      <div id="qlearning-container" class="demo-panel qlearning-panel">
+        <div class="panel-header">
+          <div class="panel-icon">🧠</div>
+          <div class="panel-title">
+            <h3>Q-Learning en Action</h3>
+            <p class="panel-subtitle">Apprentissage par Renforcement • Algorithme Q-Learning</p>
+          </div>
+          <div class="panel-close" onclick="toggleQlearning()">
+            <i class="fas fa-times"></i>
+          </div>
+        </div>
+        
+        <div class="panel-content">
+          <div class="demo-intro">
+            <div class="intro-text">
+              <p>🎯 <strong>Mission :</strong> L'agent IA doit apprendre à naviguer optimalement vers l'objectif</p>
+              <p>🌟 <strong>Objectif :</strong> Case dorée sur la grille 5×5</p>
+              <p>🤖 <strong>Agent :</strong> Utilise Q-Learning pour optimiser sa stratégie</p>
+            </div>
+            <div class="legend">
+              <div class="legend-item">
+                <div class="legend-color agent-color"></div>
+                <span>Agent IA</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color goal-color"></div>
+                <span>Objectif</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color path-color"></div>
+                <span>Chemin Optimal</span>
+              </div>
+            </div>
+          </div>
 
-    <div class="card-container">
-    <!-- Nouvelle carte Classification -->
-    <div class="interactive-card" onclick="toggleClassification()" 
-         onmouseover="this.innerHTML='🌼 Classification Demo'" 
-         onmouseout="this.innerHTML='Classification Iris'">
-    Classification Iris
-    </div>
-    </div>
-    <!-- Conteneur Classification -->
-    <div id="classification-container" class="classification-container">
-    <p>Classifiez les fleurs d'iris en 3 espèces (setosa, versicolor, virginica)</p>
-    <div class="data-tables">
-    <div class="data-table">
-     <h3>Données de Test</h3>
-     <div id="test-data"></div>
-    </div>
-    <div class="data-table prediction-table" id="prediction-section" style="display:none;">
-     <h3>Résultats de Prédiction</h3>
-     <div id="prediction-results"></div>
-    </div>
-    </div>
-    <button onclick="startClassification()" id="classify-btn">Démarrer la Classification</button>
-    <button onclick="resetClassification()" id="reset-btn">🔁 Réinitialiser</button>
-    <div id="classification-status"></div>
-    </div>
-      <!-- Conteneur Q-Learning -->
+          <div class="grid-container">
+            <div class="grid-wrapper">
+              <div class="q-learning-grid" id="grid"></div>
+            </div>
+          </div>
 
-
-
-
-      <div id="qlearning-container">
-        <p>Un agent doit apprendre à atteindre l'objectif (case dorée) sur une grille 5x5.</p>
-        <div class="q-learning-grid" id="grid"></div>
-        <button id="start-btn" onclick="startQLearning()">Démarrer l'apprentissage</button>
-        <div id="status"></div>
+          <div class="demo-controls">
+            <button id="start-btn" onclick="startQLearning()" class="demo-btn primary">
+              <i class="fas fa-play"></i>
+              Démarrer l'Apprentissage
+            </button>
+            <button onclick="resetQlearning()" class="demo-btn secondary">
+              <i class="fas fa-redo"></i>
+              Réinitialiser
+            </button>
+          </div>
+          
+          <div id="status" class="demo-status"></div>
+        </div>
       </div>
 
 
@@ -468,14 +805,7 @@
 
 
 
-    <!-- Carte GBT -->
-    <div class="card-container">
-    <div class="interactive-card" onclick="toggleGBT()" 
-         onmouseover="this.innerHTML='🧠 Try It'" 
-         onmouseout="this.innerHTML='Test GBT API'">
-    Test GBT API
-    </div>
-    </div>
+
     <!-- Panneau GBT -->
     <div id="gbt-container" class="gbt-container" style="display:none;">
       <p>Générez une image avec l'API GPT en saisissant une description :</p>
@@ -484,14 +814,149 @@
       <div id="image-status"></div>
       <div id="image-result" style="margin-top:20px;"></div>
     </div>
+
+    <!-- Conteneur Data Analytics Moderne -->
+    <div id="data-analytics-container" class="demo-panel analytics-panel">
+      <div class="panel-header">
+        <div class="panel-icon">📊</div>
+        <div class="panel-title">
+          <h3>Data Analytics Dashboard</h3>
+          <p class="panel-subtitle">Business Intelligence • Visualisation de Données • Insights</p>
+        </div>
+        <div class="panel-close" onclick="closeDataAnalytics()">
+          <i class="fas fa-times"></i>
+        </div>
+      </div>
+      
+      <div class="panel-content">
+        <div class="demo-intro">
+          <div class="intro-text">
+            <p>📈 <strong>Objectif :</strong> Analyser et visualiser des données complexes en temps réel</p>
+            <p>🎯 <strong>Fonctionnalités :</strong> Graphiques interactifs, KPI, tendances et prédictions</p>
+            <p>🔧 <strong>Technologies :</strong> Chart.js, D3.js, Machine Learning, Python</p>
+          </div>
+        </div>
+
+        <div class="analytics-dashboard">
+          <div class="dashboard-controls">
+            <div class="data-source-selector">
+              <label for="data-source">Source de données :</label>
+              <select id="data-source" onchange="changeDataSource()">
+                <option value="sales">Données de Ventes</option>
+                <option value="users">Utilisateurs Actifs</option>
+                <option value="performance">Performance Système</option>
+                <option value="market">Analyse de Marché</option>
+              </select>
+            </div>
+            <div class="time-range-selector">
+              <label for="time-range">Période :</label>
+              <select id="time-range" onchange="changeTimeRange()">
+                <option value="24h">Dernières 24h</option>
+                <option value="7d">7 derniers jours</option>
+                <option value="30d">30 derniers jours</option>
+                <option value="1y">Cette année</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-icon">💰</div>
+              <div class="kpi-content">
+                <h4>Revenus</h4>
+                <div class="kpi-value" id="revenue-kpi">€45,230</div>
+                <div class="kpi-trend positive">↗ +15.3%</div>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon">👥</div>
+              <div class="kpi-content">
+                <h4>Utilisateurs</h4>
+                <div class="kpi-value" id="users-kpi">12,847</div>
+                <div class="kpi-trend positive">↗ +8.7%</div>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon">📈</div>
+              <div class="kpi-content">
+                <h4>Conversion</h4>
+                <div class="kpi-value" id="conversion-kpi">3.2%</div>
+                <div class="kpi-trend negative">↘ -2.1%</div>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon">⚡</div>
+              <div class="kpi-content">
+                <h4>Performance</h4>
+                <div class="kpi-value" id="performance-kpi">98.5%</div>
+                <div class="kpi-trend positive">↗ +1.2%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="charts-grid">
+            <div class="chart-container">
+              <div class="chart-header">
+                <h4><i class="fas fa-chart-line"></i> Tendance des Ventes</h4>
+              </div>
+              <div class="chart-placeholder" id="sales-chart">
+                <canvas id="salesCanvas" width="400" height="200"></canvas>
+              </div>
+            </div>
+            <div class="chart-container">
+              <div class="chart-header">
+                <h4><i class="fas fa-chart-pie"></i> Répartition par Catégorie</h4>
+              </div>
+              <div class="chart-placeholder" id="category-chart">
+                <canvas id="categoryCanvas" width="400" height="200"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-insights">
+            <div class="insights-header">
+              <i class="fas fa-brain"></i>
+              <h4>Insights IA</h4>
+            </div>
+            <div class="insights-content" id="ai-insights-content">
+              <div class="insight-item">
+                <i class="fas fa-lightbulb"></i>
+                <span>Les ventes augmentent de 23% le vendredi par rapport aux autres jours.</span>
+              </div>
+              <div class="insight-item">
+                <i class="fas fa-trending-up"></i>
+                <span>Prédiction : +18% de croissance attendue le mois prochain.</span>
+              </div>
+              <div class="insight-item">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Attention : Baisse de conversion dans la tranche 25-34 ans.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo-controls">
+          <button onclick="generateAnalytics()" class="demo-btn primary">
+            <i class="fas fa-sync"></i>
+            Actualiser les Données
+          </button>
+          <button onclick="exportDashboard()" class="demo-btn secondary">
+            <i class="fas fa-download"></i>
+            Exporter le Rapport
+          </button>
+        </div>
+        
+        <div id="analytics-status" class="demo-status"></div>
+      </div>
+    </div>
     </section>
 
     <!-- Pied de page -->
     <footer id="contact">
       <div class="contact-grid">
-        <a href="mailto:anas.sghir.2912@gmail.com" class="contact-item">
+        <a href="mailto:anas@itssghir.com" class="contact-item">
           <i class="fas fa-envelope"></i>
-          <span>anas.sghir.2912@gmail.com</span>
+          <span>anas@itssghir.com</span>
         </a>
         <a href="https://www.linkedin.com/in/anas-sghir/" target="_blank" class="contact-item">
           <i class="fab fa-linkedin"></i>
