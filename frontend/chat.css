@@ -34,7 +34,7 @@
     right: 30px;
     width: 320px;
     height: 450px;
-    background: rgba(75, 0, 130, 0.95);
+    background: rgba(75, 0, 130, 1);
     border-radius: 20px;
     box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
     display: none;
@@ -43,6 +43,14 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     overflow: hidden;
+}
+
+/* Force complete opacity for dark theme - more aggressive */
+body.dark-theme .chat-window,
+.dark-theme .chat-window {
+    background: #252422 !important;
+    backdrop-filter: none !important;
+    opacity: 1 !important;
 }
 
 .chat-header {
@@ -92,21 +100,37 @@
     flex-direction: column;
     gap: 12px;
     scrollbar-width: thin;
-    scrollbar-color: #00ffcc rgba(255, 255, 255, 0.1);
+    scrollbar-color: #00ffcc transparent;
+    background: rgba(0, 0, 0, 0.1);
 }
 
+/* Scrollbar minimaliste et moderne - FORCÉ */
 .chat-messages::-webkit-scrollbar {
-    width: 6px;
+    width: 4px !important;
+    height: 4px !important;
 }
 
 .chat-messages::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
 }
 
 .chat-messages::-webkit-scrollbar-thumb {
-    background: #00ffcc;
-    border-radius: 3px;
+    background: linear-gradient(180deg, #00ffcc, #00d4aa) !important;
+    border-radius: 2px !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #00d4aa, #00b894) !important;
+    transform: scaleX(1.5) !important;
+}
+
+.chat-messages::-webkit-scrollbar-corner {
+    background: transparent !important;
 }
 
 .chat-message {
@@ -159,10 +183,11 @@
 }
 
 .bot-message .message-content {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.25);
     color: #fff;
     border-bottom-left-radius: 5px;
     box-shadow: 0 3px 15px rgba(155, 89, 182, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .chat-input {
@@ -172,6 +197,11 @@
     gap: 12px;
     align-items: center;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Force opaque input area for dark theme */
+body.dark-theme .chat-input {
+    background: #403D39 !important;
 }
 
 .chat-input input {
@@ -410,6 +440,7 @@ body.dark-theme .chat-window,
   box-shadow: 0 0 30px rgba(204, 197, 185, 0.3) !important;
   color: #FFFCF2 !important;
   backdrop-filter: none !important;
+  opacity: 1 !important;
 }
 
 body.dark-theme .chat-header,
@@ -451,6 +482,20 @@ body.dark-theme .bot-message .message-content,
   color: #FFFCF2 !important;
   border: 1px solid #CCC5B9 !important;
   box-shadow: 0 3px 15px rgba(37, 36, 34, 0.2) !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+}
+
+/* Additional rule to ensure bot messages are completely opaque */
+body.dark-theme .bot-message,
+.dark-theme .bot-message {
+  opacity: 1 !important;
+}
+
+body.dark-theme .message-content,
+.dark-theme .message-content {
+  opacity: 1 !important;
+  filter: none !important;
 }
 
 /* Input Dark Mode */
@@ -497,15 +542,136 @@ body.dark-theme .chat-input button i,
   text-shadow: 0 0 10px rgba(37, 36, 34, 0.5) !important;
 }
 
-/* Scrollbar Dark Mode */
-body.dark-theme .chat-messages::-webkit-scrollbar-thumb,
-.dark-theme .chat-messages::-webkit-scrollbar-thumb {
-  background: #CCC5B9 !important;
+/* Scrollbar minimaliste en mode sombre - ULTRA FORCÉ */
+body.dark-theme .chat-messages,
+.dark-theme .chat-messages,
+html body.dark-theme .chat-messages,
+html .dark-theme .chat-messages {
+  scrollbar-width: thin !important;
+  scrollbar-color: #00ffcc transparent !important;
+}
+
+body.dark-theme .chat-messages::-webkit-scrollbar,
+.dark-theme .chat-messages::-webkit-scrollbar,
+html body.dark-theme .chat-messages::-webkit-scrollbar,
+html .dark-theme .chat-messages::-webkit-scrollbar {
+  width: 4px !important;
+  height: 4px !important;
 }
 
 body.dark-theme .chat-messages::-webkit-scrollbar-track,
-.dark-theme .chat-messages::-webkit-scrollbar-track {
-  background: rgba(64, 61, 57, 0.3) !important;
+.dark-theme .chat-messages::-webkit-scrollbar-track,
+html body.dark-theme .chat-messages::-webkit-scrollbar-track,
+html .dark-theme .chat-messages::-webkit-scrollbar-track {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+body.dark-theme .chat-messages::-webkit-scrollbar-thumb,
+.dark-theme .chat-messages::-webkit-scrollbar-thumb,
+html body.dark-theme .chat-messages::-webkit-scrollbar-thumb,
+html .dark-theme .chat-messages::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #00ffcc, #00d4aa) !important;
+  border-radius: 2px !important;
+  transition: all 0.3s ease !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body.dark-theme .chat-messages::-webkit-scrollbar-thumb:hover,
+.dark-theme .chat-messages::-webkit-scrollbar-thumb:hover,
+html body.dark-theme .chat-messages::-webkit-scrollbar-thumb:hover,
+html .dark-theme .chat-messages::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #00d4aa, #00b894) !important;
+  transform: scaleX(1.5) !important;
+}
+
+body.dark-theme .chat-messages::-webkit-scrollbar-corner,
+.dark-theme .chat-messages::-webkit-scrollbar-corner,
+html body.dark-theme .chat-messages::-webkit-scrollbar-corner,
+html .dark-theme .chat-messages::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* Scrollbar minimaliste en mode clair */
+body.light-theme .chat-messages,
+.light-theme .chat-messages {
+  scrollbar-width: thin;
+  scrollbar-color: #252422 transparent;
+}
+
+body.light-theme .chat-messages::-webkit-scrollbar,
+.light-theme .chat-messages::-webkit-scrollbar {
+  width: 4px;
+}
+
+body.light-theme .chat-messages::-webkit-scrollbar-track,
+.light-theme .chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body.light-theme .chat-messages::-webkit-scrollbar-thumb,
+.light-theme .chat-messages::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #252422, #403e3c);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+body.light-theme .chat-messages::-webkit-scrollbar-thumb:hover,
+.light-theme .chat-messages::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #403e3c, #5a5753);
+  width: 6px;
+}
+
+/* Zone de messages en mode sombre */
+body.dark-theme .chat-messages,
+.dark-theme .chat-messages {
+  background: #252422 !important;
+  opacity: 1 !important;
+}
+
+/* Force complete opacity for entire chat window in dark mode */
+body.dark-theme .chat-window,
+body.dark-theme .chat-window *,
+.dark-theme .chat-window,
+.dark-theme .chat-window * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Override any inherited transparency */
+body.dark-theme .chat-window {
+  background: #252422 !important;
+  background-color: #252422 !important;
+  background-image: none !important;
+  background-attachment: scroll !important;
+  background-clip: border-box !important;
+  background-origin: padding-box !important;
+  background-position: 0% 0% !important;
+  background-repeat: repeat !important;
+  background-size: auto auto !important;
+}
+
+body.dark-theme .chat-window {
+  background: #252422 !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+/* Ultra aggressive opacity fix for dark theme */
+body.dark-theme .chat-window {
+  background-color: #252422 !important;
+  background-image: none !important;
+  background: #252422 !important;
+}
+
+body.dark-theme .chat-window::before {
+  display: none !important;
+}
+
+body.dark-theme .chat-window::after {
+  display: none !important;
 }
 
 /* Icons Dark Mode */
@@ -534,16 +700,19 @@ body.dark-theme .typing-indicator .dot,
 /* Error messages Dark Mode */
 body.dark-theme .error-message .message-content,
 .dark-theme .error-message .message-content {
-  background: rgba(64, 61, 57, 0.2) !important;
+  background: #403D39 !important;
   color: #FFFCF2 !important;
-  border: 1px solid rgba(204, 197, 185, 0.2) !important;
+  border: 1px solid #CCC5B9 !important;
 }
 
 /* Welcome message Dark Mode */
 body.dark-theme .welcome-message,
 .dark-theme .welcome-message {
-  color: rgba(255, 252, 242, 0.7) !important;
-  border-bottom: 1px solid rgba(204, 197, 185, 0.2) !important;
+  color: #FFFCF2 !important;
+  border-bottom: 1px solid #CCC5B9 !important;
+  background: #252422 !important;
+  padding: 15px !important;
+  border-radius: 8px !important;
 }
 
 /* 3. RÈGLES COMPORTEMENTALES STRICTES */
@@ -681,7 +850,7 @@ body.dark-theme .user-message .message-content,
 /* Messages bot - Sans violet */
 body.dark-theme .bot-message .message-content,
 .dark-theme .bot-message .message-content {
-  background: rgba(64, 61, 57, 0.3) !important;
+  background: #403D39 !important;
   color: #FFFCF2 !important;
 }
 
@@ -694,7 +863,7 @@ body.dark-theme .chat-input button,
 /* Input chat - Sans fond violet */
 body.dark-theme .chat-input,
 .dark-theme .chat-input {
-  background: rgba(37, 36, 34, 0.4) !important;
+  background: #403D39 !important;
 }
 
 /* Éliminer toutes les références rgba violet du chat */
@@ -704,7 +873,7 @@ body.dark-theme .chat-button *[style*="rgba(155, 89, 182"],
 .dark-theme .chat-window *[style*="rgba(75, 0, 130"],
 .dark-theme .chat-window *[style*="rgba(155, 89, 182"],
 .dark-theme .chat-button *[style*="rgba(155, 89, 182"] {
-  background: rgba(64, 61, 57, 0.3) !important;
+  background: #403D39 !important;
 }
 
 /* Forcer la couleur des icônes */
@@ -721,4 +890,74 @@ body.dark-theme .chat-header,
 .dark-theme .chat-button,
 .dark-theme .chat-header {
   background-image: none !important;
+}
+
+/* =============================================== */
+/* CORRECTION FINALE - OPACITÉ COMPLÈTE FORCÉE  */
+/* =============================================== */
+
+/* Règle finale pour forcer l'opacité complète de la fenêtre de chat */
+html body.dark-theme .chat-window,
+html body.dark-theme .chat-window.active,
+html body.dark-theme .chat-window[style*="display: flex"] {
+  background: #252422 !important;
+  background-color: #252422 !important;
+  background-image: none !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Messages bot complètement opaques */
+html body.dark-theme .bot-message .message-content {
+  background: #403D39 !important;
+  background-color: #403D39 !important;
+  opacity: 1 !important;
+}
+
+/* Zone de messages opaque */
+html body.dark-theme .chat-messages {
+  background: #252422 !important;
+  background-color: #252422 !important;
+  opacity: 1 !important;
+}
+
+/* ======================================= */
+/* SCROLLBAR OVERRIDE ULTIME - PRIORITÉ MAX */
+/* ======================================= */
+
+/* Forcer le scrollbar partout dans le chat */
+.chat-window *::-webkit-scrollbar,
+.chat-messages::-webkit-scrollbar,
+*[class*="chat"]::-webkit-scrollbar {
+  width: 4px !important;
+  height: 4px !important;
+  -webkit-appearance: none !important;
+}
+
+.chat-window *::-webkit-scrollbar-track,
+.chat-messages::-webkit-scrollbar-track,
+*[class*="chat"]::-webkit-scrollbar-track {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  -webkit-appearance: none !important;
+}
+
+.chat-window *::-webkit-scrollbar-thumb,
+.chat-messages::-webkit-scrollbar-thumb,
+*[class*="chat"]::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #00ffcc, #00d4aa) !important;
+  border-radius: 2px !important;
+  border: none !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+}
+
+.chat-window *::-webkit-scrollbar-thumb:hover,
+.chat-messages::-webkit-scrollbar-thumb:hover,
+*[class*="chat"]::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #00d4aa, #00b894) !important;
+  transform: scaleX(1.5) !important;
 } 
