@@ -1,0 +1,1 @@
+scripts/management/manage.sh

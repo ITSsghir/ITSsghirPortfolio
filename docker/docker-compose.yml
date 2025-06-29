@@ -1,0 +1,35 @@
+---
+services:
+  portfolio-frontend:
+    build:
+      context: ./frontend
+      dockerfile: docker/Dockerfile 
+      no_cache: true
+    container_name: portfolio-frontend
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.portfolio-frontend.loadbalancer.server.port=80
+      - traefik.http.routers.portfolio-frontend.entrypoints=web,websecure
+      - traefik.http.routers.portfolio-frontend.rule=Host(`anas.itssghir.com`)
+      - traefik.http.routers.portfolio-frontend.tls=true
+      - traefik.http.routers.portfolio-frontend.tls.certresolver=cloudflare
+      - traefik.http.routers.portfolio-frontend.service=portfolio-frontend
+    networks:
+      - proxy
+      - portfolio
+    restart: unless-stopped
+  
+  portfolio-backend:
+    build:
+      context: ./backend
+      dockerfile: docker/Dockerfile
+      no_cache: true
+    container_name: portfolio-backend
+    networks:
+      - portfolio
+    restart: unless-stopped
+
+networks:
+  proxy:
+    external: true
+  portfolio:

@@ -371,7 +371,8 @@ function resetClassification() {
  // Afficher classification seulement si elle était cachée
  if (!isVisible) {
    classification.style.display = 'block';
-   drawGrid();
+   document.getElementById('test-data').innerHTML = 
+     generateDataTable({ features: irisData.features, samples: irisData.samples });
  }
 }
 
@@ -862,23 +863,18 @@ function resetClassification() {
        isDark: false,
        
        lightTheme: {
-           '--bg-primary': '#ffffff',              // Blanc pur pour contraste max
-           '--bg-secondary': '#fefefe',            // Blanc cassé subtil
-           '--bg-tertiary': '#f8f6f3',            // Beige très clair
-           '--text-primary': '#1a1a1a',           // Noir profond ultra-lisible
-           '--text-secondary': '#2d2a25',         // Brun très foncé
-           '--text-tertiary': '#4a453f',          // Brun moyen
-           '--accent-primary': '#b4945d',         // Or élégant
-           '--accent-secondary': '#9d8052',       // Bronze profond
-           '--neon-glow': 'rgba(180, 148, 93, 0.5)',
-           '--border-color': 'rgba(180, 148, 93, 0.3)',
-           '--gradient-start': '#b4945d',
-           '--gradient-end': '#9d8052',
-           '--navbar-bg': 'rgba(255, 255, 255, 0.95)',
-           '--navbar-text': '#1a1a1a',
-           '--shadow-color': 'rgba(0, 0, 0, 0.08)',
-           '--hover-bg': 'rgba(180, 148, 93, 0.08)',
-           '--card-bg': 'rgba(255, 255, 255, 0.9)'
+           '--bg-primary': '#4b0082',
+           '--bg-secondary': '#2c003e',
+           '--text-primary': '#ffffff',
+           '--text-secondary': '#cccccc',
+           '--accent-primary': '#00ffcc',
+           '--accent-secondary': '#00ccaa',
+           '--neon-glow': 'rgba(0, 255, 204, 0.5)',
+           '--border-color': 'rgba(255, 255, 255, 0.1)',
+           '--gradient-start': '#00ffcc',
+           '--gradient-end': '#00ccaa',
+           '--navbar-bg': '#CCC5B9',
+           '--navbar-text': '#403D39'
        },
        
        darkTheme: {
@@ -927,31 +923,22 @@ function resetClassification() {
            document.body.classList.remove('light-theme', 'dark-theme');
            document.body.classList.add(this.isDark ? 'dark-theme' : 'light-theme');
            
-           // Appliquer le background approprié selon le thème
-           if (this.isDark) {
-               // Mode sombre : background uni sombre
-               document.body.style.background = '#252422';
-               document.body.style.backgroundImage = 'none';
-               
-               // Forcer la navbar sombre
-               const navbar = document.querySelector('.navbar');
-               if (navbar) {
+           // Forcer la mise à jour de la navbar
+           const navbar = document.querySelector('.navbar');
+           if (navbar) {
+               // Temporairement forcer le style pour éviter les transitions indésirables
+               if (this.isDark) {
                    navbar.style.background = 'rgba(37, 36, 34, 0.95)';
+               } else {
+                   navbar.style.background = 'rgba(204, 197, 185, 0.95)';
                }
-               
+           }
+           
+           // CORRECTION STRICTE - Éliminer tout violet en mode sombre UNIQUEMENT
+           if (this.isDark) {
                this.eliminatePurpleElements();
            } else {
-               // Mode clair : dégradé moderne et élégant
-               document.body.style.background = 'linear-gradient(135deg, #fefefe 0%, #f8f6f3 50%, #f0ede6 100%)';
-               document.body.style.backgroundAttachment = 'fixed';
-               
-               // Navbar claire avec transparence
-               const navbar = document.querySelector('.navbar');
-               if (navbar) {
-                   navbar.style.background = 'rgba(248, 248, 245, 0.98)';
-               }
-               
-               this.restoreLightElements();
+               this.restorePurpleElements(); // Restaurer violet en light mode
            }
        },
        
@@ -1018,122 +1005,6 @@ function resetClassification() {
                 });
             }
                },
-        
-        restoreLightElements() {
-            // OPTIMISER LES ÉLÉMENTS POUR LE MODE CLAIR PREMIUM
-            
-            // Hero section : texte ultra-sombre sur fond clair
-            const heroH1 = document.querySelector('#hero h1');
-            if (heroH1) {
-                heroH1.style.color = '#1a1a1a';
-                heroH1.style.textShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
-                heroH1.style.fontWeight = '700';
-                heroH1.style.opacity = '1';
-            }
-            
-            const heroP = document.querySelector('#hero p');
-            if (heroP) {
-                heroP.style.color = '#2d2a25';
-                heroP.style.textShadow = '0 1px 4px rgba(0, 0, 0, 0.12)';
-                heroP.style.fontWeight = '500';
-                heroP.style.opacity = '0.95';
-            }
-            
-            const rotatingText = document.getElementById('rotating-text');
-            if (rotatingText) {
-                rotatingText.style.color = '#4a453f';
-                rotatingText.style.textShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
-                rotatingText.style.fontWeight = '600';
-            }
-            
-            // CV-AVAILABILITY PREMIUM - ULTRA VISIBLE
-            const cvAvailability = document.querySelector('.cv-availability');
-            if (cvAvailability) {
-                cvAvailability.style.background = 'rgba(255, 255, 255, 0.9)';
-                cvAvailability.style.border = '1px solid rgba(180, 148, 93, 0.2)';
-                cvAvailability.style.borderRadius = '12px';
-                cvAvailability.style.padding = '20px';
-                cvAvailability.style.marginTop = '20px';
-                cvAvailability.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.08)';
-                cvAvailability.style.backdropFilter = 'blur(15px)';
-            }
-            
-            const cvAvailabilityH4 = document.querySelector('.cv-availability h4');
-            if (cvAvailabilityH4) {
-                cvAvailabilityH4.style.color = '#1a1a1a';
-                cvAvailabilityH4.style.background = 'linear-gradient(135deg, #f8f6f3, #ffffff)';
-                cvAvailabilityH4.style.padding = '12px 20px';
-                cvAvailabilityH4.style.borderRadius = '8px';
-                cvAvailabilityH4.style.borderLeft = '4px solid #b4945d';
-                cvAvailabilityH4.style.fontWeight = '600';
-                cvAvailabilityH4.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.1)';
-                cvAvailabilityH4.style.marginBottom = '15px';
-            }
-            
-            const cvAvailabilityP = document.querySelector('.cv-availability p');
-            if (cvAvailabilityP) {
-                // TEXTE BLANC SUR FOND DORÉ PREMIUM
-                cvAvailabilityP.style.color = '#ffffff';
-                cvAvailabilityP.style.background = 'linear-gradient(135deg, #b4945d, #9d8052)';
-                cvAvailabilityP.style.padding = '15px 25px';
-                cvAvailabilityP.style.borderRadius = '25px';
-                cvAvailabilityP.style.fontWeight = '700';
-                cvAvailabilityP.style.fontSize = '1.1em';
-                cvAvailabilityP.style.textAlign = 'center';
-                cvAvailabilityP.style.boxShadow = '0 4px 15px rgba(180, 148, 93, 0.3)';
-                cvAvailabilityP.style.border = '2px solid rgba(255, 255, 255, 0.2)';
-                cvAvailabilityP.style.backdropFilter = 'blur(10px)';
-                cvAvailabilityP.style.margin = '0';
-            }
-            
-            // Restaurer les boutons avec couleurs modernes
-            const buttons = document.querySelectorAll('button:not(.theme-button)');
-            buttons.forEach(button => {
-                button.style.background = 'linear-gradient(135deg, #b4945d, #9d8052)';
-                button.style.color = '#ffffff';
-                button.style.border = '1px solid #9d8052';
-            });
-            
-            // Chat button moderne
-            const chatButton = document.querySelector('.chat-button, .chat-toggle');
-            if (chatButton) {
-                chatButton.style.background = 'linear-gradient(135deg, #b4945d, #9d8052)';
-                chatButton.style.border = '2px solid #9d8052';
-                chatButton.style.color = '#ffffff';
-            }
-            
-            // Chat window claire
-            const chatWindow = document.querySelector('.chat-window, .chat-container');
-            if (chatWindow) {
-                chatWindow.style.background = 'rgba(255, 255, 255, 0.95)';
-                chatWindow.style.border = '1px solid rgba(180, 148, 93, 0.3)';
-                chatWindow.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.1)';
-            }
-            
-            // Textarea avec thème clair
-            const textareas = document.querySelectorAll('textarea');
-            textareas.forEach(textarea => {
-                textarea.style.background = 'rgba(255, 255, 255, 0.9)';
-                textarea.style.color = '#4a453f';
-                textarea.style.border = '1px solid rgba(180, 148, 93, 0.3)';
-            });
-            
-            // SQL output clair
-            const sqlOutput = document.getElementById('sql-output');
-            if (sqlOutput) {
-                sqlOutput.style.background = 'rgba(255, 255, 255, 0.9)';
-                sqlOutput.style.color = '#4a453f';
-                sqlOutput.style.border = '1px solid rgba(180, 148, 93, 0.3)';
-            }
-            
-            // Cartes et panneaux avec design moderne
-            const cards = document.querySelectorAll('.cv-section, .repo-card, .demo-card');
-            cards.forEach(card => {
-                card.style.background = 'rgba(255, 255, 255, 0.8)';
-                card.style.border = '1px solid rgba(200, 190, 175, 0.3)';
-                card.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
-            });
-        },
         
         restorePurpleElements() {
             // RESTAURER LES COULEURS VIOLET ORIGINALES EN LIGHT MODE
