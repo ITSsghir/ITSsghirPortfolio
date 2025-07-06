@@ -4954,48 +4954,49 @@ body.light-theme #hero h1 {
   font-size: 1rem;
 }
 
-/* LIGHT THEME MOBILE STYLES - TEST AVEC COULEURS FORCÉES */
+/* LIGHT THEME MOBILE STYLES - RESTORED ORIGINAL */
 .light-theme .hamburger-btn {
-  border-color: #FF0000 !important;
-  background: #FF0000 !important;
+  border-color: #b4945d;
+  background: rgba(248, 246, 243, 0.95);
 }
 
 .light-theme .hamburger-btn:hover {
-  background: #CC0000 !important;
+  background: rgba(180, 148, 93, 0.1);
 }
 
 .light-theme .hamburger-line {
-  background: #FF0000 !important;
+  background: #4a453f;
 }
 
 .light-theme .mobile-menu {
-  background: #FF0000 !important;
-  border-color: #FF0000 !important;
+  background: rgba(248, 246, 243, 0.98);
+  border-color: rgba(180, 148, 93, 0.3);
+  backdrop-filter: blur(12px);
 }
 
 .light-theme .mobile-menu-header h3 {
-  color: #FF0000 !important;
+  color: #4a453f;
 }
 
 .light-theme .mobile-menu-close,
 .light-theme .mobile-theme-btn {
-  color: #FF0000 !important;
-  border-color: #FF0000 !important;
+  color: #4a453f;
+  border-color: #b4945d;
 }
 
 .light-theme .mobile-menu-close:hover,
 .light-theme .mobile-theme-btn:hover {
-  background: #FF0000 !important;
-  color: #FFFFFF !important;
+  background: linear-gradient(135deg, #b4945d, #9d8052);
+  color: #ffffff;
 }
 
 .light-theme .mobile-menu-item {
-  color: #FF0000 !important;
+  color: #4a453f;
 }
 
 .light-theme .mobile-menu-item:hover {
-  background: #FF0000 !important;
-  border-left-color: #FF0000 !important;
+  background: rgba(180, 148, 93, 0.1);
+  border-left-color: #b4945d;
 }
 
 /* DARK THEME MOBILE STYLES */
@@ -5916,69 +5917,23 @@ body.light-theme #hero h1 {
   }
 }
 
-/* ===== CORRECTION MODE JOUR PREMIUM - Texte ultra-lisible ===== */
+/* CORRECTION MODE JOUR - Texte sombre sur fond clair */
 .light-theme #hero h1 {
-    color: #1a1a1a !important;           /* Noir profond pour maximum contraste */
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-    font-weight: 700 !important;
+    color: #2d2a25 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
     opacity: 1 !important;
 }
 
 .light-theme #hero p { 
-    color: #2d2a25 !important;           /* Brun très foncé lisible */
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) !important;
-    font-weight: 500 !important;
-    opacity: 0.95 !important;
+    color: #4a453f !important; 
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    opacity: 0.9; 
 }
 
 .light-theme #rotating-text {
-    color: #4a453f !important;           /* Brun moyen contrasté */
-    font-weight: 600 !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    color: #6b645a !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
     opacity: 0.9;
-}
-
-/* ===== CV-AVAILABILITY PREMIUM ULTRA-VISIBLE ===== */
-.light-theme .cv-availability {
-    background: rgba(255, 255, 255, 0.9) !important;
-    border: 1px solid rgba(180, 148, 93, 0.2) !important;
-    border-radius: 12px !important;
-    padding: 20px !important;
-    margin-top: 20px !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
-    backdrop-filter: blur(15px) !important;
-}
-
-.light-theme .cv-availability h4 {
-    color: #1a1a1a !important;
-    background: linear-gradient(135deg, #f8f6f3, #ffffff) !important;
-    padding: 12px 20px !important;
-    border-radius: 8px !important;
-    border-left: 4px solid #b4945d !important;
-    font-weight: 600 !important;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1) !important;
-    margin-bottom: 15px !important;
-}
-
-.light-theme .cv-availability p {
-    color: #ffffff !important;           /* TEXTE BLANC SUR FOND DORÉ */
-    background: linear-gradient(135deg, #b4945d, #9d8052) !important;
-    padding: 15px 25px !important;
-    border-radius: 25px !important;
-    font-weight: 700 !important;
-    font-size: 1.1em !important;
-    text-align: center !important;
-    box-shadow: 0 4px 15px rgba(180, 148, 93, 0.3) !important;
-    border: 2px solid rgba(255, 255, 255, 0.2) !important;
-    backdrop-filter: blur(10px) !important;
-    margin: 0 !important;
-}
-
-/* Spécificité maximale pour override */
-body.light-theme section#profil .cv-availability p {
-    color: #ffffff !important;
-    background: linear-gradient(135deg, #b4945d, #9d8052) !important;
-    font-weight: 700 !important;
 }
 
 /* ===== AMÉLIORATIONS MODE JOUR - DESIGN MODERNE ===== */
@@ -6142,5 +6097,233 @@ body.light-theme section#profil .cv-availability p {
         background: rgba(255, 255, 255, 0.95) !important;
         border: 1px solid var(--border-color) !important;
         backdrop-filter: blur(15px) !important;
+    }
+}
+
+/* S'assurer que tout le texte dans hero-text est blanc en mode sombre */
+.dark-theme .hero-text h1,
+.dark-theme .hero-text p,
+.dark-theme .hero-text div {
+  color: #ffffff;
+}
+
+/* Mode jour : texte sombre sur fond clair */
+.light-theme .hero-text h1,
+.light-theme .hero-text p,
+.light-theme .hero-text div {
+  color: var(--text-primary) !important;
+}
+
+.light-theme #hero p { 
+  color: var(--text-secondary) !important;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+.light-theme #rotating-text {
+  color: var(--accent-primary) !important;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#rotating-text {
+  animation: fade 2s ease-in-out infinite;
+  font-weight: 600;
+  color: var(--accent-primary);
+  display: inline-block;
+  min-width: 200px;
+  text-align: left;
+}
+
+.light-theme #rotating-text {
+  color: var(--accent-primary) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 📱 MOBILE LIGHT THEME OPTIMIZATIONS */
+@media (max-width: 768px) {
+    /* Hero section mobile - Mode jour */
+    .light-theme #hero {
+        padding: 40px 15px 20px;
+        margin-top: 60px;
+    }
+    
+    .light-theme #hero h1 {
+        font-size: 2.2em !important;
+        line-height: 1.2 !important;
+        margin: 15px 0 !important;
+        color: var(--text-primary) !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .light-theme #hero p {
+        font-size: 1rem !important;
+        line-height: 1.4 !important;
+        color: var(--text-secondary) !important;
+        margin: 10px 0 !important;
+        padding: 0 10px;
+    }
+    
+    .light-theme #rotating-text {
+        font-size: 1.1rem !important;
+        color: var(--accent-primary) !important;
+        font-weight: 600 !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Avatar mobile - Mode jour */
+    .light-theme .profile-avatar {
+        width: 120px !important;
+        height: 120px !important;
+        margin: 20px auto !important;
+    }
+    
+    .light-theme .avatar-ring {
+        border: 3px solid var(--accent-primary) !important;
+    }
+    
+    .light-theme .crown {
+        top: -25px !important;
+        width: 60px !important;
+        height: 30px !important;
+    }
+    
+    /* Navigation mobile - Mode jour */
+    .light-theme .navbar {
+        background: rgba(254, 254, 254, 0.98) !important;
+        backdrop-filter: blur(10px) !important;
+        border-bottom: 1px solid rgba(180, 148, 93, 0.2) !important;
+    }
+    
+    .light-theme .mobile-menu {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(15px) !important;
+        border: 1px solid rgba(180, 148, 93, 0.2) !important;
+    }
+    
+    /* Cartes mobile - Mode jour */
+    .light-theme .cv-section,
+    .light-theme .repo-card,
+    .light-theme .demo-card {
+        background: rgba(255, 255, 255, 0.9) !important;
+        border: 1px solid rgba(180, 148, 93, 0.2) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+        margin: 10px 5px !important;
+        padding: 15px !important;
+        border-radius: 12px !important;
+    }
+    
+    /* Boutons mobile - Mode jour */
+    .light-theme button:not(.theme-button):not(.mobile-theme-btn) {
+        background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)) !important;
+        color: #ffffff !important;
+        border: 1px solid var(--accent-secondary) !important;
+        padding: 10px 20px !important;
+        border-radius: 8px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    /* Footer mobile - Mode jour */
+    .light-theme footer {
+        background: linear-gradient(135deg, #f8f6f3 0%, #f0ede6 100%) !important;
+        border-top: 1px solid rgba(180, 148, 93, 0.2) !important;
+        padding: 20px 15px !important;
+    }
+    
+    .light-theme footer .contact-item {
+        background: rgba(255, 255, 255, 0.7) !important;
+        border: 1px solid rgba(180, 148, 93, 0.2) !important;
+        color: var(--text-primary) !important;
+        padding: 12px !important;
+        border-radius: 8px !important;
+    }
+    
+    .light-theme footer .contact-item i {
+        color: var(--accent-primary) !important;
+    }
+}
+
+/* 📱 VERY SMALL SCREENS LIGHT THEME OPTIMIZATIONS */
+@media (max-width: 479px) {
+    /* Hero ultra-mobile - Mode jour */
+    .light-theme #hero {
+        padding: 30px 10px 15px;
+        margin-top: 50px;
+    }
+    
+    .light-theme #hero h1 {
+        font-size: 1.8em !important;
+        line-height: 1.1 !important;
+        margin: 10px 0 !important;
+        color: var(--text-primary) !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .light-theme #hero p {
+        font-size: 0.9rem !important;
+        line-height: 1.3 !important;
+        color: var(--text-secondary) !important;
+        margin: 8px 0 !important;
+        padding: 0 5px;
+    }
+    
+    .light-theme #rotating-text {
+        font-size: 1rem !important;
+        color: var(--accent-primary) !important;
+        font-weight: 600 !important;
+        display: block !important;
+        margin-top: 10px !important;
+    }
+    
+    /* Avatar ultra-mobile - Mode jour */
+    .light-theme .profile-avatar {
+        width: 100px !important;
+        height: 100px !important;
+        margin: 15px auto !important;
+    }
+    
+    .light-theme .crown {
+        top: -20px !important;
+        width: 50px !important;
+        height: 25px !important;
+    }
+    
+    /* Navigation ultra-mobile - Mode jour */
+    .light-theme .navbar {
+        padding: 0.5rem !important;
+        height: 60px !important;
+    }
+    
+    .light-theme .theme-button {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    /* Cartes ultra-mobile - Mode jour */
+    .light-theme .cv-section,
+    .light-theme .repo-card,
+    .light-theme .demo-card {
+        margin: 8px 3px !important;
+        padding: 12px !important;
+        border-radius: 10px !important;
+    }
+    
+    /* Grilles adaptatives - Mode jour */
+    .light-theme .kpi-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    
+    .light-theme .repos-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        padding: 0 5px !important;
+    }
+    
+    .light-theme .demo-cards-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        padding: 0 5px !important;
     }
 }

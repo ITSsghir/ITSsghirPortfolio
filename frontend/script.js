@@ -862,23 +862,21 @@ function resetClassification() {
        isDark: false,
        
        lightTheme: {
-           '--bg-primary': '#ffffff',              // Blanc pur pour contraste max
-           '--bg-secondary': '#fefefe',            // Blanc cassé subtil
-           '--bg-tertiary': '#f8f6f3',            // Beige très clair
-           '--text-primary': '#1a1a1a',           // Noir profond ultra-lisible
-           '--text-secondary': '#2d2a25',         // Brun très foncé
-           '--text-tertiary': '#4a453f',          // Brun moyen
-           '--accent-primary': '#b4945d',         // Or élégant
-           '--accent-secondary': '#9d8052',       // Bronze profond
+           '--bg-primary': '#fefefe',
+           '--bg-secondary': '#f8f6f3',
+           '--text-primary': '#4a453f',
+           '--text-secondary': '#6b645a',
+           '--accent-primary': '#b4945d',
+           '--accent-secondary': '#9d8052',
            '--neon-glow': 'rgba(180, 148, 93, 0.5)',
-           '--border-color': 'rgba(180, 148, 93, 0.3)',
+           '--border-color': 'rgba(200, 190, 175, 0.3)',
            '--gradient-start': '#b4945d',
            '--gradient-end': '#9d8052',
-           '--navbar-bg': 'rgba(255, 255, 255, 0.95)',
-           '--navbar-text': '#1a1a1a',
+           '--navbar-bg': 'rgba(248, 248, 245, 0.98)',
+           '--navbar-text': '#4a453f',
            '--shadow-color': 'rgba(0, 0, 0, 0.08)',
-           '--hover-bg': 'rgba(180, 148, 93, 0.08)',
-           '--card-bg': 'rgba(255, 255, 255, 0.9)'
+           '--hover-bg': 'rgba(120, 110, 95, 0.12)',
+           '--card-bg': '#ffffff'
        },
        
        darkTheme: {
@@ -1020,70 +1018,25 @@ function resetClassification() {
                },
         
         restoreLightElements() {
-            // OPTIMISER LES ÉLÉMENTS POUR LE MODE CLAIR PREMIUM
+            // OPTIMISER LES ÉLÉMENTS POUR LE MODE CLAIR
             
-            // Hero section : texte ultra-sombre sur fond clair
+            // Hero section : texte sombre sur fond clair
             const heroH1 = document.querySelector('#hero h1');
             if (heroH1) {
-                heroH1.style.color = '#1a1a1a';
-                heroH1.style.textShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
-                heroH1.style.fontWeight = '700';
-                heroH1.style.opacity = '1';
+                heroH1.style.color = '#2d2a25';
+                heroH1.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
             }
             
             const heroP = document.querySelector('#hero p');
             if (heroP) {
-                heroP.style.color = '#2d2a25';
-                heroP.style.textShadow = '0 1px 4px rgba(0, 0, 0, 0.12)';
-                heroP.style.fontWeight = '500';
-                heroP.style.opacity = '0.95';
+                heroP.style.color = '#4a453f';
+                heroP.style.textShadow = '0 1px 2px rgba(0, 0, 0, 0.1)';
             }
             
             const rotatingText = document.getElementById('rotating-text');
             if (rotatingText) {
-                rotatingText.style.color = '#4a453f';
-                rotatingText.style.textShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
-                rotatingText.style.fontWeight = '600';
-            }
-            
-            // CV-AVAILABILITY PREMIUM - ULTRA VISIBLE
-            const cvAvailability = document.querySelector('.cv-availability');
-            if (cvAvailability) {
-                cvAvailability.style.background = 'rgba(255, 255, 255, 0.9)';
-                cvAvailability.style.border = '1px solid rgba(180, 148, 93, 0.2)';
-                cvAvailability.style.borderRadius = '12px';
-                cvAvailability.style.padding = '20px';
-                cvAvailability.style.marginTop = '20px';
-                cvAvailability.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.08)';
-                cvAvailability.style.backdropFilter = 'blur(15px)';
-            }
-            
-            const cvAvailabilityH4 = document.querySelector('.cv-availability h4');
-            if (cvAvailabilityH4) {
-                cvAvailabilityH4.style.color = '#1a1a1a';
-                cvAvailabilityH4.style.background = 'linear-gradient(135deg, #f8f6f3, #ffffff)';
-                cvAvailabilityH4.style.padding = '12px 20px';
-                cvAvailabilityH4.style.borderRadius = '8px';
-                cvAvailabilityH4.style.borderLeft = '4px solid #b4945d';
-                cvAvailabilityH4.style.fontWeight = '600';
-                cvAvailabilityH4.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.1)';
-                cvAvailabilityH4.style.marginBottom = '15px';
-            }
-            
-            const cvAvailabilityP = document.querySelector('.cv-availability p');
-            if (cvAvailabilityP) {
-                // TEXTE BLANC SUR FOND DORÉ PREMIUM
-                cvAvailabilityP.style.color = '#ffffff';
-                cvAvailabilityP.style.background = 'linear-gradient(135deg, #b4945d, #9d8052)';
-                cvAvailabilityP.style.padding = '15px 25px';
-                cvAvailabilityP.style.borderRadius = '25px';
-                cvAvailabilityP.style.fontWeight = '700';
-                cvAvailabilityP.style.fontSize = '1.1em';
-                cvAvailabilityP.style.textAlign = 'center';
-                cvAvailabilityP.style.boxShadow = '0 4px 15px rgba(180, 148, 93, 0.3)';
-                cvAvailabilityP.style.border = '2px solid rgba(255, 255, 255, 0.2)';
-                cvAvailabilityP.style.backdropFilter = 'blur(10px)';
-                cvAvailabilityP.style.margin = '0';
+                rotatingText.style.color = '#6b645a';
+                rotatingText.style.textShadow = '0 1px 2px rgba(0, 0, 0, 0.1)';
             }
             
             // Restaurer les boutons avec couleurs modernes

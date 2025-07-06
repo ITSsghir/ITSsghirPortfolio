@@ -23,19 +23,19 @@ function validateChatRequest(req, res, next) {
     // Nettoyage du message
     const cleanMessage = message.trim();
     if (cleanMessage.length === 0) {
-        return res.status(400).json({ 
+            return res.status(400).json({ 
             error: 'Message vide',
-            details: 'Le message ne peut pas être vide'
-        });
-    }
-    
+                details: 'Le message ne peut pas être vide'
+            });
+        }
+        
     if (cleanMessage.length > 1000) {
-        return res.status(400).json({ 
-            error: 'Message trop long',
-            details: 'Le message ne peut pas dépasser 1000 caractères'
-        });
-    }
-    
+            return res.status(400).json({ 
+                error: 'Message trop long',
+                details: 'Le message ne peut pas dépasser 1000 caractères'
+            });
+        }
+
     // Ajouter le message nettoyé à la requête
     req.cleanMessage = cleanMessage;
     next();
