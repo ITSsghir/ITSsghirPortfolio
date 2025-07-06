@@ -1,0 +1,15 @@
+/* ===== MAIN CSS - IMPORTS DE TOUS LES MODULES ===== */
+
+/* Base - Fondations */
+@import url('./styles/base/variables.css');
+@import url('./styles/base/reset.css');
+
+/* Components - Composants réutilisables */
+@import url('./components/preloader/preloader.css');
+@import url('./components/navbar/navbar.css');
+
+/* Chat - Conservé tel quel pour l'instant */
+@import url('./chat.css');
+
+/* Legacy - Styles principaux (temporairement conservés) */
+/* Note: Ces styles seront progressivement déplacés vers des modules spécialisés */ 

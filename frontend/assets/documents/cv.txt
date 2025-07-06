@@ -1,3 +1,29 @@
+CV - Anas Sghir
+=================
+
+Profil Professionnel
+--------------------
+Data Scientist passionné par l'intelligence artificielle et l'apprentissage automatique.
+Spécialisé en Python, Machine Learning et développement d'applications web.
+
+Compétences Techniques
+---------------------
+- Python (NumPy, Pandas, Scikit-learn)
+- Machine Learning & Deep Learning
+- Développement Web (HTML, CSS, JavaScript)
+- Bases de données (SQL, NoSQL)
+- Git & GitHub
+
+Expérience
+----------
+- Développement de projets d'IA
+- Analyse de données complexes
+- Création d'applications web interactives
+
+Contact
+-------
+Email: contact@itssghir.com
+GitHub: ITSsghir
 
 🔹 Profil
 Actuellement étudiant en Master 2 MIAGE, où j'ai acquis une solide expérience en informatique, en gestion et en organisation.
@@ -37,14 +63,14 @@ Français, Anglais, Arabe
 - Transformation des besoins métiers en dashboards pertinents
 
 📌 Projet académique — Université Toulouse III (2023 - 2024)
-- Développement d’une application de calcul d’empreinte carbone (Python, React Native)
+- Développement d'une application de calcul d'empreinte carbone (Python, React Native)
 - Reconnaissance caméra et vocale (APIs Google)
 - Gestion complète du projet (coordination, planification, supervision)
 
 📌 Alternance Chef de Projet IT — SHL, Marseille (2022 - 2023)
-- Développement full-stack d’une interface d’administration
+- Développement full-stack d'une interface d'administration
 - Leadership dans la finalisation du site
-- Gestion d’équipe multidisciplinaire et alignement stratégique
+- Gestion d'équipe multidisciplinaire et alignement stratégique
 
 📌 Freelance Web — Moi, Aix-en-Provence (2021 - 2022)
 - Conception et développement de sites web multisecteurs
@@ -66,7 +92,7 @@ Université Aix-Marseille, Aix-en-Provence (2021 - 2023)
 - Informatique : Cybersécurité, Programmation, Développement
 - Data : Manipulation, analyse et traitement des données
 - Gestion : Application des solutions informatiques aux entreprises
-- Gestion de projet & Management d’équipe
+- Gestion de projet & Management d'équipe
 ========================
 🔹 certification
 

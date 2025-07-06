@@ -4,8 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Itssghir - Portfolio AI</title>
+  <!-- Nouveau système modulaire CSS -->
+  <link rel="stylesheet" href="main.css">
+  <!-- Styles legacy temporaires -->
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="chat.css">
+  
+  <!-- Fonts externes -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -195,7 +199,7 @@
       <div class="cv-header">
         <div class="title-container">
           <h2><i class="fas fa-user"></i> Profil</h2>
-          <a href="cv.pdf" download class="cv-download-btn">
+          <a href="assets/documents/cv.txt" download class="cv-download-btn">
             <span class="download-icon">
               <i class="fas fa-file-download"></i>
             </span>
@@ -993,12 +997,26 @@
     <!-- Conteneur pour le chat -->
     <div id="chat-container"></div>
 
-    <!-- Scripts -->
+    <!-- Scripts - Nouveau système modulaire -->
+    <!-- Bibliothèques externes -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    
+    <!-- Modules JavaScript -->
+    <script src="components/preloader/preloader.js"></script>
+    <script src="modules/theme-manager.js"></script>
+    <script src="components/navbar/navbar.js"></script>
+    
+    <!-- Chat (conservé tel quel) -->
     <script src="chat.js"></script>
+    
+    <!-- Scripts legacy (temporaire) -->
     <script src="script.js"></script>
+    
+    <!-- Point d'entrée principal -->
+    <script src="main.js"></script>
+    
     <script>
-        // Initialisation
+        // Initialisation legacy (temporaire)
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // Initialiser la base de données
