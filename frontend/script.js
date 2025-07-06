@@ -1611,31 +1611,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
- function toggleGBT() {
- const gbt = document.getElementById('gbt-container');
- const classification = document.getElementById('classification-container');
- const qlearning = document.getElementById('qlearning-container');
- const dataAnalytics = document.getElementById('data-analytics-container');
 
- // Masquer les autres
- classification.style.display = 'none';
- qlearning.style.display = 'none';
- dataAnalytics.style.display = 'none';
- gbt.style.display = gbt.style.display === 'block' ? 'none' : 'block';
-}
 
 function toggleDataAnalytics() {
  const dataAnalytics = document.getElementById('data-analytics-container');
  const classification = document.getElementById('classification-container');
  const qlearning = document.getElementById('qlearning-container');
- const gbt = document.getElementById('gbt-container');
 
  const isVisible = dataAnalytics.style.display === 'block';
 
  // Masquer tous les autres
  classification.style.display = 'none';
  qlearning.style.display = 'none';
- gbt.style.display = 'none';
 
  // Afficher data analytics seulement si il était caché
  if (!isVisible) {

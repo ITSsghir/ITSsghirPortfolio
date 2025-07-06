@@ -4,12 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Itssghir - Portfolio AI</title>
-  <!-- Nouveau système modulaire CSS -->
-  <link rel="stylesheet" href="main.css">
-  <!-- Styles legacy temporaires -->
   <link rel="stylesheet" href="style.css">
-  
-  <!-- Fonts externes -->
+  <link rel="stylesheet" href="chat.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -199,7 +195,7 @@
       <div class="cv-header">
         <div class="title-container">
           <h2><i class="fas fa-user"></i> Profil</h2>
-          <a href="assets/documents/cv.txt" download class="cv-download-btn">
+          <a href="cv.pdf" download class="cv-download-btn">
             <span class="download-icon">
               <i class="fas fa-file-download"></i>
             </span>
@@ -671,24 +667,7 @@
           </div>
         </div>
 
-        <!-- Carte GBT API -->
-        <div class="demo-card" onclick="toggleGBT()">
-          <div class="demo-card-header">
-            <div class="demo-card-icon">🎨</div>
-            <div class="demo-card-title">Test GBT API</div>
-          </div>
-          <div class="demo-card-description">
-            Génération d'images avec l'API GPT. Créez des images à partir de descriptions textuelles.
-          </div>
-          <div class="demo-card-tags">
-            <span class="demo-tag">API</span>
-            <span class="demo-tag">GPT</span>
-            <span class="demo-tag">IA Générative</span>
-          </div>
-          <div class="demo-card-footer">
-            <span class="demo-card-action">✨ Créer</span>
-          </div>
-        </div>
+
 
         <!-- Carte Data Analytics Dashboard -->
         <div class="demo-card" onclick="toggleDataAnalytics()">
@@ -826,14 +805,7 @@
 
 
 
-    <!-- Panneau GBT -->
-    <div id="gbt-container" class="gbt-container" style="display:none;">
-      <p>Générez une image avec l'API GPT en saisissant une description :</p>
-      <input type="text" id="gbt-prompt" placeholder="Décrivez une scène ex: un chat dans l'espace" style="width:80%; padding:10px; border-radius:8px;">
-      <button onclick="generateImage()" id="generate-btn">🎨 Générer</button>
-      <div id="image-status"></div>
-      <div id="image-result" style="margin-top:20px;"></div>
-    </div>
+
 
     <!-- Conteneur Data Analytics Moderne -->
     <div id="data-analytics-container" class="demo-panel analytics-panel">
@@ -997,26 +969,12 @@
     <!-- Conteneur pour le chat -->
     <div id="chat-container"></div>
 
-    <!-- Scripts - Nouveau système modulaire -->
-    <!-- Bibliothèques externes -->
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
-    
-    <!-- Modules JavaScript -->
-    <script src="components/preloader/preloader.js"></script>
-    <script src="modules/theme-manager.js"></script>
-    <script src="components/navbar/navbar.js"></script>
-    
-    <!-- Chat (conservé tel quel) -->
     <script src="chat.js"></script>
-    
-    <!-- Scripts legacy (temporaire) -->
     <script src="script.js"></script>
-    
-    <!-- Point d'entrée principal -->
-    <script src="main.js"></script>
-    
     <script>
-        // Initialisation legacy (temporaire)
+        // Initialisation
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // Initialiser la base de données
