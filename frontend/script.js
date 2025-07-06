@@ -1776,9 +1776,9 @@ function updateGitHubKPIs() {
     let activityText = '';
     if (daysAgo === 0) activityText = 'Aujourd\'hui';
     else if (daysAgo === 1) activityText = 'Hier';
-    else if (daysAgo < 7) activityText = `Il y a ${daysAgo} jours`;
-    else if (daysAgo < 30) activityText = `Il y a ${Math.floor(daysAgo/7)} semaines`;
-    else activityText = `Il y a ${Math.floor(daysAgo/30)} mois`;
+    else if (daysAgo < 7) activityText = `${daysAgo}j`;
+    else if (daysAgo < 30) activityText = `${Math.floor(daysAgo/7)}sem`;
+    else activityText = `${Math.floor(daysAgo/30)}mois`;
     
     document.getElementById('last-activity-kpi').textContent = activityText;
   } else {
@@ -1833,7 +1833,7 @@ function updateLanguagesChart(languages) {
         legend: {
           position: 'bottom',
           labels: {
-            color: '#ffffff',
+            color: '#000000',
             font: {
               size: 12
             }
@@ -1918,7 +1918,7 @@ function updateGitHubInsights() {
   if (topLanguage) {
     insights.push({
       icon: 'fas fa-code',
-      text: `Votre langage principal est ${topLanguage[0]} avec ${topLanguage[1]} projets`
+      text: `Mon langage principal est ${topLanguage[0]} avec ${topLanguage[1]} projets`
     });
   }
   
@@ -1926,7 +1926,7 @@ function updateGitHubInsights() {
   if (analytics.totalStars > 0) {
     insights.push({
       icon: 'fas fa-star',
-      text: `Vos projets ont reçu ${analytics.totalStars} étoiles au total`
+      text: `Mes projets ont reçu ${analytics.totalStars} étoiles au total`
     });
   }
   
@@ -1936,7 +1936,7 @@ function updateGitHubInsights() {
     if (daysAgo <= 7) {
       insights.push({
         icon: 'fas fa-fire',
-        text: 'Très actif récemment ! Votre dernier projet date de moins d\'une semaine'
+        text: 'Très actif récemment ! Mon dernier projet date de moins d\'une semaine'
       });
     } else {
       insights.push({
@@ -1951,7 +1951,7 @@ function updateGitHubInsights() {
   if (languageCount >= 5) {
     insights.push({
       icon: 'fas fa-palette',
-      text: `Polyvalent ! Vous maîtrisez ${languageCount} langages différents`
+      text: `Polyvalent ! Je maîtrise ${languageCount} langages différents`
     });
   }
   
