@@ -669,19 +669,19 @@
 
 
 
-        <!-- Carte Data Analytics Dashboard -->
+        <!-- Carte GitHub Analytics Dashboard -->
         <div class="demo-card" onclick="toggleDataAnalytics()">
           <div class="demo-card-header">
             <div class="demo-card-icon">📊</div>
-            <div class="demo-card-title">Data Analytics Pro</div>
+            <div class="demo-card-title">GitHub Analytics</div>
           </div>
           <div class="demo-card-description">
-            Tableau de bord d'analyse de données en temps réel avec visualisations interactives et insights automatiques.
+            Analyse de mon portfolio GitHub avec métriques réelles, répartition des langages et popularité des projets.
           </div>
           <div class="demo-card-tags">
+            <span class="demo-tag">GitHub</span>
             <span class="demo-tag">Analytics</span>
-            <span class="demo-tag">Visualization</span>
-            <span class="demo-tag">Dashboard</span>
+            <span class="demo-tag">Portfolio</span>
           </div>
           <div class="demo-card-footer">
             <span class="demo-card-action">📈 Analyser</span>
@@ -807,13 +807,13 @@
 
 
 
-    <!-- Conteneur Data Analytics Moderne -->
+    <!-- Conteneur GitHub Analytics Dashboard -->
     <div id="data-analytics-container" class="demo-panel analytics-panel">
       <div class="panel-header">
         <div class="panel-icon">📊</div>
         <div class="panel-title">
-          <h3>Data Analytics Dashboard</h3>
-          <p class="panel-subtitle">Business Intelligence • Visualisation de Données • Insights</p>
+          <h3>GitHub Analytics Dashboard</h3>
+          <p class="panel-subtitle">Analyse de Mon Portfolio GitHub • Métriques Réelles • Insights Développeur</p>
         </div>
         <div class="panel-close" onclick="closeDataAnalytics()">
           <i class="fas fa-times"></i>
@@ -823,65 +823,65 @@
       <div class="panel-content">
         <div class="demo-intro">
           <div class="intro-text">
-            <p>📈 <strong>Objectif :</strong> Analyser et visualiser des données complexes en temps réel</p>
-            <p>🎯 <strong>Fonctionnalités :</strong> Graphiques interactifs, KPI, tendances et prédictions</p>
-            <p>🔧 <strong>Technologies :</strong> Chart.js, D3.js, Machine Learning, Python</p>
+            <p>📈 <strong>Objectif :</strong> Analyser mes projets GitHub et l'évolution de mes compétences</p>
+            <p>🎯 <strong>Fonctionnalités :</strong> Métriques réelles, analyse des langages, popularité des projets</p>
+            <p>🔧 <strong>Technologies :</strong> GitHub API, Chart.js, Analyse de données en temps réel</p>
           </div>
         </div>
 
         <div class="analytics-dashboard">
           <div class="dashboard-controls">
             <div class="data-source-selector">
-              <label for="data-source">Source de données :</label>
-              <select id="data-source" onchange="changeDataSource()">
-                <option value="sales">Données de Ventes</option>
-                <option value="users">Utilisateurs Actifs</option>
-                <option value="performance">Performance Système</option>
-                <option value="market">Analyse de Marché</option>
+              <label for="github-data-source">Type d'analyse :</label>
+              <select id="github-data-source" onchange="changeGitHubDataSource()">
+                <option value="overview">Vue d'Ensemble</option>
+                <option value="languages">Analyse des Langages</option>
+                <option value="projects">Top Projets</option>
+                <option value="activity">Activité Récente</option>
               </select>
             </div>
             <div class="time-range-selector">
-              <label for="time-range">Période :</label>
-              <select id="time-range" onchange="changeTimeRange()">
-                <option value="24h">Dernières 24h</option>
-                <option value="7d">7 derniers jours</option>
-                <option value="30d">30 derniers jours</option>
+              <label for="github-time-range">Période :</label>
+              <select id="github-time-range" onchange="changeGitHubTimeRange()">
+                <option value="all">Tous les temps</option>
                 <option value="1y">Cette année</option>
+                <option value="6m">6 derniers mois</option>
+                <option value="3m">3 derniers mois</option>
               </select>
             </div>
           </div>
 
           <div class="kpi-grid">
             <div class="kpi-card">
-              <div class="kpi-icon">💰</div>
+              <div class="kpi-icon">📁</div>
               <div class="kpi-content">
-                <h4>Revenus</h4>
-                <div class="kpi-value" id="revenue-kpi">€45,230</div>
-                <div class="kpi-trend positive">↗ +15.3%</div>
+                <h4>Total Repos</h4>
+                <div class="kpi-value" id="total-repos-kpi">0</div>
+                <div class="kpi-trend positive">↗ En cours...</div>
               </div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-icon">👥</div>
+              <div class="kpi-icon">⭐</div>
               <div class="kpi-content">
-                <h4>Utilisateurs</h4>
-                <div class="kpi-value" id="users-kpi">12,847</div>
-                <div class="kpi-trend positive">↗ +8.7%</div>
+                <h4>Total Stars</h4>
+                <div class="kpi-value" id="total-stars-kpi">0</div>
+                <div class="kpi-trend positive">↗ En cours...</div>
               </div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-icon">📈</div>
+              <div class="kpi-icon">🔧</div>
               <div class="kpi-content">
-                <h4>Conversion</h4>
-                <div class="kpi-value" id="conversion-kpi">3.2%</div>
-                <div class="kpi-trend negative">↘ -2.1%</div>
+                <h4>Langages</h4>
+                <div class="kpi-value" id="languages-count-kpi">0</div>
+                <div class="kpi-trend positive">↗ En cours...</div>
               </div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-icon">⚡</div>
+              <div class="kpi-icon">📅</div>
               <div class="kpi-content">
-                <h4>Performance</h4>
-                <div class="kpi-value" id="performance-kpi">98.5%</div>
-                <div class="kpi-trend positive">↗ +1.2%</div>
+                <h4>Dernière Activité</h4>
+                <div class="kpi-value" id="last-activity-kpi">-</div>
+                <div class="kpi-trend positive">↗ En cours...</div>
               </div>
             </div>
           </div>
@@ -889,18 +889,18 @@
           <div class="charts-grid">
             <div class="chart-container">
               <div class="chart-header">
-                <h4><i class="fas fa-chart-line"></i> Tendance des Ventes</h4>
+                <h4><i class="fas fa-chart-pie"></i> Répartition des Langages</h4>
               </div>
-              <div class="chart-placeholder" id="sales-chart">
-                <canvas id="salesCanvas" width="400" height="200"></canvas>
+              <div class="chart-placeholder" id="languages-chart">
+                <canvas id="languagesCanvas" width="400" height="200"></canvas>
               </div>
             </div>
             <div class="chart-container">
               <div class="chart-header">
-                <h4><i class="fas fa-chart-pie"></i> Répartition par Catégorie</h4>
+                <h4><i class="fas fa-chart-bar"></i> Top Projets par Popularité</h4>
               </div>
-              <div class="chart-placeholder" id="category-chart">
-                <canvas id="categoryCanvas" width="400" height="200"></canvas>
+              <div class="chart-placeholder" id="projects-chart">
+                <canvas id="projectsCanvas" width="400" height="200"></canvas>
               </div>
             </div>
           </div>
@@ -908,37 +908,37 @@
           <div class="ai-insights">
             <div class="insights-header">
               <i class="fas fa-brain"></i>
-              <h4>Insights IA</h4>
+              <h4>Insights Développeur</h4>
             </div>
-            <div class="insights-content" id="ai-insights-content">
+            <div class="insights-content" id="github-insights-content">
               <div class="insight-item">
                 <i class="fas fa-lightbulb"></i>
-                <span>Les ventes augmentent de 23% le vendredi par rapport aux autres jours.</span>
+                <span>Analyse en cours de vos projets GitHub...</span>
               </div>
               <div class="insight-item">
                 <i class="fas fa-trending-up"></i>
-                <span>Prédiction : +18% de croissance attendue le mois prochain.</span>
+                <span>Chargement des métriques de popularité...</span>
               </div>
               <div class="insight-item">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>Attention : Baisse de conversion dans la tranche 25-34 ans.</span>
+                <i class="fas fa-code"></i>
+                <span>Évaluation de votre stack technique...</span>
               </div>
             </div>
           </div>
         </div>
 
         <div class="demo-controls">
-          <button onclick="generateAnalytics()" class="demo-btn primary">
+          <button onclick="refreshGitHubAnalytics()" class="demo-btn primary">
             <i class="fas fa-sync"></i>
-            Actualiser les Données
+            Actualiser les Données GitHub
           </button>
-          <button onclick="exportDashboard()" class="demo-btn secondary">
+          <button onclick="exportGitHubReport()" class="demo-btn secondary">
             <i class="fas fa-download"></i>
-            Exporter le Rapport
+            Exporter le Rapport GitHub
           </button>
         </div>
         
-        <div id="analytics-status" class="demo-status"></div>
+        <div id="github-analytics-status" class="demo-status"></div>
       </div>
     </div>
     </section>
@@ -971,6 +971,7 @@
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="chat.js"></script>
     <script src="script.js"></script>
     <script>

@@ -1624,10 +1624,10 @@ function toggleDataAnalytics() {
  classification.style.display = 'none';
  qlearning.style.display = 'none';
 
- // Afficher data analytics seulement si il était caché
+ // Afficher GitHub analytics seulement si il était caché
  if (!isVisible) {
    dataAnalytics.style.display = 'block';
-   initializeDataAnalytics();
+   initializeGitHubAnalytics();
  }
 }
 
@@ -1636,125 +1636,336 @@ function closeDataAnalytics() {
  dataAnalytics.style.display = 'none';
  
  // Réinitialiser à la source par défaut
- document.getElementById('data-source').value = 'sales';
- document.getElementById('time-range').value = '7d';
+ document.getElementById('github-data-source').value = 'overview';
+ document.getElementById('github-time-range').value = 'all';
 }
 
-// Données simulées dynamiques pour le dashboard
-function generateDynamicData() {
-  const currentTime = Date.now();
-  const randomFactor = Math.sin(currentTime / 100000) * 0.3 + 1; // Oscillation basée sur le temps
-  
-  return {
-    sales: {
-      name: "Données de Ventes",
-      kpis: {
-        revenue: "€" + Math.floor(45230 * randomFactor).toLocaleString(),
-        users: Math.floor(12847 * (randomFactor + 0.1)).toLocaleString(),
-        conversion: (3.2 * randomFactor).toFixed(1) + "%",
-        performance: (98.5 * (randomFactor * 0.02 + 0.98)).toFixed(1) + "%"
-      },
-      trends: {
-        revenue: (Math.random() > 0.5 ? "+" : "") + (15.3 * randomFactor - 7.5).toFixed(1) + "%",
-        users: (Math.random() > 0.5 ? "+" : "") + (8.7 * randomFactor - 4).toFixed(1) + "%",
-        conversion: (Math.random() > 0.5 ? "+" : "") + (2.1 * randomFactor - 3).toFixed(1) + "%",
-        performance: (Math.random() > 0.5 ? "+" : "") + (1.2 * randomFactor - 0.5).toFixed(1) + "%"
-      },
-      chartData: Array.from({length: 7}, (_, i) => Math.floor((120 + i * 40) * (randomFactor + Math.sin(i) * 0.2))),
-      categories: ["Produit A", "Produit B", "Produit C", "Produit D"],
-      categoryValues: [
-        Math.floor(35 * randomFactor),
-        Math.floor(25 * (randomFactor + 0.2)),
-        Math.floor(20 * (randomFactor + 0.1)),
-        Math.floor(20 * randomFactor)
-      ]
-    },
-    users: {
-      name: "Utilisateurs Actifs",
-      kpis: {
-        revenue: "€" + Math.floor(38920 * (randomFactor + 0.3)).toLocaleString(),
-        users: Math.floor(18234 * randomFactor).toLocaleString(),
-        conversion: (4.1 * (randomFactor + 0.1)).toFixed(1) + "%",
-        performance: (96.8 * (randomFactor * 0.03 + 0.97)).toFixed(1) + "%"
-      },
-      trends: {
-        revenue: (Math.random() > 0.5 ? "+" : "") + (8.9 * randomFactor - 4).toFixed(1) + "%",
-        users: (Math.random() > 0.5 ? "+" : "") + (12.3 * randomFactor - 6).toFixed(1) + "%",
-        conversion: (Math.random() > 0.5 ? "+" : "") + (3.2 * randomFactor - 1.5).toFixed(1) + "%",
-        performance: (Math.random() > 0.5 ? "+" : "") + (0.5 * randomFactor - 1).toFixed(1) + "%"
-      },
-      chartData: Array.from({length: 7}, (_, i) => Math.floor((800 + i * 150) * (randomFactor + Math.cos(i) * 0.3))),
-      categories: ["Nouveaux", "Récurrents", "Premium", "Inactifs"],
-      categoryValues: [
-        Math.floor(40 * (randomFactor + 0.1)),
-        Math.floor(35 * randomFactor),
-        Math.floor(15 * (randomFactor + 0.3)),
-        Math.floor(10 * randomFactor)
-      ]
-    },
-    performance: {
-      name: "Performance Système",
-      kpis: {
-        revenue: "€" + Math.floor(52840 * (randomFactor + 0.2)).toLocaleString(),
-        users: Math.floor(9567 * (randomFactor + 0.1)).toLocaleString(),
-        conversion: (2.8 * randomFactor).toFixed(1) + "%",
-        performance: (99.2 * (randomFactor * 0.01 + 0.995)).toFixed(1) + "%"
-      },
-      trends: {
-        revenue: (Math.random() > 0.5 ? "+" : "") + (22.1 * randomFactor - 10).toFixed(1) + "%",
-        users: (Math.random() > 0.5 ? "+" : "") + (5.4 * randomFactor - 2.5).toFixed(1) + "%",
-        conversion: (Math.random() > 0.5 ? "+" : "") + (1.8 * randomFactor - 2.5).toFixed(1) + "%",
-        performance: (Math.random() > 0.5 ? "+" : "") + (2.1 * randomFactor - 1).toFixed(1) + "%"
-      },
-      chartData: Array.from({length: 7}, (_, i) => Math.floor((95 + Math.sin(i) * 3) * (randomFactor * 0.02 + 0.98))),
-      categories: ["CPU", "Mémoire", "Réseau", "Stockage"],
-      categoryValues: [
-        Math.floor(30 * (randomFactor + 0.1)),
-        Math.floor(25 * randomFactor),
-        Math.floor(25 * (randomFactor + 0.2)),
-        Math.floor(20 * randomFactor)
-      ]
-    },
-    market: {
-      name: "Analyse de Marché",
-      kpis: {
-        revenue: "€" + Math.floor(67190 * (randomFactor + 0.4)).toLocaleString(),
-        users: Math.floor(24891 * randomFactor).toLocaleString(),
-        conversion: (5.7 * (randomFactor + 0.2)).toFixed(1) + "%",
-        performance: (94.3 * (randomFactor * 0.04 + 0.96)).toFixed(1) + "%"
-      },
-      trends: {
-        revenue: (Math.random() > 0.5 ? "+" : "") + (18.7 * randomFactor - 9).toFixed(1) + "%",
-        users: (Math.random() > 0.5 ? "+" : "") + (15.9 * randomFactor - 7.5).toFixed(1) + "%",
-        conversion: (Math.random() > 0.5 ? "+" : "") + (4.3 * randomFactor - 2).toFixed(1) + "%",
-        performance: (Math.random() > 0.5 ? "+" : "") + (1.8 * randomFactor - 2.5).toFixed(1) + "%"
-      },
-      chartData: Array.from({length: 7}, (_, i) => Math.floor((200 + i * 110) * (randomFactor + Math.sin(i * 0.8) * 0.25))),
-      categories: ["Segment 1", "Segment 2", "Segment 3", "Segment 4"],
-      categoryValues: [
-        Math.floor(45 * (randomFactor + 0.1)),
-        Math.floor(30 * randomFactor),
-        Math.floor(15 * (randomFactor + 0.4)),
-        Math.floor(10 * randomFactor)
-      ]
+// Données GitHub réelles pour le dashboard
+let githubData = {
+  repos: [],
+  user: null,
+  analytics: {
+    totalRepos: 0,
+    totalStars: 0,
+    languages: {},
+    topProjects: [],
+    lastActivity: null
+  }
+};
+
+// Fonction pour récupérer les données GitHub
+async function fetchGitHubData() {
+  try {
+    const [reposResponse, userResponse] = await Promise.all([
+      fetch('https://api.github.com/users/itssghir/repos?sort=updated&per_page=100'),
+      fetch('https://api.github.com/users/itssghir')
+    ]);
+
+    if (!reposResponse.ok || !userResponse.ok) {
+      throw new Error('Erreur lors de la récupération des données GitHub');
     }
+
+    const repos = await reposResponse.json();
+    const user = await userResponse.json();
+
+    // Filtrer les repos (exclure les forks et archives)
+    const filteredRepos = repos.filter(repo => !repo.fork && !repo.archived);
+
+    // Analyser les données
+    const analytics = analyzeGitHubData(filteredRepos);
+
+    return {
+      repos: filteredRepos,
+      user: user,
+      analytics: analytics
+    };
+  } catch (error) {
+    console.error('Erreur GitHub:', error);
+    throw error;
+  }
+}
+
+// Fonction pour analyser les données GitHub
+function analyzeGitHubData(repos) {
+  const languages = {};
+  let totalStars = 0;
+  let totalForks = 0;
+
+  // Analyser chaque repository
+  repos.forEach(repo => {
+    // Compter les langages
+    if (repo.language) {
+      languages[repo.language] = (languages[repo.language] || 0) + 1;
+    }
+
+    // Compter les étoiles et forks
+    totalStars += repo.stargazers_count;
+    totalForks += repo.forks_count;
+  });
+
+  // Créer le top des projets par popularité
+  const topProjects = repos
+    .sort((a, b) => (b.stargazers_count + b.forks_count) - (a.stargazers_count + a.forks_count))
+    .slice(0, 5)
+    .map(repo => ({
+      name: repo.name,
+      stars: repo.stargazers_count,
+      forks: repo.forks_count,
+      language: repo.language,
+      description: repo.description
+    }));
+
+  // Trouver la dernière activité
+  const lastActivity = repos.length > 0 
+    ? new Date(Math.max(...repos.map(r => new Date(r.updated_at))))
+    : null;
+
+  return {
+    totalRepos: repos.length,
+    totalStars: totalStars,
+    totalForks: totalForks,
+    languages: languages,
+    topProjects: topProjects,
+    lastActivity: lastActivity
   };
 }
 
-function initializeDataAnalytics() {
-  // Initialiser avec les données de ventes par défaut
-  updateAnalyticsDashboard('sales');
-  
-  // Mettre à jour le status
-  document.getElementById('analytics-status').innerHTML = 
-    '<span style="color: #00ffcc;">✓ Dashboard initialisé</span><br>' +
-    '<span style="color: #ffd700;">📊 Données simulées chargées avec succès</span><br>' +
-    '<span style="color: #ffffff;">🔄 Prêt pour l\'analyse en temps réel</span>';
+async function initializeGitHubAnalytics() {
+  try {
+    // Afficher le statut de chargement
+    document.getElementById('github-analytics-status').innerHTML = 
+      '<span style="color: #ffd700;">🔄 Chargement des données GitHub...</span>';
+    
+    // Récupérer les données GitHub
+    const data = await fetchGitHubData();
+    githubData = data;
+    
+    // Mettre à jour les KPIs
+    updateGitHubKPIs();
+    
+    // Mettre à jour les graphiques
+    updateGitHubCharts();
+    
+    // Mettre à jour les insights
+    updateGitHubInsights();
+    
+    // Mettre à jour le statut
+    document.getElementById('github-analytics-status').innerHTML = 
+      '<span style="color: #00ffcc;">✓ Données GitHub chargées avec succès</span><br>' +
+      '<span style="color: #ffffff;">📊 ' + githubData.analytics.totalRepos + ' repositories analysés</span>';
+    
+  } catch (error) {
+    console.error('Erreur lors de l\'initialisation GitHub Analytics:', error);
+    document.getElementById('github-analytics-status').innerHTML = 
+      '<span style="color: #ff6b6b;">❌ Erreur lors du chargement des données GitHub</span><br>' +
+      '<span style="color: #ffffff;">Vérifiez votre connexion internet</span>';
+  }
 }
 
-function changeDataSource() {
-  const dataSource = document.getElementById('data-source').value;
-  updateAnalyticsDashboard(dataSource);
+function updateGitHubKPIs() {
+  const analytics = githubData.analytics;
+  
+  // Mettre à jour les KPIs
+  document.getElementById('total-repos-kpi').textContent = analytics.totalRepos;
+  document.getElementById('total-stars-kpi').textContent = analytics.totalStars;
+  document.getElementById('languages-count-kpi').textContent = Object.keys(analytics.languages).length;
+  
+  // Formater la dernière activité
+  if (analytics.lastActivity) {
+    const daysAgo = Math.floor((new Date() - analytics.lastActivity) / (1000 * 60 * 60 * 24));
+    let activityText = '';
+    if (daysAgo === 0) activityText = 'Aujourd\'hui';
+    else if (daysAgo === 1) activityText = 'Hier';
+    else if (daysAgo < 7) activityText = `Il y a ${daysAgo} jours`;
+    else if (daysAgo < 30) activityText = `Il y a ${Math.floor(daysAgo/7)} semaines`;
+    else activityText = `Il y a ${Math.floor(daysAgo/30)} mois`;
+    
+    document.getElementById('last-activity-kpi').textContent = activityText;
+  } else {
+    document.getElementById('last-activity-kpi').textContent = 'N/A';
+  }
+  
+  // Mettre à jour les tendances
+  const trends = document.querySelectorAll('.kpi-trend');
+  trends.forEach(trend => {
+    trend.textContent = '↗ Données réelles';
+    trend.className = 'kpi-trend positive';
+  });
+}
+
+function updateGitHubCharts() {
+  const analytics = githubData.analytics;
+  
+  // Graphique des langages (camembert)
+  updateLanguagesChart(analytics.languages);
+  
+  // Graphique des projets (barres)
+  updateProjectsChart(analytics.topProjects);
+}
+
+function updateLanguagesChart(languages) {
+  const ctx = document.getElementById('languagesCanvas');
+  if (!ctx) return;
+  
+  const labels = Object.keys(languages);
+  const data = Object.values(languages);
+  const colors = [
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+    '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+  ];
+  
+  // Créer le graphique camembert
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: colors.slice(0, labels.length),
+        borderWidth: 2,
+        borderColor: '#1a1a1a'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: '#ffffff',
+            font: {
+              size: 12
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function updateProjectsChart(projects) {
+  const ctx = document.getElementById('projectsCanvas');
+  if (!ctx) return;
+  
+  const labels = projects.map(p => p.name);
+  const starsData = projects.map(p => p.stars);
+  const forksData = projects.map(p => p.forks);
+  
+  // Créer le graphique en barres
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Étoiles',
+        data: starsData,
+        backgroundColor: '#FFD700',
+        borderColor: '#FFA500',
+        borderWidth: 1
+      }, {
+        label: 'Forks',
+        data: forksData,
+        backgroundColor: '#36A2EB',
+        borderColor: '#1E90FF',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: '#ffffff'
+          },
+          grid: {
+            color: '#333333'
+          }
+        },
+        x: {
+          ticks: {
+            color: '#ffffff',
+            maxRotation: 45
+          },
+          grid: {
+            color: '#333333'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: '#ffffff'
+          }
+        }
+      }
+    }
+  });
+}
+
+function updateGitHubInsights() {
+  const analytics = githubData.analytics;
+  const insightsContainer = document.getElementById('github-insights-content');
+  
+  // Générer des insights basés sur les données
+  const insights = [];
+  
+  // Insight sur le langage principal
+  const topLanguage = Object.entries(analytics.languages)
+    .sort(([,a], [,b]) => b - a)[0];
+  if (topLanguage) {
+    insights.push({
+      icon: 'fas fa-code',
+      text: `Votre langage principal est ${topLanguage[0]} avec ${topLanguage[1]} projets`
+    });
+  }
+  
+  // Insight sur la popularité
+  if (analytics.totalStars > 0) {
+    insights.push({
+      icon: 'fas fa-star',
+      text: `Vos projets ont reçu ${analytics.totalStars} étoiles au total`
+    });
+  }
+  
+  // Insight sur l'activité
+  if (analytics.lastActivity) {
+    const daysAgo = Math.floor((new Date() - analytics.lastActivity) / (1000 * 60 * 60 * 24));
+    if (daysAgo <= 7) {
+      insights.push({
+        icon: 'fas fa-fire',
+        text: 'Très actif récemment ! Votre dernier projet date de moins d\'une semaine'
+      });
+    } else {
+      insights.push({
+        icon: 'fas fa-clock',
+        text: `Dernière activité : ${daysAgo} jours`
+      });
+    }
+  }
+  
+  // Insight sur la diversité
+  const languageCount = Object.keys(analytics.languages).length;
+  if (languageCount >= 5) {
+    insights.push({
+      icon: 'fas fa-palette',
+      text: `Polyvalent ! Vous maîtrisez ${languageCount} langages différents`
+    });
+  }
+  
+  // Mettre à jour l'affichage
+  insightsContainer.innerHTML = insights.map(insight => `
+    <div class="insight-item">
+      <i class="${insight.icon}"></i>
+      <span>${insight.text}</span>
+    </div>
+  `).join('');
+}
+
+function changeGitHubDataSource() {
+  const dataSource = document.getElementById('github-data-source').value;
   
   // Animation de changement
   const dashboard = document.querySelector('.analytics-dashboard');
@@ -1766,293 +1977,96 @@ function changeDataSource() {
     dashboard.style.transform = 'scale(1)';
   }, 300);
   
-  // Mettre à jour le status
-  const analyticsData = generateDynamicData();
-  document.getElementById('analytics-status').innerHTML = 
-    `<span style="color: #00ffcc;">✓ Source de données mise à jour : ${analyticsData[dataSource].name}</span>`;
+  // Mettre à jour le statut
+  const sourceNames = {
+    'overview': 'Vue d\'Ensemble',
+    'languages': 'Analyse des Langages',
+    'projects': 'Top Projets',
+    'activity': 'Activité Récente'
+  };
+  
+  document.getElementById('github-analytics-status').innerHTML = 
+    `<span style="color: #00ffcc;">✓ Vue mise à jour : ${sourceNames[dataSource]}</span>`;
 }
 
-function changeTimeRange() {
-  const timeRange = document.getElementById('time-range').value;
+function changeGitHubTimeRange() {
+  const timeRange = document.getElementById('github-time-range').value;
   const timeRangeNames = {
-    '24h': 'Dernières 24 heures',
-    '7d': '7 derniers jours', 
-    '30d': '30 derniers jours',
-    '1y': 'Cette année'
+    'all': 'Tous les temps',
+    '1y': 'Cette année',
+    '6m': '6 derniers mois',
+    '3m': '3 derniers mois'
   };
   
   // Simulation de rechargement des données
   setTimeout(() => {
-    document.getElementById('analytics-status').innerHTML = 
+    document.getElementById('github-analytics-status').innerHTML = 
       `<span style="color: #ffd700;">📅 Période mise à jour : ${timeRangeNames[timeRange]}</span><br>` +
-      `<span style="color: #00ffcc;">🔄 Données recalculées automatiquement</span>`;
+      `<span style="color: #00ffcc;">🔄 Analyse des projets récents</span>`;
   }, 500);
 }
 
-function updateAnalyticsDashboard(dataSource) {
-  const analyticsData = generateDynamicData();
-  const data = analyticsData[dataSource];
-  
-  // Mettre à jour les KPIs
-  document.getElementById('revenue-kpi').textContent = data.kpis.revenue;
-  document.getElementById('users-kpi').textContent = data.kpis.users;
-  document.getElementById('conversion-kpi').textContent = data.kpis.conversion;
-  document.getElementById('performance-kpi').textContent = data.kpis.performance;
-  
-  // Mettre à jour les tendances
-  const kpiCards = document.querySelectorAll('.kpi-card');
-  const trends = ['revenue', 'users', 'conversion', 'performance'];
-  
-  kpiCards.forEach((card, index) => {
-    const trendElement = card.querySelector('.kpi-trend');
-    const trendValue = data.trends[trends[index]];
-    trendElement.textContent = trendValue;
+async function refreshGitHubAnalytics() {
+  try {
+    document.getElementById('github-analytics-status').innerHTML = 
+      '<span style="color: #ffd700;">🔄 Actualisation des données GitHub...</span>';
     
-    // Déterminer si c'est positif ou négatif
-    if (trendValue.includes('+')) {
-      trendElement.className = 'kpi-trend positive';
-    } else {
-      trendElement.className = 'kpi-trend negative';
-    }
-  });
-  
-  // Simuler la mise à jour des graphiques
-  updateChartPlaceholders(data, dataSource);
-}
-
-function updateChartPlaceholders(data, dataSource) {
-  // Couleurs spécifiques selon la source de données
-  const sourceColors = {
-    sales: { primary: '#00ffcc', secondary: '#ffd700', accent: '#ff6B35' },
-    users: { primary: '#4CAF50', secondary: '#8BC34A', accent: '#CDDC39' },
-    performance: { primary: '#2196F3', secondary: '#03DAC6', accent: '#BB86FC' },
-    market: { primary: '#FF9800', secondary: '#FF5722', accent: '#E91E63' }
-  };
-  
-  const colors = sourceColors[dataSource] || sourceColors.sales;
-  
-  // Graphique des tendances - style différent selon la source
-  const salesChart = document.getElementById('sales-chart');
-  const maxValue = Math.max(...data.chartData);
-  
-  salesChart.innerHTML = `
-    <div style="
-      display: flex; 
-      align-items: end; 
-      justify-content: space-around; 
-      height: 150px; 
-      padding: 20px;
-      background: linear-gradient(45deg, rgba(0,0,0,0.1), rgba(255,255,255,0.05));
-      border-radius: 8px;
-    ">
-      ${data.chartData.map((value, index) => {
-        const height = (value / maxValue) * 100;
-        const barStyle = dataSource === 'performance' ? 
-          `background: linear-gradient(to top, ${colors.primary}, ${colors.secondary}); border-radius: 8px;` :
-          dataSource === 'users' ?
-          `background: linear-gradient(135deg, ${colors.primary}, ${colors.secondary}); border-radius: 50% 50% 0 0;` :
-          `background: linear-gradient(to top, ${colors.primary}, ${colors.secondary}); border-radius: 4px 4px 0 0;`;
-        
-        return `
-          <div style="
-            width: ${dataSource === 'market' ? '25px' : '20px'}; 
-            height: ${height}%; 
-            ${barStyle}
-            margin: 0 2px;
-            position: relative;
-            animation: barGrow 1s ease ${index * 0.15}s both;
-            box-shadow: 0 0 10px rgba(0,255,204,0.3);
-          ">
-            <div style="
-              position: absolute;
-              top: -25px;
-              left: 50%;
-              transform: translateX(-50%);
-              font-size: 10px;
-              color: ${colors.primary};
-              font-weight: bold;
-            ">${value}</div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-    <div style="
-      display: flex;
-      justify-content: space-around;
-      margin-top: 10px;
-      font-size: 11px;
-      color: #888;
-    ">
-      ${['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(day => `<span>${day}</span>`).join('')}
-    </div>
-    <style>
-      @keyframes barGrow {
-        from { height: 0; opacity: 0; }
-        to { height: ${100}%; opacity: 1; }
-      }
-    </style>
-  `;
-  
-  // Graphique en secteurs - design différent selon la source
-  const categoryChart = document.getElementById('category-chart');
-  const total = data.categoryValues.reduce((a, b) => a + b, 0);
-  
-  categoryChart.innerHTML = `
-    <div style="display: flex; flex-direction: column; height: 150px; gap: 8px; padding: 10px;">
-      ${data.categories.map((category, index) => {
-        const percentage = Math.round((data.categoryValues[index] / total) * 100);
-        const barWidth = percentage;
-        
-        return `
-          <div style="
-            display: flex; 
-            align-items: center; 
-            gap: 12px;
-            animation: slideInLeft 0.8s ease ${index * 0.2}s both;
-          ">
-            <div style="
-              width: 80px;
-              font-size: 0.8rem;
-              color: #ffffff;
-              text-align: right;
-            ">${category}</div>
-            <div style="
-              flex: 1;
-              height: 18px;
-              background: rgba(255,255,255,0.1);
-              border-radius: 10px;
-              overflow: hidden;
-              position: relative;
-            ">
-              <div style="
-                width: ${barWidth}%;
-                height: 100%;
-                background: linear-gradient(90deg, ${colors.primary}, ${colors.secondary});
-                border-radius: 10px;
-                animation: fillBar 1.2s ease ${index * 0.3}s both;
-                position: relative;
-              ">
-                <div style="
-                  position: absolute;
-                  right: 5px;
-                  top: 50%;
-                  transform: translateY(-50%);
-                  font-size: 10px;
-                  color: white;
-                  font-weight: bold;
-                  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-                ">${percentage}%</div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-    <style>
-      @keyframes slideInLeft {
-        from { 
-          opacity: 0; 
-          transform: translateX(-30px); 
-        }
-        to { 
-          opacity: 1; 
-          transform: translateX(0); 
-        }
-      }
-      @keyframes fillBar {
-        from { width: 0%; }
-        to { width: ${100}%; }
-      }
-    </style>
-  `;
-  
-  // Mettre à jour les insights IA selon la source de données
-  updateAIInsights(dataSource, data);
-}
-
-function updateAIInsights(dataSource, data) {
-  const insights = {
-    sales: [
-      `Les ventes ont augmenté de ${data.trends.revenue} ce mois-ci`,
-      `Peak de ventes détecté le vendredi (+23% vs moyenne)`,
-      `Recommandation: Optimiser le stock des produits A et B`
-    ],
-    users: [
-      `Croissance utilisateurs: ${data.trends.users} vs mois dernier`,
-      `Les utilisateurs premium génèrent 3x plus de revenus`,
-      `Taux de rétention en hausse dans la tranche 25-35 ans`
-    ],
-    performance: [
-      `Performance système: ${data.kpis.performance} (excellent)`,
-      `CPU optimisé: -15% de consommation vs semaine dernière`,
-      `Recommandation: Augmenter la capacité réseau de 20%`
-    ],
-    market: [
-      `Part de marché: ${data.trends.revenue} de croissance`,
-      `Segment 1 domine avec ${data.categoryValues[0]}% du marché`,
-      `Opportunité détectée: expansion sur le Segment 3`
-    ]
-  };
-  
-  const insightsContainer = document.getElementById('ai-insights-content');
-  if (insightsContainer) {
-    insightsContainer.innerHTML = insights[dataSource].map((insight, index) => `
-      <div class="insight-item" style="animation: fadeInUp 0.6s ease ${index * 0.2}s both;">
-        <i class="fas fa-${index === 0 ? 'lightbulb' : index === 1 ? 'trending-up' : 'exclamation-triangle'}"></i>
-        <span>${insight}</span>
-      </div>
-    `).join('');
+    // Récupérer les nouvelles données
+    const data = await fetchGitHubData();
+    githubData = data;
+    
+    // Mettre à jour l'affichage
+    updateGitHubKPIs();
+    updateGitHubCharts();
+    updateGitHubInsights();
+    
+    document.getElementById('github-analytics-status').innerHTML = 
+      '<span style="color: #00ffcc;">✓ Données GitHub actualisées</span><br>' +
+      '<span style="color: #ffffff;">📊 ' + githubData.analytics.totalRepos + ' repositories analysés</span>';
+    
+  } catch (error) {
+    console.error('Erreur lors de l\'actualisation:', error);
+    document.getElementById('github-analytics-status').innerHTML = 
+      '<span style="color: #ff6b6b;">❌ Erreur lors de l\'actualisation</span>';
   }
 }
 
-function generateAnalytics() {
-  // Animation de rechargement
-  const status = document.getElementById('analytics-status');
-  const kpiCards = document.querySelectorAll('.kpi-card');
+function exportGitHubReport() {
+  const analytics = githubData.analytics;
   
-  status.innerHTML = '<span style="color: #ffd700;">🔄 Actualisation des données en cours...</span>';
+  // Créer le contenu du rapport
+  let report = `Rapport GitHub Analytics - Anas Sghir\n`;
+  report += `=====================================\n\n`;
+  report += `📊 Vue d'ensemble:\n`;
+  report += `- Total repositories: ${analytics.totalRepos}\n`;
+  report += `- Total étoiles: ${analytics.totalStars}\n`;
+  report += `- Total forks: ${analytics.totalForks}\n`;
+  report += `- Langages utilisés: ${Object.keys(analytics.languages).length}\n\n`;
   
-  // Animer les cartes KPI
-  kpiCards.forEach((card, index) => {
-    setTimeout(() => {
-      card.style.transform = 'scale(0.95)';
-      card.style.opacity = '0.7';
-      
-      setTimeout(() => {
-        card.style.transform = 'scale(1)';
-        card.style.opacity = '1';
-      }, 200);
-    }, index * 100);
+  report += `🔧 Répartition des langages:\n`;
+  Object.entries(analytics.languages).forEach(([lang, count]) => {
+    report += `- ${lang}: ${count} projets\n`;
+  });
+  report += `\n`;
+  
+  report += `⭐ Top 5 projets:\n`;
+  analytics.topProjects.forEach((project, index) => {
+    report += `${index + 1}. ${project.name} (${project.stars}⭐, ${project.forks}🍴)\n`;
   });
   
-  // Simulation du rechargement
-  setTimeout(() => {
-    const dataSource = document.getElementById('data-source').value;
-    updateAnalyticsDashboard(dataSource);
-    
-    const processedData = Math.floor(Math.random() * 1000 + 500);
-    const accuracy = (95 + Math.random() * 4).toFixed(1);
-    
-    status.innerHTML = 
-      '<span style="color: #00ffcc;">✅ Données actualisées avec succès !</span><br>' +
-      '<span style="color: #ffd700;">⏰ Dernière mise à jour : ' + new Date().toLocaleTimeString() + '</span><br>' +
-      '<span style="color: #ffffff;">📊 ' + processedData + ' points de données traités</span><br>' +
-      '<span style="color: #00ffcc;">🎯 Précision des prédictions : ' + accuracy + '%</span>';
-  }, 2000);
-}
-
-function exportDashboard() {
-  const status = document.getElementById('analytics-status');
+  // Créer et télécharger le fichier
+  const blob = new Blob([report], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'github-analytics-report.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
   
-  status.innerHTML = '<span style="color: #ffd700;">📄 Génération du rapport en cours...</span>';
-  
-  // Simulation de l'export
-  setTimeout(() => {
-    status.innerHTML = 
-      '<span style="color: #00ffcc;">✅ Rapport exporté avec succès !</span><br>' +
-      '<span style="color: #ffffff;">📋 Format : PDF • Taille : 2.3 MB</span><br>' +
-      '<span style="color: #ffd700;">💾 Sauvegardé dans : /downloads/analytics_report.pdf</span>';
-  }, 1500);
+  document.getElementById('github-analytics-status').innerHTML = 
+    '<span style="color: #00ffcc;">✓ Rapport GitHub exporté avec succès</span>';
 }
 
 // Fonction pour toggle les sections CV
