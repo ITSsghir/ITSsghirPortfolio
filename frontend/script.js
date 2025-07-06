@@ -2,7 +2,7 @@
 const config = {
     githubUsername: 'ITSsghir',
     githubToken: '', // Laissez vide pour les repos publics
-    apiBaseUrl: '/api'
+    apiBaseUrl: 'http://localhost:3000'
 };
 
 // ===== GESTIONNAIRE DE PRELOADER MINIMALISTE ===== //
@@ -371,7 +371,8 @@ function resetClassification() {
  // Afficher classification seulement si elle était cachée
  if (!isVisible) {
    classification.style.display = 'block';
-   drawGrid();
+   document.getElementById('test-data').innerHTML = 
+     generateDataTable({ features: irisData.features, samples: irisData.samples });
  }
 }
 
@@ -783,7 +784,7 @@ function resetClassification() {
        appendMessage('user', message);
        
        try {
-           const response = await fetch('/api/chat/message', {
+           const response = await fetch(`${config.apiBaseUrl}/api/chat/message`, {
                method: 'POST',
                headers: {
                    'Content-Type': 'application/json'
@@ -793,18 +794,13 @@ function resetClassification() {
                })
            });
 
-           if (!response.ok) {
-               const errorData = await response.json().catch(() => ({}));
-               throw new Error(errorData.error || 'Erreur de communication avec le serveur');
-           }
-
            const data = await response.json();
            if (data.error) {
-               throw new Error(data.error);
+               throw new Error(data.error.message);
            }
            
            const botResponse = data.message;
-           appendMessage('bot', botResponse, data.type);
+           appendMessage('bot', botResponse);
            
            chatbot.messages.push(
                { role: 'user', content: message },
@@ -812,44 +808,22 @@ function resetClassification() {
            );
            
        } catch (error) {
-           appendMessage('error', error.message || 'Désolé, une erreur est survenue. Veuillez réessayer.');
+           appendMessage('error', 'Désolé, une erreur est survenue. Veuillez réessayer.');
            console.error('Chatbot error:', error);
        }
    }
 
-   function appendMessage(type, content, responseType = null) {
+   function appendMessage(type, content) {
        const messages = document.getElementById('chat-messages');
        if (!messages) return;
        
        const messageDiv = document.createElement('div');
-       let className = `chat-message ${type}-message`;
-       
-       // Ajouter une classe spéciale pour les réponses personnelles
-       if (type === 'bot' && responseType === 'personal') {
-           className += ' personal-response';
-       } else if (type === 'bot' && responseType === 'general') {
-           className += ' general-response';
-       }
-       
-       messageDiv.className = className;
-       
-       let iconColor = '';
-       // Couleurs différentes selon le type de réponse
-       if (type === 'bot' && responseType === 'personal') {
-           iconColor = 'style="color: #4a90e2;"'; // Bleu pour personnel
-       } else if (type === 'bot' && responseType === 'general') {
-           iconColor = 'style="color: #50c878;"'; // Vert pour général
-       }
-       
-       const icon = type === 'user' ? '<i class="fas fa-user"></i>' : 
-                   type === 'error' ? '<i class="fas fa-exclamation-triangle"></i>' :
-                   `<i class="fas fa-robot" ${iconColor}></i>`;
+       messageDiv.className = `chat-message ${type}-message`;
        
        messageDiv.innerHTML = `
            <div class="message-content">
-               ${icon}
+               ${type === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>'}
                <p>${content}</p>
-               ${responseType ? `<span class="response-type">${responseType === 'personal' ? '👤' : '🌍'}</span>` : ''}
            </div>
        `;
        
@@ -862,21 +836,18 @@ function resetClassification() {
        isDark: false,
        
        lightTheme: {
-           '--bg-primary': '#fefefe',
-           '--bg-secondary': '#f8f6f3',
-           '--text-primary': '#4a453f',
-           '--text-secondary': '#6b645a',
-           '--accent-primary': '#b4945d',
-           '--accent-secondary': '#9d8052',
-           '--neon-glow': 'rgba(180, 148, 93, 0.5)',
-           '--border-color': 'rgba(200, 190, 175, 0.3)',
-           '--gradient-start': '#b4945d',
-           '--gradient-end': '#9d8052',
-           '--navbar-bg': 'rgba(248, 248, 245, 0.98)',
-           '--navbar-text': '#4a453f',
-           '--shadow-color': 'rgba(0, 0, 0, 0.08)',
-           '--hover-bg': 'rgba(120, 110, 95, 0.12)',
-           '--card-bg': '#ffffff'
+           '--bg-primary': '#4b0082',
+           '--bg-secondary': '#2c003e',
+           '--text-primary': '#ffffff',
+           '--text-secondary': '#cccccc',
+           '--accent-primary': '#00ffcc',
+           '--accent-secondary': '#00ccaa',
+           '--neon-glow': 'rgba(0, 255, 204, 0.5)',
+           '--border-color': 'rgba(255, 255, 255, 0.1)',
+           '--gradient-start': '#00ffcc',
+           '--gradient-end': '#00ccaa',
+           '--navbar-bg': '#CCC5B9',
+           '--navbar-text': '#403D39'
        },
        
        darkTheme: {
@@ -925,31 +896,22 @@ function resetClassification() {
            document.body.classList.remove('light-theme', 'dark-theme');
            document.body.classList.add(this.isDark ? 'dark-theme' : 'light-theme');
            
-           // Appliquer le background approprié selon le thème
-           if (this.isDark) {
-               // Mode sombre : background uni sombre
-               document.body.style.background = '#252422';
-               document.body.style.backgroundImage = 'none';
-               
-               // Forcer la navbar sombre
-               const navbar = document.querySelector('.navbar');
-               if (navbar) {
+           // Forcer la mise à jour de la navbar
+           const navbar = document.querySelector('.navbar');
+           if (navbar) {
+               // Temporairement forcer le style pour éviter les transitions indésirables
+               if (this.isDark) {
                    navbar.style.background = 'rgba(37, 36, 34, 0.95)';
+               } else {
+                   navbar.style.background = 'rgba(204, 197, 185, 0.95)';
                }
-               
+           }
+           
+           // CORRECTION STRICTE - Éliminer tout violet en mode sombre UNIQUEMENT
+           if (this.isDark) {
                this.eliminatePurpleElements();
            } else {
-               // Mode clair : dégradé moderne et élégant
-               document.body.style.background = 'linear-gradient(135deg, #fefefe 0%, #f8f6f3 50%, #f0ede6 100%)';
-               document.body.style.backgroundAttachment = 'fixed';
-               
-               // Navbar claire avec transparence
-               const navbar = document.querySelector('.navbar');
-               if (navbar) {
-                   navbar.style.background = 'rgba(248, 248, 245, 0.98)';
-               }
-               
-               this.restoreLightElements();
+               this.restorePurpleElements(); // Restaurer violet en light mode
            }
        },
        
@@ -1016,77 +978,6 @@ function resetClassification() {
                 });
             }
                },
-        
-        restoreLightElements() {
-            // OPTIMISER LES ÉLÉMENTS POUR LE MODE CLAIR
-            
-            // Hero section : texte sombre sur fond clair
-            const heroH1 = document.querySelector('#hero h1');
-            if (heroH1) {
-                heroH1.style.color = '#2d2a25';
-                heroH1.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-            }
-            
-            const heroP = document.querySelector('#hero p');
-            if (heroP) {
-                heroP.style.color = '#4a453f';
-                heroP.style.textShadow = '0 1px 2px rgba(0, 0, 0, 0.1)';
-            }
-            
-            const rotatingText = document.getElementById('rotating-text');
-            if (rotatingText) {
-                rotatingText.style.color = '#6b645a';
-                rotatingText.style.textShadow = '0 1px 2px rgba(0, 0, 0, 0.1)';
-            }
-            
-            // Restaurer les boutons avec couleurs modernes
-            const buttons = document.querySelectorAll('button:not(.theme-button)');
-            buttons.forEach(button => {
-                button.style.background = 'linear-gradient(135deg, #b4945d, #9d8052)';
-                button.style.color = '#ffffff';
-                button.style.border = '1px solid #9d8052';
-            });
-            
-            // Chat button moderne
-            const chatButton = document.querySelector('.chat-button, .chat-toggle');
-            if (chatButton) {
-                chatButton.style.background = 'linear-gradient(135deg, #b4945d, #9d8052)';
-                chatButton.style.border = '2px solid #9d8052';
-                chatButton.style.color = '#ffffff';
-            }
-            
-            // Chat window claire
-            const chatWindow = document.querySelector('.chat-window, .chat-container');
-            if (chatWindow) {
-                chatWindow.style.background = 'rgba(255, 255, 255, 0.95)';
-                chatWindow.style.border = '1px solid rgba(180, 148, 93, 0.3)';
-                chatWindow.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.1)';
-            }
-            
-            // Textarea avec thème clair
-            const textareas = document.querySelectorAll('textarea');
-            textareas.forEach(textarea => {
-                textarea.style.background = 'rgba(255, 255, 255, 0.9)';
-                textarea.style.color = '#4a453f';
-                textarea.style.border = '1px solid rgba(180, 148, 93, 0.3)';
-            });
-            
-            // SQL output clair
-            const sqlOutput = document.getElementById('sql-output');
-            if (sqlOutput) {
-                sqlOutput.style.background = 'rgba(255, 255, 255, 0.9)';
-                sqlOutput.style.color = '#4a453f';
-                sqlOutput.style.border = '1px solid rgba(180, 148, 93, 0.3)';
-            }
-            
-            // Cartes et panneaux avec design moderne
-            const cards = document.querySelectorAll('.cv-section, .repo-card, .demo-card');
-            cards.forEach(card => {
-                card.style.background = 'rgba(255, 255, 255, 0.8)';
-                card.style.border = '1px solid rgba(200, 190, 175, 0.3)';
-                card.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
-            });
-        },
         
         restorePurpleElements() {
             // RESTAURER LES COULEURS VIOLET ORIGINALES EN LIGHT MODE

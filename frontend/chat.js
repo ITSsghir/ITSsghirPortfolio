@@ -172,8 +172,8 @@ class ChatBot {
         this.showTypingIndicator();
 
         try {
-            // Envoyer le message au backend via le proxy nginx
-            const response = await fetch('/api/chat/message', {
+            // Envoyer le message au backend
+            const response = await fetch('http://localhost:3000/api/chat/message', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -182,26 +182,21 @@ class ChatBot {
             });
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || 'Erreur de communication avec le serveur');
+                throw new Error('Erreur de communication avec le serveur');
             }
 
             const data = await response.json();
-            
-            if (data.error) {
-                throw new Error(data.error);
-            }
             
             // Petit délai pour une expérience plus naturelle
             await new Promise(resolve => setTimeout(resolve, 500));
             
             // Supprimer l'indicateur de frappe et ajouter la réponse
             this.removeTypingIndicator();
-            this.addMessage('bot', data.message, data.type);
+            this.addMessage('bot', data.message);
         } catch (error) {
             console.error('Erreur:', error);
             this.removeTypingIndicator();
-            this.addMessage('error', error.message || 'Désolé, une erreur est survenue. Veuillez réessayer plus tard.');
+            this.addMessage('error', 'Désolé, une erreur est survenue. Veuillez réessayer plus tard.');
         } finally {
             // Réactiver l'input et le bouton
             this.input.disabled = false;
@@ -210,34 +205,15 @@ class ChatBot {
         }
     }
 
-    addMessage(type, content, responseType = null) {
+    addMessage(type, content) {
         const messageDiv = document.createElement('div');
-        let className = `chat-message ${type}-message`;
+        messageDiv.className = `chat-message ${type}-message`;
         
-        // Ajouter une classe spéciale pour les réponses personnelles
-        if (type === 'bot' && responseType === 'personal') {
-            className += ' personal-response';
-        } else if (type === 'bot' && responseType === 'general') {
-            className += ' general-response';
-        }
-        
-        messageDiv.className = className;
-        
-        const icon = type === 'user' ? 'user' : (type === 'error' ? 'exclamation-triangle' : 'robot');
-        let iconColor = '';
-        
-        // Couleurs différentes selon le type de réponse
-        if (type === 'bot' && responseType === 'personal') {
-            iconColor = 'style="color: #4a90e2;"'; // Bleu pour personnel
-        } else if (type === 'bot' && responseType === 'general') {
-            iconColor = 'style="color: #50c878;"'; // Vert pour général
-        }
-        
+        const icon = type === 'user' ? 'user' : 'robot';
         messageDiv.innerHTML = `
             <div class="message-content">
-                <i class="fas fa-${icon}" ${iconColor}></i>
+                <i class="fas fa-${icon}"></i>
                 ${content}
-                ${responseType ? `<span class="response-type">${responseType === 'personal' ? '👤' : '🌍'}</span>` : ''}
             </div>
         `;
         
