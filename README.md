@@ -1071,3 +1071,54 @@ Pour adopter ces améliorations dans d'autres projets :
 
 *Dernière mise à jour : Décembre 2024*  
 *Version actuelle : 2.1.0*
+
+## 🚀 Scripts de Déploiement et Gestion
+
+**Déploiement :**
+```bash
+./deploy.sh
+```
+- Déploie le site, reconstruit les conteneurs, vérifie Traefik et le réseau Docker.
+
+**Gestion & Monitoring :**
+```bash
+./manage.sh status      # Statut des services
+./manage.sh logs        # Logs (ajouter --frontend ou --backend)
+./manage.sh monitor     # Monitoring temps réel (CPU, RAM, statut)
+./manage.sh restart     # Redémarrer les services
+./manage.sh backup      # Sauvegarde
+```
+
+**Installation initiale (nouveau serveur) :**
+```bash
+./quick-setup.sh
+```
+
+**(Optionnel) Déploiement avancé :**
+```bash
+./deploy-advanced.sh
+```
+
+## 🛡️ Gestion du cache Cloudflare et navigateur
+
+Pour éviter que Cloudflare ou le navigateur ne serve une ancienne version du site après un déploiement :
+
+- **Paramètres de version sur les fichiers CSS/JS**
+  ```html
+  <link rel="stylesheet" href="style.css?v=20250707">
+  <link rel="stylesheet" href="chat.css?v=20250707">
+  ```
+  > Changez le numéro de version à chaque déploiement important (ex : date du jour).
+
+- **Cache busting dans les fichiers**
+  - Un commentaire avec la date est ajouté en haut des fichiers CSS pour forcer le changement de hash.
+
+- **Nginx/Cloudflare**
+  - Les fichiers statiques sont servis avec `Cache-Control: public, max-age=31536000, immutable`.
+  - Grâce au paramètre `?v=...`, chaque nouvelle version est vue comme un nouveau fichier par Cloudflare et le navigateur.
+
+**En résumé :**
+- Si tu modifies le CSS/JS, change le paramètre `?v=...` dans le HTML pour forcer le rechargement côté client et Cloudflare.
+- Pas besoin de vider le cache Cloudflare manuellement.
+
+---
