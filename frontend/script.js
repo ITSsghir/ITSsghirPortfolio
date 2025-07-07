@@ -286,23 +286,24 @@ const domCache = {
 let classifier = new IrisClassifier(irisData);
 
    function generateDataTable(data, withPrediction = false) {
-     let html = `<table>
-       <tr>
-         ${data.features.map(f => `<th class="feature-column">${f}</th>`).join('')}
-         ${withPrediction ? '<th class="prediction-column">Prédiction</th>' : ''}
-       </tr>`;
-     
+     if (!data.samples || data.samples.length === 0) {
+       return `<div class="empty-table-message">Aucune donnée d'entraînement disponible</div>`;
+     }
+     let html = `<table><tr>`;
+     html += data.features.map(f => `<th class="feature-column">${f}</th>`).join('');
+     if (withPrediction) html += '<th class="prediction-column">Prédiction</th>';
+     html += '</tr>';
      data.samples.forEach(sample => {
-       html += `<tr>
-         <td>${sample.sepal_length}</td>
-         <td>${sample.sepal_width}</td>
-         <td>${sample.petal_length}</td>
-         <td>${sample.petal_width}</td>
-         ${withPrediction ? 
-           `<td class="prediction-column">${irisData.targetNames[sample.prediction]}</td>` : ''}
-       </tr>`;
+       html += `<tr>`;
+       html += `<td class="feature-column">${sample.sepal_length}</td>`;
+       html += `<td class="feature-column">${sample.sepal_width}</td>`;
+       html += `<td class="feature-column">${sample.petal_length}</td>`;
+       html += `<td class="feature-column">${sample.petal_width}</td>`;
+       if (withPrediction) {
+         html += `<td class="prediction-column">${irisData.targetNames[sample.prediction]}</td>`;
+       }
+       html += `</tr>`;
      });
-     
      return html + '</table>';
    }
  
@@ -371,8 +372,7 @@ function resetClassification() {
  // Afficher classification seulement si elle était cachée
  if (!isVisible) {
    classification.style.display = 'block';
-   document.getElementById('test-data').innerHTML = 
-     generateDataTable({ features: irisData.features, samples: irisData.samples });
+   drawGrid();
  }
 }
 
@@ -599,7 +599,7 @@ function resetClassification() {
                `).join('');
          
                domCache.tableList.innerHTML = `
-           <div class="table-header">📊 Base de données du CV</div>
+           <div class="table-header">Base de données du CV</div>
            <div class="table-description">
              Explorez les différentes tables de mon CV interactif avec des requêtes SQL
            </div>
@@ -1653,12 +1653,25 @@ let githubData = {
   }
 };
 
-// Fonction pour récupérer les données GitHub
-async function fetchGitHubData() {
+let githubUsername = localStorage.getItem('github-username') || 'itssghir';
+
+document.getElementById('github-username').value = githubUsername;
+
+async function changeGitHubUsername() {
+  const input = document.getElementById('github-username');
+  const username = input.value.trim();
+  if (!username) return;
+  githubUsername = username;
+  localStorage.setItem('github-username', username);
+  await initializeGitHubAnalytics();
+}
+
+// Adapter fetchGitHubData pour prendre le username en paramètre
+async function fetchGitHubData(username = githubUsername) {
   try {
     const [reposResponse, userResponse] = await Promise.all([
-      fetch('https://api.github.com/users/itssghir/repos?sort=updated&per_page=100'),
-      fetch('https://api.github.com/users/itssghir')
+      fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`),
+      fetch(`https://api.github.com/users/${username}`)
     ]);
 
     if (!reposResponse.ok || !userResponse.ok) {
@@ -1671,8 +1684,30 @@ async function fetchGitHubData() {
     // Filtrer les repos (exclure les forks et archives)
     const filteredRepos = repos.filter(repo => !repo.fork && !repo.archived);
 
-    // Analyser les données
+    // Récupérer le nombre total de commits (API limitée, on additionne les commits de chaque repo)
+    let totalCommits = 0;
+    for (const repo of filteredRepos) {
+      try {
+        const commitsResp = await fetch(`https://api.github.com/repos/${username}/${repo.name}/commits?per_page=1&sha=${repo.default_branch}`);
+        if (commitsResp.ok) {
+          const link = commitsResp.headers.get('Link');
+          if (link && link.includes('rel="last"')) {
+            const match = link.match(/&page=(\d+)>; rel="last"/);
+            if (match) {
+              totalCommits += parseInt(match[1], 10);
+            } else {
+              totalCommits += 1;
+            }
+          } else {
+            const commits = await commitsResp.json();
+            totalCommits += commits.length;
+          }
+        }
+      } catch (e) {}
+    }
+
     const analytics = analyzeGitHubData(filteredRepos);
+    analytics.totalCommits = totalCommits;
 
     return {
       repos: filteredRepos,
@@ -1685,7 +1720,24 @@ async function fetchGitHubData() {
   }
 }
 
-// Fonction pour analyser les données GitHub
+// Adapter initializeGitHubAnalytics pour utiliser le username courant
+async function initializeGitHubAnalytics() {
+  try {
+    document.getElementById('github-analytics-status').innerHTML = '<span style="color: #ffd700;">🔄 Chargement des données GitHub...</span>';
+    const data = await fetchGitHubData(githubUsername);
+    githubData = data;
+    updateGitHubKPIs();
+    updateGitHubCharts();
+    updateGitHubInsights();
+    document.getElementById('github-analytics-status').innerHTML = '<span style="color: #00ffcc;">✓ Données GitHub chargées avec succès</span><br>' + '<span style="color: #ffffff;">📊 ' + githubData.analytics.totalRepos + ' repositories analysés</span>';
+  } catch (error) {
+    document.getElementById('github-analytics-status').innerHTML = '<span style="color: #ff6b6b;">❌ Erreur lors du chargement des données GitHub</span><br><span style="color: #ffffff;">Vérifiez le username ou la connexion internet</span>';
+  }
+}
+
+// Initialiser à l'ouverture
+initializeGitHubAnalytics();
+
 function analyzeGitHubData(repos) {
   const languages = {};
   let totalStars = 0;
@@ -1730,38 +1782,6 @@ function analyzeGitHubData(repos) {
   };
 }
 
-async function initializeGitHubAnalytics() {
-  try {
-    // Afficher le statut de chargement
-    document.getElementById('github-analytics-status').innerHTML = 
-      '<span style="color: #ffd700;">🔄 Chargement des données GitHub...</span>';
-    
-    // Récupérer les données GitHub
-    const data = await fetchGitHubData();
-    githubData = data;
-    
-    // Mettre à jour les KPIs
-    updateGitHubKPIs();
-    
-    // Mettre à jour les graphiques
-    updateGitHubCharts();
-    
-    // Mettre à jour les insights
-    updateGitHubInsights();
-    
-    // Mettre à jour le statut
-    document.getElementById('github-analytics-status').innerHTML = 
-      '<span style="color: #00ffcc;">✓ Données GitHub chargées avec succès</span><br>' +
-      '<span style="color: #ffffff;">📊 ' + githubData.analytics.totalRepos + ' repositories analysés</span>';
-    
-  } catch (error) {
-    console.error('Erreur lors de l\'initialisation GitHub Analytics:', error);
-    document.getElementById('github-analytics-status').innerHTML = 
-      '<span style="color: #ff6b6b;">❌ Erreur lors du chargement des données GitHub</span><br>' +
-      '<span style="color: #ffffff;">Vérifiez votre connexion internet</span>';
-  }
-}
-
 function updateGitHubKPIs() {
   const analytics = githubData.analytics;
   
@@ -1769,6 +1789,7 @@ function updateGitHubKPIs() {
   document.getElementById('total-repos-kpi').textContent = analytics.totalRepos;
   document.getElementById('total-stars-kpi').textContent = analytics.totalStars;
   document.getElementById('languages-count-kpi').textContent = Object.keys(analytics.languages).length;
+  document.getElementById('commits-kpi').textContent = analytics.totalCommits || 0;
   
   // Formater la dernière activité
   if (analytics.lastActivity) {
@@ -1781,7 +1802,7 @@ function updateGitHubKPIs() {
     else activityText = `${Math.floor(daysAgo/30)}mois`;
     
     document.getElementById('last-activity-kpi').textContent = activityText;
-  } else {
+    } else {
     document.getElementById('last-activity-kpi').textContent = 'N/A';
   }
   
@@ -1960,8 +1981,8 @@ function updateGitHubInsights() {
     <div class="insight-item">
       <i class="${insight.icon}"></i>
       <span>${insight.text}</span>
-    </div>
-  `).join('');
+      </div>
+    `).join('');
 }
 
 function changeGitHubDataSource() {
@@ -1972,7 +1993,7 @@ function changeGitHubDataSource() {
   dashboard.style.opacity = '0.7';
   dashboard.style.transform = 'scale(0.98)';
   
-  setTimeout(() => {
+    setTimeout(() => {
     dashboard.style.opacity = '1';
     dashboard.style.transform = 'scale(1)';
   }, 300);
@@ -2435,17 +2456,13 @@ async function loadGitHubRepos() {
 
         // Add hover effects and animations after rendering
         document.querySelectorAll('.repo-card').forEach((card, index) => {
-            // Animation d'apparition progressive
             card.style.opacity = '0';
             card.style.transform = 'translateY(20px)';
-            
             setTimeout(() => {
                 card.style.transition = 'all 0.6s cubic-bezier(0.23, 1, 0.320, 1)';
                 card.style.opacity = '1';
                 card.style.transform = 'translateY(0)';
             }, index * 100);
-            
-            // Effets de survol
             card.addEventListener('mouseenter', () => createParticleEffect(card));
         });
 
@@ -2807,7 +2824,8 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.toggle('active');
             
             if (chatContainer.classList.contains('active')) {
-                toggleText.textContent = 'Fermer l\'assistant';
+                const closeText = translations[currentLang] ? translations[currentLang]["Fermer l'assistant"] : "Fermer l'assistant";
+                toggleText.textContent = closeText;
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 setTimeout(() => {
                     const chatInput = document.getElementById('chat-input');
@@ -2816,7 +2834,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }, 300);
             } else {
-                toggleText.textContent = 'Ouvrir l\'assistant';
+                const openText = translations[currentLang] ? translations[currentLang]["Ouvrir l'assistant"] : "Ouvrir l'assistant";
+                toggleText.textContent = openText;
             }
         });
     } else {
@@ -3382,4 +3401,922 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.error('❌ ResponsiveNavbar non trouvée');
     }
+});
+
+// Appeler loadGitHubRepos au chargement
+loadGitHubRepos();
+
+// === TRADUCTION DYNAMIQUE FR/EN ===
+const translations = {
+  fr: {
+    Profil: 'Profil',
+    "Compétences": 'Compétences',
+    "Expérience": 'Expérience',
+    Projets: 'Projets',
+    Contact: 'Contact',
+    Technologies: 'Technologies',
+    Langues: 'Langues',
+    Éducation: 'Éducation',
+    Certifications: 'Certifications',
+    'Data Scientist • Python Enthusiast • Q-Learning Explorer': 'Data Scientist • Python Enthusiast • Q-Learning Explorer',
+    'Télécharger mon CV': 'Télécharger mon CV',
+    'Disponibilité': 'Disponibilité',
+    'À partir de septembre 2025': 'À partir de septembre 2025',
+    'Console SQL Interactive': 'Console SQL Interactive',
+    'Explorez la base de données avec des requêtes SQL personnalisées': 'Explorez la base de données avec des requêtes SQL personnalisées',
+    'Assistant Personnel IA': 'Assistant Personnel IA',
+    'Posez vos questions sur mon profil et mes compétences': 'Posez vos questions sur mon profil et mes compétences',
+    'Test My Project': 'Test My Project',
+    'Découvrez mes projets interactifs en action': 'Découvrez mes projets interactifs en action',
+    'FR | EN': 'FR | EN',
+    'EN | FR': 'EN | FR',
+    // Ajoute ici tous les autres textes à traduire
+    'ProfilTexte': `Actuellement étudiant en Master 2 MIAGE, où j'ai acquis une solide expérience en informatique, en gestion et en organisation. Ma spécialisation en conception, développement et gestion de projets informatiques m'a permis de maîtriser plusieurs langages informatiques et de travailler efficacement sur différentes plateformes et logiciels. Mon intérêt pour les nouvelles technologies et les défis complexes m'a rendu curieux, créatif et passionné par la recherche de solutions innovantes.`,
+    'Expérience Professionnelle': 'Expérience Professionnelle',
+    'Product Owner / Data Engineer': 'Product Owner / Data Engineer',
+    'La Banque Postale': 'La Banque Postale',
+    'Documentation technique et métier des données': 'Documentation technique et métier des données',
+    'Modélisation logique des données et lineage complet': 'Modélisation logique des données et lineage complet',
+    'Tableaux de bord avec Tableau & Power BI': 'Tableaux de bord avec Tableau & Power BI',
+    'Optimisation des requêtes sur gros volumes': 'Optimisation des requêtes sur gros volumes',
+    'Projet Académique - Application Empreinte Carbone': 'Projet Académique - Application Empreinte Carbone',
+    'Université Toulouse III': 'Université Toulouse III',
+    "Développement d'une application de calcul d'empreinte carbone (Python, React Native)": "Développement d'une application de calcul d'empreinte carbone (Python, React Native)",
+    'Reconnaissance caméra et vocale (APIs Google)': 'Reconnaissance caméra et vocale (APIs Google)',
+    'Gestion complète du projet (coordination, planification, supervision)': 'Gestion complète du projet (coordination, planification, supervision)',
+    'Chef de Projet IT': 'Chef de Projet IT',
+    'SHL': 'SHL',
+    "Développement full-stack d'une interface d'administration": "Développement full-stack d'une interface d'administration",
+    'Leadership dans la finalisation du site': 'Leadership dans la finalisation du site',
+    "Gestion d'équipe multidisciplinaire": "Gestion d'équipe multidisciplinaire",
+    'Freelance Web': 'Freelance Web',
+    'Indépendant': 'Indépendant',
+    'Conception et développement de sites web multisecteurs': 'Conception et développement de sites web multisecteurs',
+    'Travail en équipe interdisciplinaire': 'Travail en équipe interdisciplinaire',
+    'Compétences en gestion, communication, autonomie': 'Compétences en gestion, communication, autonomie',
+    'Gestion de Projet': 'Gestion de Projet',
+    'Langues': 'Langues',
+    'Français': 'Français',
+    'Anglais': 'Anglais',
+    'Arabe': 'Arabe',
+    'Maîtrise 100/100': 'Maîtrise 100/100',
+    'Maîtrise 75/100': 'Maîtrise 75/100',
+    'Certifications': 'Certifications',
+    'Core Designer — Dataiku': 'Core Designer — Dataiku',
+    'Certification en conception et développement sur la plateforme Dataiku': 'Certification en conception et développement sur la plateforme Dataiku',
+    'Console SQL Interactive': 'Console SQL Interactive',
+    'Explorez la base de données avec des requêtes SQL personnalisées': 'Explorez la base de données avec des requêtes SQL personnalisées',
+    'Base de données du CV': 'Base de données du CV',
+    'Explorez les différentes tables de mon CV interactif avec des requêtes SQL': 'Explorez les différentes tables de mon CV interactif avec des requêtes SQL',
+    "Ouvrir l'assistant": "Ouvrir l'assistant",
+    "Fermer l'assistant": "Fermer l'assistant",
+    'Test My Project': 'Test My Project',
+    'Découvrez mes projets interactifs en action': 'Découvrez mes projets interactifs en action',
+    'Q-Learning Demo': 'Q-Learning Demo',
+    "Algorithme d'apprentissage par renforcement. L'agent apprend à naviguer pour atteindre l'objectif.": "Algorithme d'apprentissage par renforcement. L'agent apprend à naviguer pour atteindre l'objectif.",
+    'IA': 'IA',
+    'Machine Learning': 'Machine Learning',
+    'Python': 'Python',
+    '🎮 Essayer': '🎮 Essayer',
+    'Classification Iris': 'Classification Iris',
+    'Classification de fleurs d\'iris en 3 espèces avec un modèle de machine learning.': 'Classification de fleurs d\'iris en 3 espèces avec un modèle de machine learning.',
+    'Classification': 'Classification',
+    'Data Science': 'Data Science',
+    'R': 'R',
+    '🔬 Tester': '🔬 Tester',
+    'GitHub Analytics': 'GitHub Analytics',
+    'Analyse de mon portfolio GitHub avec métriques réelles, répartition des langages et popularité des projets.': 'Analyse de mon portfolio GitHub avec métriques réelles, répartition des langages et popularité des projets.',
+    'GitHub': 'GitHub',
+    'Analytics': 'Analytics',
+    'Portfolio': 'Portfolio',
+    '📈 Analyser': '📈 Analyser',
+    'GitHub Analytics Dashboard': 'GitHub Analytics Dashboard',
+    'Analyse de Mon Portfolio GitHub • Métriques Réelles • Insights Développeur': 'Analyse de Mon Portfolio GitHub • Métriques Réelles • Insights Développeur',
+    'Nom d\'utilisateur GitHub à analyser :': 'Nom d\'utilisateur GitHub à analyser :',
+    'Entrez un username GitHub': 'Entrez un username GitHub',
+    'Analyser': 'Analyser',
+    'Type d\'analyse :': 'Type d\'analyse :',
+    'Vue d\'Ensemble': 'Vue d\'Ensemble',
+    'Analyse des Langages': 'Analyse des Langages',
+    'Top Projets': 'Top Projets',
+    'Activité Récente': 'Activité Récente',
+    'Total Repos': 'Total Repos',
+    'Total Stars': 'Total Stars',
+    'Langages': 'Langages',
+    'Dernière Activité': 'Dernière Activité',
+    'Commits': 'Commits',
+    '↗ En cours...': '↗ En cours...',
+    'Répartition des Langages': 'Répartition des Langages',
+    'Top Projets par Popularité': 'Top Projets par Popularité',
+    'Insights Développeur': 'Insights Développeur',
+    'Analyse en cours de vos projets GitHub...': 'Analyse en cours de vos projets GitHub...',
+    'Chargement des métriques de popularité...': 'Chargement des métriques de popularité...',
+    'Évaluation de votre stack technique...': 'Évaluation de votre stack technique...',
+    'Actualiser les Données GitHub': 'Actualiser les Données GitHub',
+    'Exporter le Rapport GitHub': 'Exporter le Rapport GitHub',
+    '❌ Erreur lors du chargement des données GitHub': '❌ Erreur lors du chargement des données GitHub',
+    'Vérifiez le username ou la connexion internet': 'Vérifiez le username ou la connexion internet',
+    '🔄 Chargement des données GitHub...': '🔄 Chargement des données GitHub...',
+    '✓ Données GitHub chargées avec succès': '✓ Données GitHub chargées avec succès',
+    'repositories analysés': 'repositories analysés',
+    '↗ Données réelles': '↗ Données réelles',
+    'Aujourd\'hui': 'Aujourd\'hui',
+    'Hier': 'Hier',
+    'N/A': 'N/A',
+    'Q-Learning en Action': 'Q-Learning en Action',
+    'Apprentissage par Renforcement • Algorithme Q-Learning': 'Apprentissage par Renforcement • Algorithme Q-Learning',
+    'Mission :': 'Mission :',
+    'L\'agent IA doit apprendre à naviguer optimalement vers l\'objectif': 'L\'agent IA doit apprendre à naviguer optimalement vers l\'objectif',
+    'Objectif :': 'Objectif :',
+    'Case dorée sur la grille 5×5': 'Case dorée sur la grille 5×5',
+    'Agent :': 'Agent :',
+    'Utilise Q-Learning pour optimiser sa stratégie': 'Utilise Q-Learning pour optimiser sa stratégie',
+    'Agent IA': 'Agent IA',
+    'Objectif': 'Objectif',
+    'Chemin Optimal': 'Chemin Optimal',
+    'Démarrer l\'Apprentissage': 'Démarrer l\'Apprentissage',
+    'Réinitialiser': 'Réinitialiser',
+    // ... autres tags de compétences si besoin
+    'Classification des Iris': 'Classification des Iris',
+    'Intelligence Artificielle • Classification Multi-Classes': 'Intelligence Artificielle • Classification Multi-Classes',
+    'Classifier automatiquement les fleurs d\'iris en 3 espèces distinctes': 'Classifier automatiquement les fleurs d\'iris en 3 espèces distinctes',
+    'Machine Learning avec validation croisée': 'Machine Learning avec validation croisée',
+    'Données d\'Entraînement': 'Données d\'Entraînement',
+    'Lancer la Classification': 'Lancer la Classification',
+    'Réinitialiser': 'Réinitialiser',
+    'Classification en cours...': 'Classification en cours...',
+    'Classification terminée !': 'Classification terminée !',
+    'Veuillez saisir toutes les valeurs.': 'Veuillez saisir toutes les valeurs.',
+    'Aucune donnée d\'entraînement disponible': 'Aucune donnée d\'entraînement disponible',
+    'Éducation': 'Éducation',
+    'Master 2 MIAGE - Ingénierie des Données et Protection (IDP)': 'Master 2 MIAGE - Ingénierie des Données et Protection (IDP)',
+    'Université Toulouse III - Paul Sabatier, Toulouse (2023 - 2025)': 'Université Toulouse III - Paul Sabatier, Toulouse (2023 - 2025)',
+    'Licence Informatique - Parcours MIAGE': 'Licence Informatique - Parcours MIAGE',
+    'Université Aix-Marseille, Aix-en-Provence (2021 - 2023)': 'Université Aix-Marseille, Aix-en-Provence (2021 - 2023)',
+    'Compétences': 'Compétences',
+    'Programmation': 'Programmation',
+    'Développement Web': 'Développement Web',
+    'Gestion de Projet': 'Gestion de Projet',
+    'Data Science': 'Data Science',
+    'Cybersécurité': 'Cybersécurité',
+    'Conception': 'Conception',
+    'Data Analysis': 'Data Analysis',
+    'Data Base': 'Data Base',
+    'Cloud': 'Cloud',
+    'C': 'C',
+    'Java': 'Java',
+    'Python': 'Python',
+    'R': 'R',
+    'HTML': 'HTML',
+    'CSS': 'CSS',
+    'JavaScript': 'JavaScript',
+    'Django': 'Django',
+    'SCRUM': 'SCRUM',
+    'GANTT': 'GANTT',
+    'TOGAF': 'TOGAF',
+    'ARCHIMATE': 'ARCHIMATE',
+    'SQL': 'SQL',
+    'NoSQL': 'NoSQL',
+    'OpenSSL': 'OpenSSL',
+    'RSA': 'RSA',
+    'AES': 'AES',
+    'MERISE': 'MERISE',
+    'UML': 'UML',
+    'SysML': 'SysML',
+    'Tableau': 'Tableau',
+    'Power BI': 'Power BI',
+    'MySQL': 'MySQL',
+    'Dataiku': 'Dataiku',
+    'PostgreSQL': 'PostgreSQL',
+    'IBM': 'IBM',
+    'AWS': 'AWS',
+  },
+  en: {
+    Profil: 'Profile',
+    "Compétences": 'Skills',
+    "Expérience": 'Experience',
+    Projets: 'Projects',
+    Contact: 'Contact',
+    Technologies: 'Technologies',
+    Langues: 'Languages',
+    Éducation: 'Education',
+    Certifications: 'Certifications',
+    'Data Scientist • Python Enthusiast • Q-Learning Explorer': 'Data Scientist • Python Enthusiast • Q-Learning Explorer',
+    'Télécharger mon CV': 'Download my CV',
+    'Disponibilité': 'Availability',
+    'À partir de septembre 2025': 'From September 2025',
+    'Console SQL Interactive': 'Interactive SQL Console',
+    'Explorez la base de données avec des requêtes SQL personnalisées': 'Explore the database with custom SQL queries',
+    'Assistant Personnel IA': 'Personal AI Assistant',
+    'Posez vos questions sur mon profil et mes compétences': 'Ask questions about my profile and skills',
+    'Test My Project': 'Test My Project',
+    'Découvrez mes projets interactifs en action': 'Discover my interactive projects in action',
+    'FR | EN': 'EN | FR',
+    'EN | FR': 'FR | EN',
+    // Ajoute ici tous les autres textes à traduire
+    'ProfilTexte': `Currently a Master 2 MIAGE student, where I have gained solid experience in computer science, management, and organization. My specialization in design, development, and management of IT projects has enabled me to master several programming languages and work efficiently on various platforms and software. My interest in new technologies and complex challenges has made me curious, creative, and passionate about finding innovative solutions.`,
+    'Expérience Professionnelle': 'Professional Experience',
+    'Product Owner / Data Engineer': 'Product Owner / Data Engineer',
+    'La Banque Postale': 'La Banque Postale',
+    'Documentation technique et métier des données': 'Technical and business data documentation',
+    'Modélisation logique des données et lineage complet': 'Logical data modeling and complete lineage',
+    'Tableaux de bord avec Tableau & Power BI': 'Dashboards with Tableau & Power BI',
+    'Optimisation des requêtes sur gros volumes': 'Query optimization on large volumes',
+    'Projet Académique - Application Empreinte Carbone': 'Academic Project - Carbon Footprint App',
+    'Université Toulouse III': 'University of Toulouse III',
+    "Développement d'une application de calcul d'empreinte carbone (Python, React Native)": "Development of a carbon footprint calculation app (Python, React Native)",
+    'Reconnaissance caméra et vocale (APIs Google)': 'Camera and voice recognition (Google APIs)',
+    'Gestion complète du projet (coordination, planification, supervision)': 'Full project management (coordination, planning, supervision)',
+    'Chef de Projet IT': 'IT Project Manager',
+    'SHL': 'SHL',
+    "Développement full-stack d'une interface d'administration": "Full-stack development of an admin interface",
+    'Leadership dans la finalisation du site': 'Leadership in site completion',
+    "Gestion d'équipe multidisciplinaire": "Multidisciplinary team management",
+    'Freelance Web': 'Freelance Web',
+    'Indépendant': 'Freelancer',
+    'Conception et développement de sites web multisecteurs': 'Design and development of multi-sector websites',
+    'Travail en équipe interdisciplinaire': 'Interdisciplinary teamwork',
+    'Compétences en gestion, communication, autonomie': 'Skills in management, communication, autonomy',
+    'Gestion de Projet': 'Project Management',
+    'Langues': 'Languages',
+    'Français': 'French',
+    'Anglais': 'English',
+    'Arabe': 'Arabic',
+    'Maîtrise 100/100': 'Mastery 100/100',
+    'Maîtrise 75/100': 'Mastery 75/100',
+    'Certifications': 'Certifications',
+    'Core Designer — Dataiku': 'Core Designer — Dataiku',
+    'Certification en conception et développement sur la plateforme Dataiku': 'Certification in design and development on the Dataiku platform',
+    'Console SQL Interactive': 'Interactive SQL Console',
+    'Explorez la base de données avec des requêtes SQL personnalisées': 'Explore the database with custom SQL queries',
+    'Base de données du CV': 'CV Database',
+    'Explorez les différentes tables de mon CV interactif avec des requêtes SQL': 'Explore the different tables of my interactive CV with SQL queries',
+    "Ouvrir l'assistant": "Open Assistant",
+    "Fermer l'assistant": "Close Assistant",
+    'Test My Project': 'Test My Project',
+    'Découvrez mes projets interactifs en action': 'Discover my interactive projects in action',
+    'Q-Learning Demo': 'Q-Learning Demo',
+    "Algorithme d'apprentissage par renforcement. L'agent apprend à naviguer pour atteindre l'objectif.": "Reinforcement learning algorithm. The agent learns to navigate to reach the goal.",
+    'IA': 'AI',
+    'Machine Learning': 'Machine Learning',
+    'Python': 'Python',
+    '🎮 Essayer': '🎮 Try',
+    'Classification Iris': 'Iris Classification',
+    'Classification de fleurs d\'iris en 3 espèces avec un modèle de machine learning.': 'Classification of iris flowers into 3 species with a machine learning model.',
+    'Classification': 'Classification',
+    'Data Science': 'Data Science',
+    'R': 'R',
+    '🔬 Tester': '🔬 Test',
+    'GitHub Analytics': 'GitHub Analytics',
+    'Analyse de mon portfolio GitHub avec métriques réelles, répartition des langages et popularité des projets.': 'Analysis of my GitHub portfolio with real metrics, language distribution and project popularity.',
+    'GitHub': 'GitHub',
+    'Analytics': 'Analytics',
+    'Portfolio': 'Portfolio',
+    '📈 Analyser': '📈 Analyze',
+    'GitHub Analytics Dashboard': 'GitHub Analytics Dashboard',
+    'Analyse de Mon Portfolio GitHub • Métriques Réelles • Insights Développeur': 'My GitHub Portfolio Analysis • Real Metrics • Developer Insights',
+    'Nom d\'utilisateur GitHub à analyser :': 'GitHub username to analyze:',
+    'Entrez un username GitHub': 'Enter a GitHub username',
+    'Analyser': 'Analyze',
+    'Type d\'analyse :': 'Analysis type:',
+    'Vue d\'Ensemble': 'Overview',
+    'Analyse des Langages': 'Language Analysis',
+    'Top Projets': 'Top Projects',
+    'Activité Récente': 'Recent Activity',
+    'Total Repos': 'Total Repos',
+    'Total Stars': 'Total Stars',
+    'Langages': 'Languages',
+    'Dernière Activité': 'Last Activity',
+    'Commits': 'Commits',
+    '↗ En cours...': '↗ Loading...',
+    'Répartition des Langages': 'Language Distribution',
+    'Top Projets par Popularité': 'Top Projects by Popularity',
+    'Insights Développeur': 'Developer Insights',
+    'Analyse en cours de vos projets GitHub...': 'Analyzing your GitHub projects...',
+    'Chargement des métriques de popularité...': 'Loading popularity metrics...',
+    'Évaluation de votre stack technique...': 'Evaluating your tech stack...',
+    'Actualiser les Données GitHub': 'Refresh GitHub Data',
+    'Exporter le Rapport GitHub': 'Export GitHub Report',
+    '❌ Erreur lors du chargement des données GitHub': '❌ Error loading GitHub data',
+    'Vérifiez le username ou la connexion internet': 'Check username or internet connection',
+    '🔄 Chargement des données GitHub...': '🔄 Loading GitHub data...',
+    '✓ Données GitHub chargées avec succès': '✓ GitHub data loaded successfully',
+    'repositories analysés': 'repositories analyzed',
+    '↗ Données réelles': '↗ Real data',
+    'Aujourd\'hui': 'Today',
+    'Hier': 'Yesterday',
+    'N/A': 'N/A',
+    'Q-Learning en Action': 'Q-Learning in Action',
+    'Apprentissage par Renforcement • Algorithme Q-Learning': 'Reinforcement Learning • Q-Learning Algorithm',
+    'Mission :': 'Mission:',
+    'L\'agent IA doit apprendre à naviguer optimalement vers l\'objectif': 'The AI agent must learn to navigate optimally to the goal',
+    'Objectif :': 'Goal:',
+    'Case dorée sur la grille 5×5': 'Golden cell on the 5×5 grid',
+    'Agent :': 'Agent:',
+    'Utilise Q-Learning pour optimiser sa stratégie': 'Uses Q-Learning to optimize its strategy',
+    'Agent IA': 'AI Agent',
+    'Objectif': 'Goal',
+    'Chemin Optimal': 'Optimal Path',
+    'Démarrer l\'Apprentissage': 'Start Learning',
+    'Réinitialiser': 'Reset',
+    // ... autres tags de compétences si besoin
+    'Classification des Iris': 'Iris Classification',
+    'Intelligence Artificielle • Classification Multi-Classes': 'Artificial Intelligence • Multi-Class Classification',
+    'Classifier automatiquement les fleurs d\'iris en 3 espèces distinctes': 'Automatically classify iris flowers into 3 distinct species',
+    'Machine Learning avec validation croisée': 'Machine Learning with cross-validation',
+    'Données d\'Entraînement': 'Training Data',
+    'Lancer la Classification': 'Start Classification',
+    'Réinitialiser': 'Reset',
+    'Classification en cours...': 'Classification in progress...',
+    'Classification terminée !': 'Classification complete!',
+    'Veuillez saisir toutes les valeurs.': 'Please enter all values.',
+    'Aucune donnée d\'entraînement disponible': 'No training data available',
+    'Éducation': 'Education',
+    'Master 2 MIAGE - Ingénierie des Données et Protection (IDP)': 'Master 2 MIAGE - Data Engineering and Protection (IDP)',
+    'Université Toulouse III - Paul Sabatier, Toulouse (2023 - 2025)': 'University of Toulouse III - Paul Sabatier, Toulouse (2023 - 2025)',
+    'Licence Informatique - Parcours MIAGE': 'Bachelor in Computer Science - MIAGE Track',
+    'Université Aix-Marseille, Aix-en-Provence (2021 - 2023)': 'Aix-Marseille University, Aix-en-Provence (2021 - 2023)',
+    'Compétences': 'Skills',
+    'Programmation': 'Programming',
+    'Développement Web': 'Web Development',
+    'Gestion de Projet': 'Project Management',
+    'Data Science': 'Data Science',
+    'Cybersécurité': 'Cybersecurity',
+    'Conception': 'Design',
+    'Data Analysis': 'Data Analysis',
+    'Data Base': 'Database',
+    'Cloud': 'Cloud',
+    'C': 'C',
+    'Java': 'Java',
+    'Python': 'Python',
+    'R': 'R',
+    'HTML': 'HTML',
+    'CSS': 'CSS',
+    'JavaScript': 'JavaScript',
+    'Django': 'Django',
+    'SCRUM': 'SCRUM',
+    'GANTT': 'GANTT',
+    'TOGAF': 'TOGAF',
+    'ARCHIMATE': 'ARCHIMATE',
+    'SQL': 'SQL',
+    'NoSQL': 'NoSQL',
+    'OpenSSL': 'OpenSSL',
+    'RSA': 'RSA',
+    'AES': 'AES',
+    'MERISE': 'MERISE',
+    'UML': 'UML',
+    'SysML': 'SysML',
+    'Tableau': 'Tableau',
+    'Power BI': 'Power BI',
+    'MySQL': 'MySQL',
+    'Dataiku': 'Dataiku',
+    'PostgreSQL': 'PostgreSQL',
+    'IBM': 'IBM',
+    'AWS': 'AWS',
+  }
+};
+
+function setLanguage(lang) {
+  localStorage.setItem('lang', lang);
+  applyTranslations(lang);
+}
+
+function applyTranslations(lang) {
+  // Navbar principaux
+  document.querySelectorAll('.navbar-item span').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Navbar secondaires (icônes)
+  document.querySelectorAll('.navbar-icon-item').forEach(el => {
+    const origTitle = el.dataset.title || el.getAttribute('title');
+    if (!el.dataset.title) el.dataset.title = origTitle;
+    if (translations[lang][origTitle]) el.setAttribute('title', translations[lang][origTitle]);
+    else el.setAttribute('title', origTitle);
+  });
+  // Mobile menu
+  document.querySelectorAll('.mobile-menu-item span').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Titres de section
+  document.querySelectorAll('.section-header h2, .section-header h1').forEach(el => {
+    let node = el.childNodes[el.childNodes.length-1];
+    if (!node.dataset) node.dataset = {};
+    if (!node.dataset.text) node.dataset.text = node.textContent.trim();
+    const fr = node.dataset.text;
+    if (translations[lang][fr]) node.textContent = ' ' + translations[lang][fr];
+    else node.textContent = ' ' + fr;
+  });
+  // Sous-titres
+  document.querySelectorAll('.section-subtitle').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Bouton CV
+  const cvBtn = document.querySelector('.cv-download-btn .download-text');
+  if (cvBtn) {
+    if (!cvBtn.dataset.text) cvBtn.dataset.text = cvBtn.textContent.trim();
+    const fr = cvBtn.dataset.text;
+    if (translations[lang][fr]) cvBtn.textContent = translations[lang][fr];
+    else cvBtn.textContent = fr;
+  }
+  // Disponibilité
+  const dispo = document.querySelector('.cv-availability h4');
+  if (dispo && dispo.childNodes[1]) {
+    let node = dispo.childNodes[1];
+    if (!node.dataset) node.dataset = {};
+    if (!node.dataset.text) node.dataset.text = node.textContent.trim();
+    const fr = node.dataset.text;
+    if (translations[lang][fr]) node.textContent = ' ' + translations[lang][fr];
+    else node.textContent = ' ' + fr;
+  }
+  const dispoDate = document.querySelector('.cv-availability p');
+  if (dispoDate) {
+    if (!dispoDate.dataset.text) dispoDate.dataset.text = dispoDate.textContent.trim();
+    const fr = dispoDate.dataset.text;
+    if (translations[lang][fr]) dispoDate.textContent = translations[lang][fr];
+    else dispoDate.textContent = fr;
+  }
+  // Met à jour le label du bouton
+  const langBtn = document.getElementById('lang-switch-label');
+  if (langBtn) langBtn.textContent = translations[lang][lang === 'fr' ? 'FR | EN' : 'EN | FR'];
+  // Traduction du texte de profil
+  const profileText = document.querySelector('.cv-profile-text');
+  if (profileText) {
+    if (!profileText.dataset.text) profileText.dataset.text = profileText.textContent.trim();
+    const fr = 'ProfilTexte';
+    if (translations[lang][fr]) profileText.textContent = translations[lang][fr];
+    else profileText.textContent = profileText.dataset.text;
+  }
+  // Traduction de la section Expérience
+  // Titre principal
+  document.querySelectorAll('#experience .cv-header h2').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.childNodes[el.childNodes.length-1].textContent = ' ' + translations[lang][fr];
+    else el.childNodes[el.childNodes.length-1].textContent = ' ' + fr;
+  });
+  // Titres de poste et entreprises
+  document.querySelectorAll('.cv-experience-title').forEach(el => {
+    el.childNodes.forEach(node => {
+      if (node.nodeType === 3 && node.textContent.trim()) {
+        if (!node.dataset) node.dataset = {};
+        if (!node.dataset.text) node.dataset.text = node.textContent.trim();
+        const fr = node.dataset.text;
+        if (translations[lang][fr]) node.textContent = translations[lang][fr];
+        else node.textContent = fr;
+      }
+    });
+  });
+  document.querySelectorAll('.cv-experience-company').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Lieux et années (ne pas traduire les dates)
+  document.querySelectorAll('.cv-experience-location').forEach(el => {
+    // On ne traduit que le nom de la ville
+    const icon = el.querySelector('i');
+    let txt = el.textContent.replace(/^[^a-zA-ZÀ-ÿ]+/, '').trim();
+    if (!el.dataset.text) el.dataset.text = txt;
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.innerHTML = (icon ? icon.outerHTML + ' ' : '') + translations[lang][fr];
+    else el.innerHTML = (icon ? icon.outerHTML + ' ' : '') + fr;
+  });
+  // Descriptions (li)
+  document.querySelectorAll('.cv-experience-description li').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Compétences (tags)
+  document.querySelectorAll('.cv-experience-skill').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Traduction de la section Langues
+  // Titre principal
+  document.querySelectorAll('#langues .cv-header h2').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.childNodes[el.childNodes.length-1].textContent = ' ' + translations[lang][fr];
+    else el.childNodes[el.childNodes.length-1].textContent = ' ' + fr;
+  });
+  // Noms des langues
+  document.querySelectorAll('.cv-language-name').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Niveaux de maîtrise
+  document.querySelectorAll('.cv-language-level').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Traduction de la section Certifications
+  // Titre principal
+  document.querySelectorAll('#certifications .cv-header h2').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.childNodes[el.childNodes.length-1].textContent = ' ' + translations[lang][fr];
+    else el.childNodes[el.childNodes.length-1].textContent = ' ' + fr;
+  });
+  // Nom de la certification (dans le lien)
+  document.querySelectorAll('#certifications h4 a').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Description de la certification
+  document.querySelectorAll('#certifications p').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Traduction de la section Console SQL Interactive
+  // Titre principal
+  document.querySelectorAll('#sql-console .section-header h2').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.childNodes[el.childNodes.length-1].textContent = ' ' + translations[lang][fr];
+    else el.childNodes[el.childNodes.length-1].textContent = ' ' + fr;
+  });
+  // Sous-titre
+  document.querySelectorAll('#sql-console .section-subtitle').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Description de la base de données (dans le script)
+  const tableHeader = document.querySelector('.table-header');
+  if (tableHeader) {
+    if (!tableHeader.dataset.text) tableHeader.dataset.text = tableHeader.textContent.trim();
+    const fr = tableHeader.dataset.text;
+    if (translations[lang][fr]) tableHeader.textContent = translations[lang][fr];
+    else tableHeader.textContent = fr;
+  }
+  const tableDescription = document.querySelector('.table-description');
+  if (tableDescription) {
+    if (!tableDescription.dataset.text) tableDescription.dataset.text = tableDescription.textContent.trim();
+    const fr = tableDescription.dataset.text;
+    if (translations[lang][fr]) tableDescription.textContent = translations[lang][fr];
+    else tableDescription.textContent = fr;
+  }
+  // Traduction du bouton de l'assistant
+  const chatToggle = document.querySelector('#chat-toggle span');
+  if (chatToggle) {
+    if (!chatToggle.dataset.text) chatToggle.dataset.text = chatToggle.textContent.trim();
+    const fr = chatToggle.dataset.text;
+    if (translations[lang][fr]) chatToggle.textContent = translations[lang][fr];
+    else chatToggle.textContent = fr;
+  }
+  // Traduction de la section Test My Project
+  // Titre principal
+  document.querySelectorAll('#demos .section-header h2').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.childNodes[el.childNodes.length-1].textContent = ' ' + translations[lang][fr];
+    else el.childNodes[el.childNodes.length-1].textContent = ' ' + fr;
+  });
+  // Sous-titre
+  document.querySelectorAll('#demos .section-subtitle').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Titres des cartes
+  document.querySelectorAll('.demo-card-title').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Descriptions des cartes
+  document.querySelectorAll('.demo-card-description').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Tags des cartes
+  document.querySelectorAll('.demo-tag').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Boutons d'action
+  document.querySelectorAll('.demo-card-action').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Traduction du GitHub Analytics Dashboard
+  // Titre principal
+  document.querySelectorAll('#data-analytics-container .panel-title h3').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Sous-titre
+  document.querySelectorAll('#data-analytics-container .panel-subtitle').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Label username
+  document.querySelectorAll('.github-username-label').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Placeholder input
+  const githubUsernameInput = document.getElementById('github-username');
+  if (githubUsernameInput) {
+    if (!githubUsernameInput.dataset.placeholder) githubUsernameInput.dataset.placeholder = githubUsernameInput.placeholder;
+    const fr = githubUsernameInput.dataset.placeholder;
+    if (translations[lang][fr]) githubUsernameInput.placeholder = translations[lang][fr];
+    else githubUsernameInput.placeholder = fr;
+  }
+  // Bouton Analyser
+  document.querySelectorAll('#data-analytics-container .demo-btn').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Label type d'analyse
+  document.querySelectorAll('#data-analytics-container label').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Options du select
+  document.querySelectorAll('#github-data-source option').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Titres des KPIs
+  document.querySelectorAll('.kpi-content h4').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Tendances des KPIs
+  document.querySelectorAll('.kpi-trend').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Titres des graphiques
+  document.querySelectorAll('.chart-header h4').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Titre insights
+  document.querySelectorAll('.insights-header h4').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Contenu des insights
+  document.querySelectorAll('.insight-item span').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Boutons de contrôle
+  document.querySelectorAll('#data-analytics-container .demo-controls .demo-btn').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Traduction du Q-Learning Panel
+  // Titre principal
+  document.querySelectorAll('#qlearning-container .panel-title h3').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Sous-titre
+  document.querySelectorAll('#qlearning-container .panel-subtitle').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Descriptions de mission
+  document.querySelectorAll('#qlearning-container .intro-text p').forEach(el => {
+    // Sauvegarder le HTML d'origine une seule fois
+    if (!el.dataset.html) el.dataset.html = el.innerHTML.trim();
+    // Toujours repartir du HTML d'origine
+    let htmlOrig = el.dataset.html;
+    let fr = htmlOrig.split('</strong>')[1];
+    if (fr) fr = fr.trim();
+    if (translations[lang][fr]) {
+      if (htmlOrig.includes('Mission')) {
+        el.innerHTML = '🎯 <strong>' + (lang === 'en' ? 'Mission:' : 'Mission :') + '</strong> ' + translations[lang][fr];
+      } else if (htmlOrig.includes('Objectif')) {
+        el.innerHTML = '🌟 <strong>' + (lang === 'en' ? 'Goal:' : 'Objectif :') + '</strong> ' + translations[lang][fr];
+      } else if (htmlOrig.includes('Agent')) {
+        el.innerHTML = '🤖 <strong>' + (lang === 'en' ? 'Agent:' : 'Agent :') + '</strong> ' + translations[lang][fr];
+      } else {
+        el.textContent = translations[lang][fr];
+      }
+    } else {
+      el.textContent = fr;
+    }
+  });
+  // Légende
+  document.querySelectorAll('#qlearning-container .legend-item span').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Boutons de contrôle Q-Learning
+  document.querySelectorAll('#qlearning-container .demo-controls .demo-btn').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Descriptions de mission Classification des Iris robustes
+  document.querySelectorAll('#classification-container .intro-text p').forEach(el => {
+    if (!el.dataset.html) el.dataset.html = el.innerHTML.trim();
+    let htmlOrig = el.dataset.html;
+    // Pour chaque <p>, on regarde si c'est Objectif, Espèces ou Algorithme
+    if (htmlOrig.includes('Objectif')) {
+      // Objectif : texte simple
+      let fr = htmlOrig.split('</strong>')[1];
+      if (fr) fr = fr.trim();
+      if (translations[lang][fr]) {
+        el.innerHTML = translations[lang][fr];
+      } else {
+        el.innerHTML = fr;
+      }
+    } else if (htmlOrig.includes('Espèces')) {
+      // Espèces : label traduit + spans inchangés
+      let labelFr = 'Espèces :';
+      let labelEn = 'Species:';
+      let label = (lang === 'en' ? labelEn : labelFr);
+      let species = htmlOrig.match(/<span.*?setosa.*?span>.*?<span.*?versicolor.*?span>.*?<span.*?virginica.*?span>/);
+      let speciesHtml = species ? species[0] : '';
+      el.innerHTML = label + ' ' + speciesHtml;
+    } else if (htmlOrig.includes('Algorithme')) {
+      let fr = htmlOrig.split('</strong>')[1];
+      if (fr) fr = fr.trim();
+      if (translations[lang][fr]) {
+        el.innerHTML = translations[lang][fr];
+      } else {
+        el.innerHTML = fr;
+      }
+    }
+  });
+  // Traduction du titre et sous-titre du panel Classification des Iris
+  document.querySelectorAll('#classification-container .panel-title h3').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  document.querySelectorAll('#classification-container .panel-subtitle').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Traduction dynamique des boutons et messages Classification Iris
+  document.querySelectorAll('#classification-container .panel-section-header h4').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  document.querySelectorAll('#classify-btn').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.innerHTML = `<i class='fas fa-play'></i> ${translations[lang][fr]}`;
+    else el.innerHTML = `<i class='fas fa-play'></i> ${fr}`;
+  });
+  document.querySelectorAll('#reset-btn').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.innerHTML = `<i class='fas fa-redo'></i> ${translations[lang][fr]}`;
+    else el.innerHTML = `<i class='fas fa-redo'></i> ${fr}`;
+  });
+  // Messages d'état
+  const status = document.getElementById('classification-status');
+  if (status && status.textContent.trim()) {
+    const fr = status.textContent.trim();
+    if (translations[lang][fr]) status.textContent = translations[lang][fr];
+  }
+  // Traduction dynamique de la section Éducation
+  document.querySelectorAll('#education .cv-header h2').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.childNodes[el.childNodes.length-1].textContent = ' ' + translations[lang][fr];
+    else el.childNodes[el.childNodes.length-1].textContent = ' ' + fr;
+  });
+  document.querySelectorAll('#education .cv-education-details h4, #education .cv-education-details p').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+  // Traduction dynamique de la section Compétences
+  document.querySelectorAll('#competences .cv-header h2').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.childNodes[el.childNodes.length-1].textContent = ' ' + translations[lang][fr];
+    else el.childNodes[el.childNodes.length-1].textContent = ' ' + fr;
+  });
+  document.querySelectorAll('#competences .cv-skill-category h4').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.childNodes[el.childNodes.length-1].textContent = ' ' + translations[lang][fr];
+    else el.childNodes[el.childNodes.length-1].textContent = ' ' + fr;
+  });
+  document.querySelectorAll('#competences .cv-skill-tag').forEach(el => {
+    if (!el.dataset.text) el.dataset.text = el.textContent.trim();
+    const fr = el.dataset.text;
+    if (translations[lang][fr]) el.textContent = translations[lang][fr];
+    else el.textContent = fr;
+  });
+}
+
+// Gestion du clic sur le bouton
+const langSwitch = document.getElementById('lang-switch');
+if (langSwitch) {
+  langSwitch.addEventListener('click', () => {
+    const current = localStorage.getItem('lang') || 'fr';
+    const next = current === 'fr' ? 'en' : 'fr';
+    setLanguage(next);
+  });
+}
+
+// Applique la langue au chargement
+window.addEventListener('DOMContentLoaded', () => {
+  const lang = localStorage.getItem('lang') || 'fr';
+  setLanguage(lang);
+});
+// === FIN TRADUCTION ===
+
+// === Avatar dynamique selon le thème ===
+function updateAvatarByTheme() {
+  const avatar = document.getElementById('main-avatar');
+  if (!avatar) return;
+  if (document.body.classList.contains('dark-theme')) {
+    avatar.src = 'images/Photo_dark.png';
+  } else {
+    avatar.src = 'images/Photo_light.png';
+  }
+}
+
+// Applique au chargement
+window.addEventListener('DOMContentLoaded', updateAvatarByTheme);
+// Applique lors du switch de thème
+const themeToggle = document.getElementById('theme-toggle');
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    setTimeout(updateAvatarByTheme, 100); // Laisse le temps au body de changer de classe
+  });
+}
+// === Fin avatar dynamique ===
+
+document.addEventListener('DOMContentLoaded', function() {
+  resetClassification();
 });

@@ -168,9 +168,10 @@ body {
 
 /* Styles spécifiques aux thèmes pour la navbar */
 .light-theme .navbar {
-    background: rgba(204, 197, 185, 0.95) !important;
+    background: #6a1b9a !important;
     backdrop-filter: blur(10px);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 10px rgba(106, 27, 154, 0.3);
+    border-bottom: 2px solid #9c27b0;
 }
 
 .dark-theme .navbar {
@@ -221,10 +222,8 @@ body.light-theme .navbar-logo {
 /* Menu de navigation */
 .navbar-menu {
     display: flex;
-    gap: 2rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    gap: 0.1rem;
+    margin-left: 0.2rem;
 }
 
 .navbar-item {
@@ -246,7 +245,7 @@ body.light-theme .navbar-logo {
 
 /* Ajouter de l'espace avant Contact */
 .navbar-item[href="#contact"] {
-    margin-left: 2rem;
+    margin-left: -0.3rem;
 }
 
 /* Menu secondaire avec icônes */
@@ -293,71 +292,56 @@ body.light-theme .navbar-logo {
 .navbar-controls {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-left: auto;
+    gap: 0.7rem;
+    overflow: visible;
 }
 
 /* Contrôles de thème */
 .theme-controls {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    gap: 0.2rem;
 }
 
 .theme-button {
-    background: transparent;
-    border: 2px solid var(--accent-primary);
-    color: var(--accent-primary);
-    width: 40px;
-    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
     border-radius: 50%;
+    font-size: 1.1rem;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    background: rgba(0,0,0,0.08);
+    border: 2px solid transparent;
+    transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
     position: relative;
-    overflow: hidden;
 }
 
-.theme-button::before {
-    content: '';
+.theme-button:hover, .theme-button:focus {
+    background: #00ffcc22;
+    border-color: #00ffcc;
+    box-shadow: 0 0 8px #00ffcc55;
+}
+
+#lang-switch span {
+    display: none;
+}
+
+#lang-switch[title]:hover::after {
+    content: attr(title);
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--accent-primary);
-    border-radius: 50%;
-    transform: scale(0);
-    transition: transform 0.3s ease;
-    opacity: 0.1;
-    z-index: 0;
-}
-
-.theme-button:hover::before {
-    transform: scale(1);
-}
-
-.theme-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.theme-button i {
-    font-size: 1.2rem;
-    position: relative;
-    z-index: 1;
-    transition: transform 0.3s ease;
-}
-
-.theme-button.active {
-    background: var(--accent-primary);
-    color: var(--bg-primary);
-}
-
-.theme-button.active i {
-    transform: rotate(360deg);
+    left: 50%;
+    top: 110%;
+    transform: translateX(-50%);
+    background: #252422;
+    color: #fff;
+    font-size: 0.85rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 10;
+    pointer-events: none;
 }
 
 /* Animation pour le changement d'icône */
@@ -1407,7 +1391,12 @@ footer {
 .section-header h2 {
   font-size: 2.5rem;
   margin-bottom: 10px;
-  color: #fff;
+  color: #fff !important;
+  text-shadow: 0 0 20px #00ffcc;
+}
+
+.section-header h2 i {
+  color: #fff !important;
   text-shadow: 0 0 20px #00ffcc;
 }
 
@@ -2464,6 +2453,28 @@ th {
   color: #ffffff;
   text-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
   transform: translateX(4px);
+}
+
+/* Styles pour les logos d'expérience */
+.cv-experience-title {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.experience-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cv-experience-item:hover .experience-logo {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 255, 204, 0.3);
 }
 
 .cv-experience-company {
@@ -4680,6 +4691,53 @@ body.light-theme footer .contact-item i {
   color: #00ffcc;
 }
 
+/* Styles spécifiques pour la navbar en light theme */
+.light-theme .navbar-item {
+  color: #ffffff;
+}
+
+.light-theme .navbar-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #00ffcc;
+}
+
+.light-theme .navbar-icon-item {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.light-theme .navbar-icon-item:hover {
+  background: #00ffcc;
+  color: #6a1b9a;
+}
+
+.light-theme .theme-button {
+  border-color: #00ffcc;
+  color: #00ffcc;
+}
+
+.light-theme .theme-button:hover {
+  background: #00ffcc;
+  color: #6a1b9a;
+}
+
+.light-theme .theme-button.active {
+  background: #00ffcc;
+  color: #6a1b9a;
+}
+
+.light-theme .hamburger-line {
+  background: #00ffcc;
+}
+
+.light-theme .hamburger-btn {
+  border-color: #00ffcc;
+}
+
+.light-theme .hamburger-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 body.light-theme #hero h1 {
   color: #ffffff !important;
   text-shadow: 0 0 15px rgba(106, 27, 154, 0.8) !important;
@@ -5262,7 +5320,8 @@ body.light-theme #hero h1 {
 }
 
 .light-theme .section-subtitle {
-  color: rgba(37, 36, 34, 0.8);
+  color: #fff !important;
+  text-shadow: 0 0 10px #00ffcc;
 }
 
 /* Styles des panneaux de démo en mode clair */
@@ -5780,4 +5839,107 @@ body.light-theme #hero h1 {
   .kpi-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.kpi-card .kpi-value#last-activity-kpi {
+  font-size: 1.3rem !important;
+  word-break: break-all;
+  white-space: normal;
+  line-height: 1.1;
+  max-width: 90%;
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.light-theme .theme-button i {
+  color: #fff !important;
+}
+
+.light-theme .theme-button.active i {
+  color: #6a1b9a !important;
+}
+
+.navbar-item span {
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0 0.7rem;
+}
+
+.navbar-item i {
+  font-size: 1.1rem;
+}
+
+.navbar-logo-img {
+  width: 36px;
+  height: 36px;
+}
+
+.navbar-menu {
+  display: flex;
+  gap: 0.2rem;
+  margin-left: 0.2rem;
+}
+
+.navbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: visible;
+}
+
+.theme-button {
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.empty-table-message {
+  text-align: center;
+  color: #6a0dad;
+  background: #fffcf2;
+  border: 2px dashed #00ccaa;
+  border-radius: 10px;
+  padding: 1.2em 0.5em;
+  font-size: 1.1em;
+  font-weight: 600;
+  margin: 1em 0;
+  box-shadow: 0 2px 8px rgba(0,204,170,0.08);
+}
+.light-theme .empty-table-message {
+  color: #00ccaa;
+  background: #fff;
+  border-color: #6a0dad;
+}
+
+.light-theme #test-data table td.feature-column {
+  color: #006B5B !important;
+  font-weight: 700 !important;
+  background-color: rgba(0, 204, 170, 0.13) !important;
+  border: 1.5px solid #00CCAA !important;
+}
+
+.light-theme .data-display, 
+.light-theme .prediction-display {
+  background: rgba(255, 255, 255, 0.35) !important;
+  border-color: rgba(37, 36, 34, 0.1);
+}
+.light-theme .empty-table-message {
+  color: #00ccaa;
+  background: rgba(255,255,255,0.95);
+  border-color: #6a0dad;
+  z-index: 2;
+  position: relative;
+}
+
+.light-theme #test-data table th.feature-column {
+  color: #252422 !important;
+  background-color: #00CCAA !important;
+  border: 2px solid #00CCAA !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+}
+.light-theme #test-data table th.prediction-column {
+  color: #EB5E28 !important;
+  background-color: #fff3e6 !important;
+  border: 2px solid #EB5E28 !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
 }

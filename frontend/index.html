@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Itssghir - Portfolio AI</title>
+  <title>Itssghir - Data Scientist</title>
+  <link rel="icon" type="image/png" href="images/logo.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="chat.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
@@ -79,6 +80,9 @@
       
       <!-- Controls & Hamburger -->
       <div class="navbar-controls">
+        <button id="lang-switch" class="theme-button" aria-label="Changer de langue" title="Changer de langue / Switch language">
+          <i class="fas fa-globe"></i> <span id="lang-switch-label">FR | EN</span>
+        </button>
         <div class="theme-controls">
           <button id="theme-toggle" class="theme-button" aria-label="Changer de thème">
             <i class="fas fa-moon"></i>
@@ -87,7 +91,6 @@
             <i class="fas fa-volume-up"></i>
           </button>
         </div>
-        
         <!-- Hamburger Button -->
         <button class="hamburger-btn" aria-label="Menu de navigation" aria-expanded="false">
           <span class="hamburger-line"></span>
@@ -109,39 +112,39 @@
         <div class="mobile-menu-content">
           <a href="#profil" class="mobile-menu-item">
             <i class="fas fa-user"></i>
-            <span>👤 Profil</span>
+            <span>Profil</span>
           </a>
           <a href="#education" class="mobile-menu-item">
             <i class="fas fa-graduation-cap"></i>
-            <span>🎓 Éducation</span>
+            <span>Éducation</span>
           </a>
           <a href="#experience" class="mobile-menu-item">
             <i class="fas fa-briefcase"></i>
-            <span>💼 Expérience</span>
+            <span>Expérience</span>
           </a>
           <a href="#competences" class="mobile-menu-item">
             <i class="fas fa-code"></i>
-            <span>💻 Compétences</span>
+            <span>Compétences</span>
           </a>
           <a href="#technologies" class="mobile-menu-item">
             <i class="fas fa-tools"></i>
-            <span>🔧 Technologies</span>
+            <span>Technologies</span>
           </a>
           <a href="#projects" class="mobile-menu-item">
             <i class="fab fa-github"></i>
-            <span>🚀 Projets</span>
+            <span>Projets</span>
           </a>
           <a href="#langues" class="mobile-menu-item">
             <i class="fas fa-language"></i>
-            <span>🌍 Langues</span>
+            <span>Langues</span>
           </a>
           <a href="#certifications" class="mobile-menu-item">
             <i class="fas fa-medal"></i>
-            <span>🏆 Certifications</span>
+            <span>Certifications</span>
           </a>
           <a href="#contact" class="mobile-menu-item">
             <i class="fas fa-envelope"></i>
-            <span>📧 Contact</span>
+            <span>Contact</span>
           </a>
         </div>
         <div class="mobile-menu-footer">
@@ -177,14 +180,16 @@
             <div class="avatar-ring"></div>
             <div class="avatar-ring-rgb"></div>
             <div class="avatar-inner">
-              <img src="images/Photo.jpg" alt="ITSsghir Photo" class="avatar-img">
+              <img src="images/Photo_light.png" alt="ITSsghir Photo" class="avatar-img" id="main-avatar">
             </div>
             <div class="avatar-glow"></div>
           </div>
         </div>
         <div class="hero-text">
-          <h1>Itssghir</h1>
-          <p>Data Scientist • Python Enthusiast • Q-Learning Explorer</p>
+          <div class="section-header">
+            <h1><i class="fas fa-robot"></i> Itssghir</h1>
+            <p class="section-subtitle">Data Scientist • Python Enthusiast • Q-Learning Explorer</p>
+          </div>
           <div id="rotating-text"></div>
         </div>
       </div>
@@ -195,7 +200,7 @@
       <div class="cv-header">
         <div class="title-container">
           <h2><i class="fas fa-user"></i> Profil</h2>
-          <a href="cv.pdf" download class="cv-download-btn">
+          <a href="assets/documents/cv.pdf" download class="cv-download-btn">
             <span class="download-icon">
               <i class="fas fa-file-download"></i>
             </span>
@@ -262,7 +267,10 @@
             <div class="cv-experience-timeline">
               <div class="cv-experience-item" data-aos="fade-left">
                 <div class="cv-experience-header">
-                  <div class="cv-experience-title">Product Owner / Data Engineer</div>
+                  <div class="cv-experience-title">
+                    <img src="images/logo_banque_postale.png" alt="La Banque Postale" class="experience-logo">
+                    Product Owner / Data Engineer
+                  </div>
                   <div class="cv-experience-company">La Banque Postale</div>
                   <div class="cv-experience-date">
                     <span class="cv-experience-year">📅 2025</span>
@@ -282,11 +290,45 @@
                   <span class="cv-experience-skill">Power BI</span>
                   <span class="cv-experience-skill">Data Engineering</span>
                   <span class="cv-experience-skill">Agile</span>
+                  <span class="cv-experience-skill">Python</span>
+                  <span class="cv-experience-skill">Tableau</span>
+                  <span class="cv-experience-skill">Dataiku</span>
+                  <span class="cv-experience-skill">Jira</span>
+                  <span class="cv-experience-skill">Kafka</span>
                 </div>
               </div>
               <div class="cv-experience-item" data-aos="fade-left" data-aos-delay="100">
                 <div class="cv-experience-header">
-                  <div class="cv-experience-title">Chef de Projet IT</div>
+                  <div class="cv-experience-title">
+                    <img src="images/logo_toulouse3.jpg" alt="Université Toulouse III" class="experience-logo">
+                    Projet Académique - Application Empreinte Carbone
+                  </div>
+                  <div class="cv-experience-company">Université Toulouse III</div>
+                  <div class="cv-experience-date">
+                    <span class="cv-experience-year">📅 2023-2024</span>
+                    <span class="cv-experience-location"><i class="fas fa-map-marker-alt"></i> Toulouse</span>
+                  </div>
+                </div>
+                <div class="cv-experience-description">
+                  <ul>
+                    <li>Développement d'une application de calcul d'empreinte carbone (Python, React Native)</li>
+                    <li>Reconnaissance caméra et vocale (APIs Google)</li>
+                    <li>Gestion complète du projet (coordination, planification, supervision)</li>
+                  </ul>
+                </div>
+                <div class="cv-experience-skills">
+                  <span class="cv-experience-skill">Python</span>
+                  <span class="cv-experience-skill">React Native</span>
+                  <span class="cv-experience-skill">APIs Google</span>
+                  <span class="cv-experience-skill">Gestion de Projet</span>
+                </div>
+              </div>
+              <div class="cv-experience-item" data-aos="fade-left" data-aos-delay="200">
+                <div class="cv-experience-header">
+                  <div class="cv-experience-title">
+                    <img src="images/logo_shl.png" alt="SHL" class="experience-logo">
+                    Chef de Projet IT
+                  </div>
                   <div class="cv-experience-company">SHL</div>
                   <div class="cv-experience-date">
                     <span class="cv-experience-year">📅 2022-2023</span>
@@ -307,9 +349,12 @@
                   <span class="cv-experience-skill">Management</span>
                 </div>
               </div>
-              <div class="cv-experience-item" data-aos="fade-left" data-aos-delay="200">
+              <div class="cv-experience-item" data-aos="fade-left" data-aos-delay="300">
                 <div class="cv-experience-header">
-                  <div class="cv-experience-title">Freelance Web</div>
+                  <div class="cv-experience-title">
+                    <img src="images/logo.png" alt="Freelance" class="experience-logo">
+                    Freelance Web
+                  </div>
                   <div class="cv-experience-company">Indépendant</div>
                   <div class="cv-experience-date">
                     <span class="cv-experience-year">📅 2021-2022</span>
@@ -330,6 +375,7 @@
                   <span class="cv-experience-skill">UI/UX</span>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -577,54 +623,54 @@
 
     <!-- Section SQL Interactive -->
     <section id="sql-console" class="interactive-section">
-        <h2>📊 Console SQL Interactive</h2>
-        <div class="section-description">
-            Explorez la base de données avec des requêtes SQL personnalisées
+      <div class="section-header">
+        <h2><i class="fas fa-chart-bar"></i> Console SQL Interactive</h2>
+        <p class="section-subtitle">Explorez la base de données avec des requêtes SQL personnalisées</p>
+      </div>
+      <div id="table-list" class="table-info">Chargement des tables...</div>
+      <div class="sql-container">
+        <div class="sql-input-wrapper">
+          <textarea id="sql-input" placeholder="SELECT * FROM Competences;" class="sql-textarea"></textarea>
+          <div class="sql-controls">
+            <button onclick="runSQL()" class="sql-button primary">
+              <i class="fas fa-play"></i> Exécuter
+            </button>
+            <button onclick="exportSqlResults('csv')" class="sql-button">
+              <i class="fas fa-file-csv"></i> CSV
+            </button>
+            <button onclick="exportSqlResults('json')" class="sql-button">
+              <i class="fas fa-file-code"></i> JSON
+            </button>
+          </div>
         </div>
-        <div id="table-list" class="table-info">Chargement des tables...</div>
-        <div class="sql-container">
-            <div class="sql-input-wrapper">
-                <textarea id="sql-input" placeholder="SELECT * FROM Competences;" class="sql-textarea"></textarea>
-                <div class="sql-controls">
-                    <button onclick="runSQL()" class="sql-button primary">
-                        <i class="fas fa-play"></i> Exécuter
-                    </button>
-                    <button onclick="exportSqlResults('csv')" class="sql-button">
-                        <i class="fas fa-file-csv"></i> CSV
-                    </button>
-                    <button onclick="exportSqlResults('json')" class="sql-button">
-                        <i class="fas fa-file-code"></i> JSON
-                    </button>
-                </div>
-            </div>
-            <div id="sql-output" class="sql-output"></div>
-        </div>
+        <div id="sql-output" class="sql-output"></div>
+      </div>
     </section>
 
     <!-- Section Chatbot -->
     <section id="chat" class="interactive-section">
-        <h2>💬 Assistant Personnel IA</h2>
-        <div class="section-description">
-            Posez vos questions sur mon profil et mes compétences
+      <div class="section-header">
+        <h2><i class="fas fa-comments"></i> Assistant Personnel IA</h2>
+        <p class="section-subtitle">Posez vos questions sur mon profil et mes compétences</p>
+      </div>
+      <div class="chat-toggle" id="chat-toggle">
+        <span>Ouvrir l'assistant</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="chat-container">
+        <div id="chat-messages" class="chat-messages"></div>
+        <div class="chat-input-container">
+          <input type="text" id="chat-input" placeholder="Posez vos questions sur mes compétences en IA, Data Science, ou mon parcours..." class="chat-input">
+          <button onclick="sendMessage()" class="chat-send-button">
+            <i class="fas fa-paper-plane"></i>
+          </button>
         </div>
-        <div class="chat-toggle" id="chat-toggle">
-            <span>Ouvrir l'assistant</span>
-            <i class="fas fa-chevron-down"></i>
-        </div>
-        <div class="chat-container">
-            <div id="chat-messages" class="chat-messages"></div>
-            <div class="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Posez vos questions sur mes compétences en IA, Data Science, ou mon parcours..." class="chat-input">
-                <button onclick="sendMessage()" class="chat-send-button">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-        </div>
+      </div>
     </section>
 
     <section id="demos">
       <div class="section-header">
-        <h2>🧪 Test My Project :</h2>
+        <h2><i class="fas fa-flask"></i> Test My Project</h2>
         <p class="section-subtitle">Découvrez mes projets interactifs en action</p>
       </div>
       
@@ -666,8 +712,6 @@
             <span class="demo-card-action">🔬 Tester</span>
           </div>
         </div>
-
-
 
         <!-- Carte GitHub Analytics Dashboard -->
         <div class="demo-card" onclick="toggleDataAnalytics()">
@@ -799,14 +843,6 @@
         </div>
       </div>
 
-
-
-
-
-
-
-
-
     <!-- Conteneur GitHub Analytics Dashboard -->
     <div id="data-analytics-container" class="demo-panel analytics-panel">
       <div class="panel-header">
@@ -821,12 +857,10 @@
       </div>
       
       <div class="panel-content">
-        <div class="demo-intro">
-          <div class="intro-text">
-            <p><strong>Objectif :</strong> Analyser mes projets GitHub et l'évolution de mes compétences</p>
-            <p><strong>Fonctionnalités :</strong> Métriques réelles, analyse des langages, popularité des projets</p>
-            <p><strong>Technologies :</strong> GitHub API, Chart.js, Analyse de données en temps réel</p>
-          </div>
+        <div class="github-username-selector" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; justify-content: center;">
+          <label for="github-username" class="github-username-label" style="font-size: 1rem; color: #333; font-weight: 500;">Nom d'utilisateur GitHub à analyser :</label>
+          <input type="text" id="github-username" placeholder="Entrez un username GitHub" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; min-width: 220px;">
+          <button onclick="changeGitHubUsername()" class="demo-btn primary" style="padding: 8px 18px; font-size: 1rem;">Analyser</button>
         </div>
 
         <div class="analytics-dashboard">
@@ -838,15 +872,6 @@
                 <option value="languages">Analyse des Langages</option>
                 <option value="projects">Top Projets</option>
                 <option value="activity">Activité Récente</option>
-              </select>
-            </div>
-            <div class="time-range-selector">
-              <label for="github-time-range">Période :</label>
-              <select id="github-time-range" onchange="changeGitHubTimeRange()">
-                <option value="all">Tous les temps</option>
-                <option value="1y">Cette année</option>
-                <option value="6m">6 derniers mois</option>
-                <option value="3m">3 derniers mois</option>
               </select>
             </div>
           </div>
@@ -881,6 +906,14 @@
               <div class="kpi-content">
                 <h4>Dernière Activité</h4>
                 <div class="kpi-value" id="last-activity-kpi">-</div>
+                <div class="kpi-trend positive">↗ En cours...</div>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon">📝</div>
+              <div class="kpi-content">
+                <h4>Commits</h4>
+                <div class="kpi-value" id="commits-kpi">0</div>
                 <div class="kpi-trend positive">↗ En cours...</div>
               </div>
             </div>
