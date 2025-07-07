@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://anas.itssghir.com/sitemap.xml
+
+# Optimisation pour les moteurs de recherche
+# Permettre l'indexation de toutes les pages
+# Bloquer les fichiers de développement si nécessaire
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /config/
+Disallow: /docker/
+
+# Temps de crawl recommandé
+Crawl-delay: 1 
