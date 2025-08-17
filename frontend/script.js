@@ -1,6 +1,6 @@
 // Configuration globale
 const config = {
-    githubUsername: 'ITSsghir',
+
     githubToken: '', // Laissez vide pour les repos publics
     apiBaseUrl: 'http://localhost:3000'
 };
@@ -32,9 +32,10 @@ class PreloaderManager {
 
     detectAndApplyTheme() {
         const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-        document.body.className = theme === 'dark' ? 'dark-theme' : 'light-theme';
+        // Valeurs possibles désormais: 'pastel' (défaut), 'light', 'dark'
+        const themeKey = savedTheme || 'pastel';
+        const themeClass = themeKey === 'dark' ? 'dark-theme' : themeKey === 'light' ? 'light-theme' : 'pastel-theme';
+        document.body.className = themeClass;
     }
 
     trackResourceLoading() {
@@ -831,87 +832,53 @@ function resetClassification() {
        messages.scrollTop = messages.scrollHeight;
    }
 
-   // Gestionnaire de thème
+   // Gestionnaire de thème multi-thèmes
    const themeManager = {
-       isDark: false,
-       
-       lightTheme: {
-           '--bg-primary': '#4b0082',
-           '--bg-secondary': '#2c003e',
-           '--text-primary': '#ffffff',
-           '--text-secondary': '#cccccc',
-           '--accent-primary': '#00ffcc',
-           '--accent-secondary': '#00ccaa',
-           '--neon-glow': 'rgba(0, 255, 204, 0.5)',
-           '--border-color': 'rgba(255, 255, 255, 0.1)',
-           '--gradient-start': '#00ffcc',
-           '--gradient-end': '#00ccaa',
-           '--navbar-bg': '#CCC5B9',
-           '--navbar-text': '#403D39'
-       },
-       
-       darkTheme: {
-           '--bg-primary': '#252422',
-           '--bg-secondary': '#403D39',
-           '--text-primary': '#FFFCF2',
-           '--text-secondary': '#CCC5B9',
-           '--accent-primary': '#CCC5B9',
-           '--accent-secondary': '#403D39',
-           '--neon-glow': 'rgba(204, 197, 185, 0.3)',
-           '--border-color': '#CCC5B9',
-           '--gradient-start': '#403D39',
-           '--gradient-end': '#252422',
-           '--shadow-color': 'rgba(37, 36, 34, 0.8)',
-           '--navbar-bg': '#252422',
-           '--navbar-text': '#FFFCF2'
+       themes: ['pastel', 'light', 'dark'],
+       current: 'pastel',
+
+       // Variables CSS optionnelles par thème (complémentaires aux classes CSS)
+       themeVars: {
+           pastel: {
+               '--neon-glow': 'rgba(166, 177, 225, 0.35)'
+           },
+           light: {
+               '--neon-glow': 'rgba(0, 255, 204, 0.5)'
+           },
+           dark: {
+               '--neon-glow': 'rgba(204, 197, 185, 0.3)'
+           }
        },
 
        toggle() {
-           this.isDark = !this.isDark;
+           const idx = this.themes.indexOf(this.current);
+           const next = (idx + 1) % this.themes.length;
+           this.current = this.themes[next];
            this.applyTheme();
-           
-           // Mettre à jour l'icône avec une animation
-           const themeButton = document.getElementById('theme-toggle');
-           if (themeButton) {
-               const icon = themeButton.querySelector('i');
-               icon.className = 'fas ' + (this.isDark ? 'fa-sun' : 'fa-moon');
-               icon.classList.add('rotating');
-               setTimeout(() => icon.classList.remove('rotating'), 500);
-               themeButton.classList.toggle('active', this.isDark);
-           }
-           
-           // Sauvegarder la préférence
-           localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+           this.updateToggleIcon();
+           localStorage.setItem('theme', this.current);
        },
-       
+
        applyTheme() {
-           const theme = this.isDark ? this.darkTheme : this.lightTheme;
-           
-           // Appliquer les variables CSS
-           Object.entries(theme).forEach(([property, value]) => {
+           // Appliquer classes de thème
+           document.body.classList.remove('light-theme', 'dark-theme', 'pastel-theme');
+           const cls = this.current === 'dark' ? 'dark-theme' : this.current === 'light' ? 'light-theme' : 'pastel-theme';
+           document.body.classList.add(cls);
+
+           // Appliquer variables CSS complémentaires
+           const vars = this.themeVars[this.current] || {};
+           Object.entries(vars).forEach(([property, value]) => {
                document.documentElement.style.setProperty(property, value);
            });
-           
-           // Mettre à jour les classes du body
-           document.body.classList.remove('light-theme', 'dark-theme');
-           document.body.classList.add(this.isDark ? 'dark-theme' : 'light-theme');
-           
-           // Forcer la mise à jour de la navbar
-           const navbar = document.querySelector('.navbar');
-           if (navbar) {
-               // Temporairement forcer le style pour éviter les transitions indésirables
-               if (this.isDark) {
-                   navbar.style.background = 'rgba(37, 36, 34, 0.95)';
-               } else {
-                   navbar.style.background = 'rgba(204, 197, 185, 0.95)';
-               }
-           }
-           
-           // CORRECTION STRICTE - Éliminer tout violet en mode sombre UNIQUEMENT
-           if (this.isDark) {
+
+           // Ajustements spécifiques précédemment forcés en dark
+           if (this.current === 'dark') {
                this.eliminatePurpleElements();
+           } else if (this.current === 'light') {
+               this.restorePurpleElements();
            } else {
-               this.restorePurpleElements(); // Restaurer violet en light mode
+               // Pastel: neutraliser les forces précédentes
+               this.restorePurpleElements();
            }
        },
        
@@ -1023,35 +990,48 @@ function resetClassification() {
         },
         
         init() {
-           // Vérifier la préférence sauvegardée
+           // Charger préférence sauvegardée; défaut = 'pastel'
            const savedTheme = localStorage.getItem('theme');
-           if (savedTheme) {
-               this.isDark = savedTheme === 'dark';
-           } else {
-               // Vérifier la préférence système
-               this.isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-           }
-           
-           // Appliquer le thème initial
+           this.current = this.themes.includes(savedTheme) ? savedTheme : 'pastel';
+
            this.applyTheme();
-           
+           this.updateToggleIcon();
+
            // Initialiser le bouton
            const themeButton = document.getElementById('theme-toggle');
-           if (themeButton) {
-               const icon = themeButton.querySelector('i');
-               icon.className = 'fas ' + (this.isDark ? 'fa-sun' : 'fa-moon');
-               themeButton.classList.toggle('active', this.isDark);
+           if (themeButton && !themeButton._themeBound) {
+               themeButton._themeBound = true;
                themeButton.addEventListener('click', () => this.toggle());
            }
-           
-           // Écouter les changements de préférence système
-           window.matchMedia('(prefers-color-scheme: dark)').addListener((e) => {
-               if (!localStorage.getItem('theme')) {
-                   this.isDark = e.matches;
-                   this.applyTheme();
-               }
-           });
        }
+   };
+
+   // Icône selon thème courant
+   themeManager.updateToggleIcon = function() {
+       const themeButton = document.getElementById('theme-toggle');
+       if (!themeButton) return;
+       const icon = themeButton.querySelector('i');
+       
+       // Icône spécifique selon le thème
+       let iconClass;
+       switch(this.current) {
+           case 'pastel':
+               iconClass = 'fas fa-sun'; // soleil pour thème jour/doux
+               break;
+           case 'light':
+               iconClass = 'fas fa-palette'; // palette pour thème violet
+               break;
+           case 'dark':
+               iconClass = 'fas fa-moon'; // lune pour thème sombre
+               break;
+           default:
+               iconClass = 'fas fa-sun';
+       }
+       
+       icon.className = iconClass;
+       icon.classList.add('rotating');
+       setTimeout(() => icon.classList.remove('rotating'), 500);
+       themeButton.classList.toggle('active', this.current === 'dark');
    };
 
    // Initialiser le gestionnaire de thème au chargement
@@ -1079,12 +1059,7 @@ function resetClassification() {
            });
        }
        
-       // Initialize theme
-       themeManager.init();
-       const themeToggle = document.getElementById('theme-toggle');
-       if (themeToggle) {
-           themeToggle.addEventListener('click', () => themeManager.toggle());
-       }
+       // Initialize theme already handled above
    });
 
    // NAVBAR RESPONSIVE DYNAMIQUE - GESTION COMPLETE
@@ -1175,12 +1150,13 @@ function resetClassification() {
            });
            
            // Mobile theme controls
-           if (this.mobileThemeToggle) {
-               this.mobileThemeToggle.addEventListener('click', () => {
-                   themeManager.toggle();
-                   this.syncMobileControls();
-               });
-           }
+            if (this.mobileThemeToggle && !this.mobileThemeToggle._themeBound) {
+                this.mobileThemeToggle._themeBound = true;
+                this.mobileThemeToggle.addEventListener('click', () => {
+                    themeManager.toggle();
+                    this.syncMobileControls();
+                });
+            }
            
            if (this.mobileSoundToggle) {
                this.mobileSoundToggle.addEventListener('click', () => {
@@ -1344,10 +1320,19 @@ function resetClassification() {
            // Sync theme button state
            if (this.mobileThemeToggle) {
                const icon = this.mobileThemeToggle.querySelector('i');
-               if (themeManager.isDark) {
-                   icon.className = 'fas fa-sun';
-               } else {
-                   icon.className = 'fas fa-moon';
+               // Même logique que le bouton desktop
+               switch(themeManager.current) {
+                   case 'pastel':
+                       icon.className = 'fas fa-sun'; // soleil pour thème jour/doux
+                       break;
+                   case 'light':
+                       icon.className = 'fas fa-palette'; // palette pour thème violet
+                       break;
+                   case 'dark':
+                       icon.className = 'fas fa-moon'; // lune pour thème sombre
+                       break;
+                   default:
+                       icon.className = 'fas fa-sun';
                }
            }
            
@@ -1613,482 +1598,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-function toggleDataAnalytics() {
- const dataAnalytics = document.getElementById('data-analytics-container');
- const classification = document.getElementById('classification-container');
- const qlearning = document.getElementById('qlearning-container');
 
- const isVisible = dataAnalytics.style.display === 'block';
 
- // Masquer tous les autres
- classification.style.display = 'none';
- qlearning.style.display = 'none';
 
- // Afficher GitHub analytics seulement si il était caché
- if (!isVisible) {
-   dataAnalytics.style.display = 'block';
-   initializeGitHubAnalytics();
- }
-}
 
-function closeDataAnalytics() {
- const dataAnalytics = document.getElementById('data-analytics-container');
- dataAnalytics.style.display = 'none';
- 
- // Réinitialiser à la source par défaut
- document.getElementById('github-data-source').value = 'overview';
- document.getElementById('github-time-range').value = 'all';
-}
 
-// Données GitHub réelles pour le dashboard
-let githubData = {
-  repos: [],
-  user: null,
-  analytics: {
-    totalRepos: 0,
-    totalStars: 0,
-    languages: {},
-    topProjects: [],
-    lastActivity: null
-  }
-};
 
-let githubUsername = localStorage.getItem('github-username') || 'itssghir';
 
-document.getElementById('github-username').value = githubUsername;
 
-async function changeGitHubUsername() {
-  const input = document.getElementById('github-username');
-  const username = input.value.trim();
-  if (!username) return;
-  githubUsername = username;
-  localStorage.setItem('github-username', username);
-  await initializeGitHubAnalytics();
-}
 
-// Adapter fetchGitHubData pour prendre le username en paramètre
-async function fetchGitHubData(username = githubUsername) {
-  try {
-    const [reposResponse, userResponse] = await Promise.all([
-      fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`),
-      fetch(`https://api.github.com/users/${username}`)
-    ]);
 
-    if (!reposResponse.ok || !userResponse.ok) {
-      throw new Error('Erreur lors de la récupération des données GitHub');
-    }
 
-    const repos = await reposResponse.json();
-    const user = await userResponse.json();
 
-    // Filtrer les repos (exclure les forks et archives)
-    const filteredRepos = repos.filter(repo => !repo.fork && !repo.archived);
 
-    // Récupérer le nombre total de commits (API limitée, on additionne les commits de chaque repo)
-    let totalCommits = 0;
-    for (const repo of filteredRepos) {
-      try {
-        const commitsResp = await fetch(`https://api.github.com/repos/${username}/${repo.name}/commits?per_page=1&sha=${repo.default_branch}`);
-        if (commitsResp.ok) {
-          const link = commitsResp.headers.get('Link');
-          if (link && link.includes('rel="last"')) {
-            const match = link.match(/&page=(\d+)>; rel="last"/);
-            if (match) {
-              totalCommits += parseInt(match[1], 10);
-            } else {
-              totalCommits += 1;
-            }
-          } else {
-            const commits = await commitsResp.json();
-            totalCommits += commits.length;
-          }
-        }
-      } catch (e) {}
-    }
 
-    const analytics = analyzeGitHubData(filteredRepos);
-    analytics.totalCommits = totalCommits;
 
-    return {
-      repos: filteredRepos,
-      user: user,
-      analytics: analytics
-    };
-  } catch (error) {
-    console.error('Erreur GitHub:', error);
-    throw error;
-  }
-}
 
-// Adapter initializeGitHubAnalytics pour utiliser le username courant
-async function initializeGitHubAnalytics() {
-  try {
-    document.getElementById('github-analytics-status').innerHTML = '<span style="color: #ffd700;">🔄 Chargement des données GitHub...</span>';
-    const data = await fetchGitHubData(githubUsername);
-    githubData = data;
-    updateGitHubKPIs();
-    updateGitHubCharts();
-    updateGitHubInsights();
-    document.getElementById('github-analytics-status').innerHTML = '<span style="color: #00ffcc;">✓ Données GitHub chargées avec succès</span><br>' + '<span style="color: #ffffff;">📊 ' + githubData.analytics.totalRepos + ' repositories analysés</span>';
-  } catch (error) {
-    document.getElementById('github-analytics-status').innerHTML = '<span style="color: #ff6b6b;">❌ Erreur lors du chargement des données GitHub</span><br><span style="color: #ffffff;">Vérifiez le username ou la connexion internet</span>';
-  }
-}
 
-// Initialiser à l'ouverture
-initializeGitHubAnalytics();
 
-function analyzeGitHubData(repos) {
-  const languages = {};
-  let totalStars = 0;
-  let totalForks = 0;
 
-  // Analyser chaque repository
-  repos.forEach(repo => {
-    // Compter les langages
-    if (repo.language) {
-      languages[repo.language] = (languages[repo.language] || 0) + 1;
-    }
 
-    // Compter les étoiles et forks
-    totalStars += repo.stargazers_count;
-    totalForks += repo.forks_count;
-  });
 
-  // Créer le top des projets par popularité
-  const topProjects = repos
-    .sort((a, b) => (b.stargazers_count + b.forks_count) - (a.stargazers_count + a.forks_count))
-    .slice(0, 5)
-    .map(repo => ({
-      name: repo.name,
-      stars: repo.stargazers_count,
-      forks: repo.forks_count,
-      language: repo.language,
-      description: repo.description
-    }));
 
-  // Trouver la dernière activité
-  const lastActivity = repos.length > 0 
-    ? new Date(Math.max(...repos.map(r => new Date(r.updated_at))))
-    : null;
 
-  return {
-    totalRepos: repos.length,
-    totalStars: totalStars,
-    totalForks: totalForks,
-    languages: languages,
-    topProjects: topProjects,
-    lastActivity: lastActivity
-  };
-}
 
-function updateGitHubKPIs() {
-  const analytics = githubData.analytics;
-  
-  // Mettre à jour les KPIs
-  document.getElementById('total-repos-kpi').textContent = analytics.totalRepos;
-  document.getElementById('total-stars-kpi').textContent = analytics.totalStars;
-  document.getElementById('languages-count-kpi').textContent = Object.keys(analytics.languages).length;
-  document.getElementById('commits-kpi').textContent = analytics.totalCommits || 0;
-  
-  // Formater la dernière activité
-  if (analytics.lastActivity) {
-    const daysAgo = Math.floor((new Date() - analytics.lastActivity) / (1000 * 60 * 60 * 24));
-    let activityText = '';
-    if (daysAgo === 0) activityText = 'Aujourd\'hui';
-    else if (daysAgo === 1) activityText = 'Hier';
-    else if (daysAgo < 7) activityText = `${daysAgo}j`;
-    else if (daysAgo < 30) activityText = `${Math.floor(daysAgo/7)}sem`;
-    else activityText = `${Math.floor(daysAgo/30)}mois`;
-    
-    document.getElementById('last-activity-kpi').textContent = activityText;
-    } else {
-    document.getElementById('last-activity-kpi').textContent = 'N/A';
-  }
-  
-  // Mettre à jour les tendances
-  const trends = document.querySelectorAll('.kpi-trend');
-  trends.forEach(trend => {
-    trend.textContent = '↗ Données réelles';
-    trend.className = 'kpi-trend positive';
-  });
-}
 
-function updateGitHubCharts() {
-  const analytics = githubData.analytics;
-  
-  // Graphique des langages (camembert)
-  updateLanguagesChart(analytics.languages);
-  
-  // Graphique des projets (barres)
-  updateProjectsChart(analytics.topProjects);
-}
-
-function updateLanguagesChart(languages) {
-  const ctx = document.getElementById('languagesCanvas');
-  if (!ctx) return;
-  
-  const labels = Object.keys(languages);
-  const data = Object.values(languages);
-  const colors = [
-    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
-    '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
-  ];
-  
-  // Créer le graphique camembert
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: labels,
-      datasets: [{
-        data: data,
-        backgroundColor: colors.slice(0, labels.length),
-        borderWidth: 2,
-        borderColor: '#1a1a1a'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            color: '#000000',
-            font: {
-              size: 12
-            }
-          }
-        }
-      }
-    }
-  });
-}
-
-function updateProjectsChart(projects) {
-  const ctx = document.getElementById('projectsCanvas');
-  if (!ctx) return;
-  
-  const labels = projects.map(p => p.name);
-  const starsData = projects.map(p => p.stars);
-  const forksData = projects.map(p => p.forks);
-  
-  // Créer le graphique en barres
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Étoiles',
-        data: starsData,
-        backgroundColor: '#FFD700',
-        borderColor: '#FFA500',
-        borderWidth: 1
-      }, {
-        label: 'Forks',
-        data: forksData,
-        backgroundColor: '#36A2EB',
-        borderColor: '#1E90FF',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            color: '#ffffff'
-          },
-          grid: {
-            color: '#333333'
-          }
-        },
-        x: {
-          ticks: {
-            color: '#ffffff',
-            maxRotation: 45
-          },
-          grid: {
-            color: '#333333'
-          }
-        }
-      },
-      plugins: {
-        legend: {
-          labels: {
-            color: '#ffffff'
-          }
-        }
-      }
-    }
-  });
-}
-
-function updateGitHubInsights() {
-  const analytics = githubData.analytics;
-  const insightsContainer = document.getElementById('github-insights-content');
-  
-  // Générer des insights basés sur les données
-  const insights = [];
-  
-  // Insight sur le langage principal
-  const topLanguage = Object.entries(analytics.languages)
-    .sort(([,a], [,b]) => b - a)[0];
-  if (topLanguage) {
-    insights.push({
-      icon: 'fas fa-code',
-      text: `Mon langage principal est ${topLanguage[0]} avec ${topLanguage[1]} projets`
-    });
-  }
-  
-  // Insight sur la popularité
-  if (analytics.totalStars > 0) {
-    insights.push({
-      icon: 'fas fa-star',
-      text: `Mes projets ont reçu ${analytics.totalStars} étoiles au total`
-    });
-  }
-  
-  // Insight sur l'activité
-  if (analytics.lastActivity) {
-    const daysAgo = Math.floor((new Date() - analytics.lastActivity) / (1000 * 60 * 60 * 24));
-    if (daysAgo <= 7) {
-      insights.push({
-        icon: 'fas fa-fire',
-        text: 'Très actif récemment ! Mon dernier projet date de moins d\'une semaine'
-      });
-    } else {
-      insights.push({
-        icon: 'fas fa-clock',
-        text: `Dernière activité : ${daysAgo} jours`
-      });
-    }
-  }
-  
-  // Insight sur la diversité
-  const languageCount = Object.keys(analytics.languages).length;
-  if (languageCount >= 5) {
-    insights.push({
-      icon: 'fas fa-palette',
-      text: `Polyvalent ! Je maîtrise ${languageCount} langages différents`
-    });
-  }
-  
-  // Mettre à jour l'affichage
-  insightsContainer.innerHTML = insights.map(insight => `
-    <div class="insight-item">
-      <i class="${insight.icon}"></i>
-      <span>${insight.text}</span>
-      </div>
-    `).join('');
-}
-
-function changeGitHubDataSource() {
-  const dataSource = document.getElementById('github-data-source').value;
-  
-  // Animation de changement
-  const dashboard = document.querySelector('.analytics-dashboard');
-  dashboard.style.opacity = '0.7';
-  dashboard.style.transform = 'scale(0.98)';
-  
-    setTimeout(() => {
-    dashboard.style.opacity = '1';
-    dashboard.style.transform = 'scale(1)';
-  }, 300);
-  
-  // Mettre à jour le statut
-  const sourceNames = {
-    'overview': 'Vue d\'Ensemble',
-    'languages': 'Analyse des Langages',
-    'projects': 'Top Projets',
-    'activity': 'Activité Récente'
-  };
-  
-  document.getElementById('github-analytics-status').innerHTML = 
-    `<span style="color: #00ffcc;">✓ Vue mise à jour : ${sourceNames[dataSource]}</span>`;
-}
-
-function changeGitHubTimeRange() {
-  const timeRange = document.getElementById('github-time-range').value;
-  const timeRangeNames = {
-    'all': 'Tous les temps',
-    '1y': 'Cette année',
-    '6m': '6 derniers mois',
-    '3m': '3 derniers mois'
-  };
-  
-  // Simulation de rechargement des données
-  setTimeout(() => {
-    document.getElementById('github-analytics-status').innerHTML = 
-      `<span style="color: #ffd700;">📅 Période mise à jour : ${timeRangeNames[timeRange]}</span><br>` +
-      `<span style="color: #00ffcc;">🔄 Analyse des projets récents</span>`;
-  }, 500);
-}
-
-async function refreshGitHubAnalytics() {
-  try {
-    document.getElementById('github-analytics-status').innerHTML = 
-      '<span style="color: #ffd700;">🔄 Actualisation des données GitHub...</span>';
-    
-    // Récupérer les nouvelles données
-    const data = await fetchGitHubData();
-    githubData = data;
-    
-    // Mettre à jour l'affichage
-    updateGitHubKPIs();
-    updateGitHubCharts();
-    updateGitHubInsights();
-    
-    document.getElementById('github-analytics-status').innerHTML = 
-      '<span style="color: #00ffcc;">✓ Données GitHub actualisées</span><br>' +
-      '<span style="color: #ffffff;">📊 ' + githubData.analytics.totalRepos + ' repositories analysés</span>';
-    
-  } catch (error) {
-    console.error('Erreur lors de l\'actualisation:', error);
-    document.getElementById('github-analytics-status').innerHTML = 
-      '<span style="color: #ff6b6b;">❌ Erreur lors de l\'actualisation</span>';
-  }
-}
-
-function exportGitHubReport() {
-  const analytics = githubData.analytics;
-  
-  // Créer le contenu du rapport
-  let report = `Rapport GitHub Analytics - Anas Sghir\n`;
-  report += `=====================================\n\n`;
-  report += `📊 Vue d'ensemble:\n`;
-  report += `- Total repositories: ${analytics.totalRepos}\n`;
-  report += `- Total étoiles: ${analytics.totalStars}\n`;
-  report += `- Total forks: ${analytics.totalForks}\n`;
-  report += `- Langages utilisés: ${Object.keys(analytics.languages).length}\n\n`;
-  
-  report += `🔧 Répartition des langages:\n`;
-  Object.entries(analytics.languages).forEach(([lang, count]) => {
-    report += `- ${lang}: ${count} projets\n`;
-  });
-  report += `\n`;
-  
-  report += `⭐ Top 5 projets:\n`;
-  analytics.topProjects.forEach((project, index) => {
-    report += `${index + 1}. ${project.name} (${project.stars}⭐, ${project.forks}🍴)\n`;
-  });
-  
-  // Créer et télécharger le fichier
-  const blob = new Blob([report], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'github-analytics-report.txt';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  
-  document.getElementById('github-analytics-status').innerHTML = 
-    '<span style="color: #00ffcc;">✓ Rapport GitHub exporté avec succès</span>';
-}
 
 // Fonction pour toggle les sections CV
 function toggleCvSection(header) {
@@ -4288,6 +3822,158 @@ if (langSwitch) {
   });
 }
 
+// ===============================================
+// 🎯 ANIMATION DES BARRES DE PROGRESSION DES COMPÉTENCES
+// ===============================================
+
+function initializeSkillsAnimation() {
+  const observerOptions = {
+    threshold: 0.3,
+    rootMargin: '0px 0px -100px 0px'
+  };
+
+  const skillsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const progressBars = entry.target.querySelectorAll('.progress-bar');
+        progressBars.forEach(bar => {
+          const width = bar.getAttribute('data-width');
+          if (width) {
+            setTimeout(() => {
+              bar.style.width = width + '%';
+            }, Math.random() * 500); // Animation décalée pour effet cascade
+          }
+        });
+        
+        // Animer les skill items avec délai
+        const skillItems = entry.target.querySelectorAll('.skill-item');
+        skillItems.forEach((item, index) => {
+          item.style.opacity = '0';
+          item.style.transform = 'translateY(30px)';
+          setTimeout(() => {
+            item.style.transition = 'all 0.6s ease';
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+          }, index * 100);
+        });
+        
+        // Animer les tags de compétences
+        const skillTags = entry.target.querySelectorAll('.skill-tag');
+        skillTags.forEach((tag, index) => {
+          tag.style.opacity = '0';
+          tag.style.transform = 'scale(0.8)';
+          setTimeout(() => {
+            tag.style.transition = 'all 0.4s ease';
+            tag.style.opacity = '1';
+            tag.style.transform = 'scale(1)';
+          }, index * 50);
+        });
+        
+        skillsObserver.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  // Observer toutes les catégories de compétences
+  const skillCategories = document.querySelectorAll('.skills-category-group');
+  skillCategories.forEach(category => {
+    skillsObserver.observe(category);
+  });
+}
+
+// Fonction pour réinitialiser les animations lors du changement de thème
+function resetSkillsAnimations() {
+  const progressBars = document.querySelectorAll('.progress-bar');
+  progressBars.forEach(bar => {
+    bar.style.width = '0%';
+  });
+  
+  const skillItems = document.querySelectorAll('.skill-item');
+  skillItems.forEach(item => {
+    item.style.opacity = '';
+    item.style.transform = '';
+    item.style.transition = '';
+  });
+  
+  const skillTags = document.querySelectorAll('.skill-tag');
+  skillTags.forEach(tag => {
+    tag.style.opacity = '';
+    tag.style.transform = '';
+    tag.style.transition = '';
+  });
+  
+  // Réinitialiser l'observer
+  setTimeout(() => {
+    initializeSkillsAnimation();
+  }, 100);
+}
+
+// Initialiser les animations au chargement
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    initializeSkillsAnimation();
+  }, 1000); // Délai pour laisser le preloader se terminer
+});
+
+// Ajouter des effets de hover avancés pour les compétences
+function enhanceSkillsInteraction() {
+  // Effet de progression au hover
+  const skillItems = document.querySelectorAll('.skill-item');
+  skillItems.forEach(item => {
+    item.addEventListener('mouseenter', () => {
+      const progressBar = item.querySelector('.progress-bar');
+      if (progressBar) {
+        progressBar.style.transform = 'scaleY(1.2)';
+        progressBar.style.boxShadow = '0 0 20px rgba(0, 255, 204, 0.6)';
+      }
+    });
+    
+    item.addEventListener('mouseleave', () => {
+      const progressBar = item.querySelector('.progress-bar');
+      if (progressBar) {
+        progressBar.style.transform = 'scaleY(1)';
+        progressBar.style.boxShadow = 'none';
+      }
+    });
+  });
+  
+  // Effet de pulsation pour les tags de niveau expert
+  const expertTags = document.querySelectorAll('.skill-tag.expert');
+  expertTags.forEach(tag => {
+    tag.addEventListener('mouseenter', () => {
+      tag.style.animation = 'pulse 0.6s ease-in-out';
+    });
+    
+    tag.addEventListener('mouseleave', () => {
+      tag.style.animation = '';
+    });
+  });
+}
+
+// Initialiser les interactions avancées
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    enhanceSkillsInteraction();
+  }, 1500);
+});
+
+// Animation CSS pour le pulse
+const pulseKeyframes = `
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+`;
+
+// Ajouter les keyframes au document
+if (!document.querySelector('#pulse-animation')) {
+  const style = document.createElement('style');
+  style.id = 'pulse-animation';
+  style.textContent = pulseKeyframes;
+  document.head.appendChild(style);
+}
+
 // Applique la langue au chargement
 window.addEventListener('DOMContentLoaded', () => {
   const lang = localStorage.getItem('lang') || 'fr';
@@ -4301,6 +3987,8 @@ function updateAvatarByTheme() {
   if (!avatar) return;
   if (document.body.classList.contains('dark-theme')) {
     avatar.src = 'images/Photo_dark.png';
+  } else if (document.body.classList.contains('pastel-theme')) {
+    avatar.src = 'images/Photo.jpg';
   } else {
     avatar.src = 'images/Photo_light.png';
   }
@@ -4310,9 +3998,10 @@ function updateAvatarByTheme() {
 window.addEventListener('DOMContentLoaded', updateAvatarByTheme);
 // Applique lors du switch de thème
 const themeToggle = document.getElementById('theme-toggle');
-if (themeToggle) {
+if (themeToggle && !themeToggle._avatarBound) {
+  themeToggle._avatarBound = true;
   themeToggle.addEventListener('click', () => {
-    setTimeout(updateAvatarByTheme, 100); // Laisse le temps au body de changer de classe
+    setTimeout(updateAvatarByTheme, 100);
   });
 }
 // === Fin avatar dynamique ===

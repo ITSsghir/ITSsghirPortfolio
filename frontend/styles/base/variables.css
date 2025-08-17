@@ -81,3 +81,24 @@
     --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.15);
     --shadow-heavy: 0 8px 30px rgba(0, 0, 0, 0.2);
 } 
+
+/* Variables pour le thème pastel professionnel (par défaut) */
+.pastel-theme {
+    /* Palette imposée */
+    /* Bleu acier pâle */
+    /* Gris ardoise clair */
+    /* Beige taupe */
+    /* Vert sauge doux */
+
+    --bg-primary: #D8CFC4; /* Beige taupe */
+    --bg-secondary: #C7CCD4; /* Gris ardoise clair */
+    --text-primary: #2b2b2b; /* lisibilité */
+    --text-secondary: #5e5e5e;
+    --accent-primary: #A3B9C9; /* Bleu acier pâle */
+    --accent-secondary: #B8C1A3; /* Vert sauge doux */
+    --border-color: #C7CCD4; /* Gris ardoise clair */
+
+    --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.06);
+    --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --shadow-heavy: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
